@@ -18,7 +18,7 @@ function findSeatPrice(validators, maxNumberOfSeats, minimumStakeRatio, protocol
         return findSeatPriceForProtocolBefore49(validators, maxNumberOfSeats);
     }
     if (!minimumStakeRatio) {
-        const deprecate = depd_1.default('findSeatPrice(validators, maxNumberOfSeats)');
+        const deprecate = (0, depd_1.default)('findSeatPrice(validators, maxNumberOfSeats)');
         deprecate('`use `findSeatPrice(validators, maxNumberOfSeats, minimumStakeRatio)` instead');
         minimumStakeRatio = [1, 6250]; // harcoded minimumStakeRation from 12/7/21
     }

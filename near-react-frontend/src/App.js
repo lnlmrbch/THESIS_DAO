@@ -1,41 +1,70 @@
-import React, { useEffect, useState } from 'react';
-import { initNear } from './near';
+import React, { useEffect, useState } from "react";
+import { initWalletSelector } from "./wallet";
+import WalletSelectorModal from "./ui/WalletSelectorModal";
+import TokenInfo from "./components/TokenInfo";
+import TokenTransferForm from "./components/TransferForm";
 
 function App() {
-  const [wallet, setWallet] = useState(null);
+  const [selector, setSelector] = useState(null);
+  const [modal, setModal] = useState(null);
   const [accountId, setAccountId] = useState(null);
 
-  useEffect(() => {
-    async function init() {
-      const { wallet } = await initNear();
-      setWallet(wallet);
+  const contractId = "lionelsmartcontract.testnet";
 
-      if (wallet.isSignedIn()) {
-        setAccountId(wallet.getAccountId());
+  useEffect(() => {
+    (async () => {
+      const { selector, modal } = await initWalletSelector();
+      setSelector(selector);
+      setModal(modal);
+
+      try {
+        const wallet = await selector.wallet();
+
+        if (!wallet) {
+          console.warn("No wallet selected");
+          modal.show();
+          return;
+        }
+
+        const accounts = await wallet.getAccounts();
+        if (accounts.length > 0) {
+          setAccountId(accounts[0].accountId);
+        }
+      } catch (err) {
+        console.error("Wallet init error:", err);
+        modal.show();
       }
-    }
-    init();
+    })();
   }, []);
 
-  const signIn = () => {
-    wallet.requestSignIn();
-  };
-
-  const signOut = () => {
-    wallet.signOut();
+  const signOut = async () => {
+    const wallet = await selector.wallet();
+    await wallet.signOut();
     window.location.reload();
   };
 
   return (
-    <div style={{ padding: 24 }}>
-      <h1>NEAR Wallet Login</h1>
-      {wallet && !wallet.isSignedIn() && (
-        <button onClick={signIn}>Connect Wallet</button>
-      )}
-      {wallet && wallet.isSignedIn() && (
+    <div style={{ padding: 32 }}>
+      <h1>🚀 NEAR Wallet Selector UI</h1>
+
+      {!accountId ? (
+        modal && <WalletSelectorModal modal={modal} />
+      ) : (
         <>
-          <p>✅ Connected as: <strong>{accountId}</strong></p>
-          <button onClick={signOut}>Sign Out</button>
+          <p>✅ Verbunden mit: <strong>{accountId}</strong></p>
+          <button onClick={signOut}>Logout</button>
+
+          <TokenInfo
+            selector={selector}
+            accountId={accountId}
+            contractId={contractId}
+          />
+          
+          <TokenTransferForm
+            selector={selector}
+            accountId={accountId}
+            contractId={contractId}
+          />
         </>
       )}
     </div>
