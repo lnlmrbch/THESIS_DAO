@@ -15,7 +15,7 @@ export const initWalletSelector = async () => {
   });
 
   const modal = setupModal(selector, {
-    contractId: "lionelthesis.testnet", // 👉 deinen echten Contract eintragen
+    contractId: "dao.lioneluser.testnet", // 👉 deinen echten Contract eintragen
     theme: "dark", // oder "light"
   });
 

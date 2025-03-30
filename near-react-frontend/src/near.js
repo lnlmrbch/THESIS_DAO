@@ -6,7 +6,7 @@ const nearConfig = {
   walletUrl: 'https://wallet.testnet.near.org',
   helperUrl: 'https://helper.testnet.near.org',
   explorerUrl: 'https://explorer.testnet.near.org',
-  contractName: 'lionelthesis.testnet' // ⬅️ ändere diesen Wert!
+  contractName: 'dao.lioneluser.testnet' // ⬅️ ändere diesen Wert!
 };
 
 export async function initNear() {

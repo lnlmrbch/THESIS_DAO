@@ -5,13 +5,15 @@ import TokenInfo from "./components/TokenInfo";
 import TokenTransferForm from "./components/TransferForm";
 import ProposalList from "./components/ProposalList";
 import CreateProposalForm from "./components/CreateProposalForm";
+import Navbar from "./components/Navbar";
+import AllBalances from "./components/AllBalances";
 
 function App() {
   const [selector, setSelector] = useState(null);
   const [modal, setModal] = useState(null);
   const [accountId, setAccountId] = useState(null);
 
-  const contractId = "lionelsmartcontract.testnet";
+  const contractId = "dao.lioneluser.testnet";
 
   useEffect(() => {
     (async () => {
@@ -21,17 +23,12 @@ function App() {
 
       try {
         const wallet = await selector.wallet();
-
         if (!wallet) {
-          console.warn("No wallet selected");
           modal.show();
           return;
         }
-
         const accounts = await wallet.getAccounts();
-        if (accounts.length > 0) {
-          setAccountId(accounts[0].accountId);
-        }
+        if (accounts.length > 0) setAccountId(accounts[0].accountId);
       } catch (err) {
         console.error("Wallet init error:", err);
         modal.show();
@@ -46,32 +43,31 @@ function App() {
   };
 
   return (
-    <div style={{ padding: 32 }}>
-      <h1>🚀 NEAR Wallet Selector UI</h1>
+    <div className="min-h-screen bg-darkbg text-gray-100 font-sans">
+      <div className="max-w-6xl mx-auto px-4 py-10 space-y-10">
+        {!accountId ? (
+          modal && <WalletSelectorModal modal={modal} />
+        ) : (
+          <>
+            <div className="flex justify-between items-center bg-cardbg p-6 rounded-lg shadow-md border border-gray-700">
+              <p>✅ Verbunden mit: <strong>{accountId}</strong></p>
+              <button
+                onClick={signOut}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition"
+              >
+                Logout
+              </button>
+            </div>
 
-      {!accountId ? (
-        modal && <WalletSelectorModal modal={modal} />
-      ) : (
-        <>
-          <p>✅ Verbunden mit: <strong>{accountId}</strong></p>
-          <button onClick={signOut}>Logout</button>
-
-          <TokenInfo
-            selector={selector}
-            accountId={accountId}
-            contractId={contractId}
-          />
-
-          <ProposalList selector={selector} contractId={contractId} accountId={accountId} />
-          <CreateProposalForm selector={selector} contractId={contractId} />
-          
-          <TokenTransferForm
-            selector={selector}
-            accountId={accountId}
-            contractId={contractId}
-          />
-        </>
-      )}
+            <Navbar accountId={accountId} />
+            <TokenInfo selector={selector} accountId={accountId} contractId={contractId} />
+            <TokenTransferForm selector={selector} accountId={accountId} contractId={contractId} />
+            <CreateProposalForm selector={selector} contractId={contractId} />
+            <ProposalList selector={selector} contractId={contractId} accountId={accountId} />
+            <AllBalances selector={selector} contractId={contractId} />
+          </>
+        )}
+      </div>
     </div>
   );
 }
