@@ -5,6 +5,7 @@ import { setupMeteorWallet } from "@near-wallet-selector/meteor-wallet";
 
 import "@near-wallet-selector/modal-ui/styles.css";
 
+// Initialisiert den Wallet Selector und das Modal
 export const initWalletSelector = async () => {
   const selector = await setupWalletSelector({
     network: "testnet",
@@ -20,4 +21,11 @@ export const initWalletSelector = async () => {
   });
 
   return { selector, modal };
+};
+
+// Funktion zum Ausloggen des Benutzers
+export const logout = async (selector) => {
+  const wallet = await selector.wallet();
+  await wallet.signOut();
+  window.location.reload();  // Seite neu laden, um den Zustand zu aktualisieren
 };

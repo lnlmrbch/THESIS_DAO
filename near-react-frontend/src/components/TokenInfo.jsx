@@ -19,37 +19,29 @@ const TokenInfo = ({ accountId, contractId }) => {
             args_base64: Buffer.from(JSON.stringify(args)).toString("base64"),
             finality: "final",
           });
-
           const raw = res?.result;
-          if (!raw) {
-            console.error(`Empty result for method ${method}`);
-            return null;
-          }
-
           const decoded = new TextDecoder().decode(new Uint8Array(raw));
           return JSON.parse(decoded);
         } catch (err) {
-          console.error(`Error fetching ${method}:`, err);
+          console.error(`Fehler bei ${method}:`, err);
           return null;
         }
       };
 
-      try {
-        const bal = await fetchView("ft_balance_of", { account_id: accountId });
-        const supply = await fetchView("ft_total_supply");
-        const meta = await fetchView("ft_metadata");
+      if (accountId && contractId) {
+        const [bal, supply, meta] = await Promise.all([
+          fetchView("ft_balance_of", { account_id: accountId }),
+          fetchView("ft_total_supply"),
+          fetchView("ft_metadata"),
+        ]);
 
         setBalance(bal);
         setTotalSupply(supply);
         setMetadata(meta);
-      } catch (err) {
-        console.error("Smart contract view call failed:", err);
       }
     };
 
-    if (accountId && contractId) {
-      fetchData();
-    }
+    fetchData();
   }, [accountId, contractId]);
 
   const formatAmount = (amount) => {
@@ -58,42 +50,44 @@ const TokenInfo = ({ accountId, contractId }) => {
   };
 
   return (
-    <div className="max-w-xl mx-auto mt-8 p-8 bg-cardbg border border-gray-700 rounded-xl shadow-xl text-white">
-      <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
-        <span className="text-accent">📊</span> Token Info
-      </h2>
+    <section className="max-w-6xl mx-auto px-6 mt-12">
+      <div className="bg-white text-black rounded-xl shadow-md p-8 space-y-6">
+        <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+          <span className="text-primary text-3xl">💰</span> Token Details
+        </h2>
 
-      {metadata ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-300">
-          <div>
-            <p className="text-gray-400">Name</p>
-            <p className="font-medium text-white">{metadata.name}</p>
+        {metadata ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-sm">
+            <div>
+              <p className="text-gray-500">Name</p>
+              <p className="font-medium">{metadata.name}</p>
+            </div>
+            <div>
+              <p className="text-gray-500">Symbol</p>
+              <p className="font-medium">{metadata.symbol}</p>
+            </div>
+            <div>
+              <p className="text-gray-500">Decimals</p>
+              <p className="font-medium">{metadata.decimals}</p>
+            </div>
+            <div>
+              <p className="text-gray-500">Total Supply</p>
+              <p className="font-semibold text-gray-800">
+                {formatAmount(totalSupply)} {metadata.symbol}
+              </p>
+            </div>
+            <div className="sm:col-span-2 md:col-span-3">
+              <p className="text-gray-500">Your Balance</p>
+              <p className="text-xl font-bold text-primary">
+                {formatAmount(balance)} {metadata.symbol}
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-gray-400">Symbol</p>
-            <p className="font-medium text-white">{metadata.symbol}</p>
-          </div>
-          <div>
-            <p className="text-gray-400">Decimals</p>
-            <p className="font-medium text-white">{metadata.decimals}</p>
-          </div>
-          <div>
-            <p className="text-gray-400">Total Supply</p>
-            <p className="font-medium text-white">
-              {formatAmount(totalSupply)} {metadata.symbol}
-            </p>
-          </div>
-          <div className="col-span-2">
-            <p className="text-gray-400">Your Balance</p>
-            <p className="text-xl font-semibold text-accent">
-              {formatAmount(balance)} {metadata.symbol}
-            </p>
-          </div>
-        </div>
-      ) : (
-        <p className="text-gray-500">Loading token data...</p>
-      )}
-    </div>
+        ) : (
+          <p className="text-gray-400">Lade Token-Daten...</p>
+        )}
+      </div>
+    </section>
   );
 };
 

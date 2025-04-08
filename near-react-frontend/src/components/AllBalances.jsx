@@ -1,72 +1,56 @@
 import React, { useEffect, useState } from "react";
+import { providers } from "near-api-js";
 
 export default function AllBalances({ selector, contractId }) {
   const [balances, setBalances] = useState([]);
-  const [error, setError] = useState(null);
-
-  const fetchBalances = async () => {
-    try {
-      const { network } = await selector.store.getState();
-      const provider = selector.options.network.nodeUrl;
-
-      const res = await fetch(provider, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          jsonrpc: "2.0",
-          id: "dontcare",
-          method: "query",
-          params: {
-            request_type: "call_function",
-            account_id: contractId,
-            method_name: "get_all_balances",
-            args_base64: "",
-            finality: "optimistic",
-          },
-        }),
-      });
-
-      const data = await res.json();
-
-      const raw = data?.result?.result;
-      if (!raw) {
-        throw new Error("Leeres Ergebnis vom Smart Contract");
-      }
-
-      const decoded = new TextDecoder().decode(Uint8Array.from(raw));
-      const parsed = JSON.parse(decoded);
-
-      setBalances(parsed);
-    } catch (err) {
-      console.error("Fehler beim Abrufen der Token-Balances:", err);
-      setError("⚠️ Konnte Token-Balances nicht laden.");
-    }
-  };
-
-  const formatYocto = (amount) => (parseFloat(amount) / 1e24).toFixed(2);
 
   useEffect(() => {
+    const fetchBalances = async () => {
+      const provider = new providers.JsonRpcProvider("https://rpc.testnet.near.org");
+      const res = await provider.query({
+        request_type: "call_function",
+        account_id: contractId,
+        method_name: "get_all_balances",
+        args_base64: Buffer.from(JSON.stringify({})).toString("base64"),
+        finality: "optimistic",
+      });
+
+      const raw = res?.result;
+      if (!raw) return;
+      const decoded = new TextDecoder().decode(new Uint8Array(raw));
+      const parsed = JSON.parse(decoded);
+      setBalances(parsed);
+    };
+
     fetchBalances();
-  }, []);
+  }, [contractId]);
 
   return (
-    <div className="max-w-2xl mx-auto bg-gray-800 text-white p-6 mt-8 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-semibold mb-4">👥 All Token Holders</h2>
-
-      {error ? (
-        <p className="text-red-400">{error}</p>
-      ) : balances.length === 0 ? (
-        <p className="text-gray-400">No balances found.</p>
-      ) : (
-        <ul className="space-y-2">
-          {balances.map(([account, amount], i) => (
-            <li key={i} className="flex justify-between border-b border-gray-700 py-2">
-              <span>{account}</span>
-              <span className="text-accent">{formatYocto(amount)} LIONEL</span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <section className="max-w-6xl mx-auto mt-16 px-6">
+      <h3 className="text-2xl font-semibold text-[#2c1c5b] mb-6">📊 Alle Token-Balances</h3>
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+        <table className="min-w-full text-sm">
+          <thead>
+            <tr className="text-left text-[#2c1c5b] border-b border-gray-200">
+              <th className="py-2">Account</th>
+              <th className="py-2">Balance (LIONEL)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {balances.map(([account, amount], index) => (
+              <tr
+                key={index}
+                className="border-b border-gray-100 hover:bg-gray-50 transition"
+              >
+                <td className="py-2 text-gray-700">{account}</td>
+                <td className="py-2 font-medium text-[#3c228c]">
+                  {(parseFloat(amount) / 1e24).toFixed(2)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
   );
 }

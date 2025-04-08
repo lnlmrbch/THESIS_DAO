@@ -1,18 +1,11 @@
 import React, { useState } from "react";
-import { toYocto } from "../utils/format";
 
-const TokenTransferForm = ({ selector, accountId, contractId }) => {
+export default function TokenTransferForm({ selector, accountId, contractId }) {
   const [receiver, setReceiver] = useState("");
   const [amount, setAmount] = useState("");
 
   const handleTransfer = async () => {
-    if (!receiver || !amount) {
-      alert("Bitte fülle beide Felder aus.");
-      return;
-    }
-
     const wallet = await selector.wallet();
-
     await wallet.signAndSendTransaction({
       signerId: accountId,
       receiverId: contractId,
@@ -21,54 +14,49 @@ const TokenTransferForm = ({ selector, accountId, contractId }) => {
           type: "FunctionCall",
           params: {
             methodName: "ft_transfer",
-            args: {
-              receiver_id: receiver,
-              amount: toYocto(amount),
-            },
+            args: { receiver_id: receiver, amount: (parseFloat(amount) * 1e24).toString() },
             gas: "30000000000000",
             deposit: "1",
           },
         },
       ],
     });
-
-    setReceiver("");
-    setAmount("");
-    alert("Transfer erfolgreich gesendet!");
   };
 
   return (
-    <div className="max-w-xl mx-auto mt-10 bg-cardbg border border-gray-700 rounded-xl shadow-xl p-8 text-white">
-      <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
-        <span className="text-accent">💸</span> Token Transfer
-      </h2>
+    <section className="bg-white border border-gray-200 shadow-md rounded-xl p-6 w-full max-w-md mx-auto">
+      <h3 className="text-lg font-semibold text-indigo-700 mb-4 flex items-center gap-2">
+        🚀 Token Transfer
+      </h3>
 
       <div className="space-y-4">
-        <input
-          type="text"
-          placeholder="Receiver account"
-          value={receiver}
-          onChange={(e) => setReceiver(e.target.value)}
-          className="w-full px-4 py-3 bg-gray-800 border border-gray-600 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-accent placeholder-gray-400"
-        />
-
-        <input
-          type="number"
-          placeholder="Amount (LIONEL)"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          className="w-full px-4 py-3 bg-gray-800 border border-gray-600 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-accent placeholder-gray-400"
-        />
-
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Empfänger Account ID</label>
+          <input
+            type="text"
+            value={receiver}
+            onChange={(e) => setReceiver(e.target.value)}
+            placeholder="z.B. user.testnet"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Anzahl Tokens</label>
+          <input
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="z.B. 10.5"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
         <button
           onClick={handleTransfer}
-          className="w-full bg-gradient-to-r from-green-400 to-accent text-black font-semibold py-3 rounded-full shadow-md hover:brightness-110 transition"
+          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-md transition"
         >
-          Transfer
+          Transfer starten
         </button>
       </div>
-    </div>
+    </section>
   );
-};
-
-export default TokenTransferForm;
+}
