@@ -1,14 +1,13 @@
 import React, { useState } from "react";
-import { FaPlus } from "react-icons/fa";
 
-export default function CreateProposalForm({ selector, contractId }) {
+const CreateProposalForm = ({ selector, contractId }) => {
   const [description, setDescription] = useState("");
 
   const submitProposal = async () => {
-    if (!description) return;
+    if (!description.trim()) return;
     const wallet = await selector.wallet();
     await wallet.signAndSendTransaction({
-      signerId: wallet.accountId,
+      signerId: await wallet.getAccounts().then((a) => a[0].accountId),
       receiverId: contractId,
       actions: [
         {
@@ -17,7 +16,7 @@ export default function CreateProposalForm({ selector, contractId }) {
             methodName: "create_proposal",
             args: { description },
             gas: "30000000000000",
-            deposit: "10000000000000000000000", // 0.01 NEAR
+            deposit: "1000000000000000000000", // 0.001 NEAR
           },
         },
       ],
@@ -26,34 +25,27 @@ export default function CreateProposalForm({ selector, contractId }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm px-6 py-6">
-      <div className="flex items-center gap-2 mb-4">
-        <FaPlus className="text-primary" />
-        <h3 className="text-lg font-semibold text-gray-800">
-          Proposal erstellen
-        </h3>
-      </div>
+    <div className="w-full max-w-2xl mx-auto">
+      <label htmlFor="description" className="block text-gray-700 font-medium mb-2">
+        Beschreibung
+      </label>
+      <input
+        type="text"
+        id="description"
+        placeholder="z.B. Budget freigeben für..."
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-4 py-4 text-base font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary mb-6"
+      />
 
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm text-gray-700 font-medium mb-1">
-            Beschreibung
-          </label>
-          <input
-            type="text"
-            placeholder="z.B. Budget freigeben für..."
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="w-full px-4 py-2 rounded-md border border-gray-300 shadow-sm text-gray-800 placeholder-gray-400 focus:ring-primary focus:border-primary transition"
-          />
-        </div>
-        <button
-          onClick={submitProposal}
-          className="w-full bg-primary hover:brightness-105 text-white font-semibold py-2 rounded-md transition"
-        >
-          Vorschlag einreichen
-        </button>
-      </div>
+      <button
+        onClick={submitProposal}
+        className="w-full bg-[#4F46E5] hover:bg-[#4338CA] text-white font-semibold py-3 rounded-md transition"
+      >
+        Vorschlag einreichen
+      </button>
     </div>
   );
-}
+};
+
+export default CreateProposalForm;

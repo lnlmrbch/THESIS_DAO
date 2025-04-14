@@ -43,7 +43,7 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <div className="w-screen bg-gradient-to-r from-gray-900 via-darkbg to-gray-900 text-white overflow-x-hidden scroll-smooth">
+    <div className="w-screen bg-[#F5F7FB] text-black overflow-x-hidden scroll-smooth">
       <motion.div style={{ scaleX }} className="fixed top-0 left-0 right-0 h-1 bg-accent origin-left z-50" />
 
       {/* Hero */}
@@ -53,17 +53,17 @@ const LandingPage = () => {
         transition={{ duration: 1 }}
         className="w-full h-screen flex flex-col justify-center items-center text-center px-4 space-y-6"
       >
-        <h1 className="text-5xl md:text-6xl font-extrabold text-accent drop-shadow-lg">
-          Willkommen bei der DAO von Lionel - Bachelor Thesis
+        <h1 className="text-5xl md:text-6xl font-extrabold text-primary">
+          Lionel Thesis DAO
         </h1>
-        <p className="text-lg md:text-xl text-gray-300 max-w-2xl">
-          Demokratisch. Transparent. Community Driven – Built on NEAR.
+        <p className="text-lg md:text-xl text-gray-600 max-w-2xl">
+          Demokratisch. Transparent. Community Driven. Built on NEAR.
         </p>
         <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.97 }}
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.98 }}
           onClick={connectWallet}
-          className="px-10 py-4 bg-gradient-to-r from-green-400 to-accent text-black font-bold rounded-full hover:brightness-110 transition text-xl"
+          className="px-8 py-3 bg-accent text-black font-semibold rounded-md transition text-lg"
         >
           Wallet verbinden & starten 🚀
         </motion.button>
@@ -71,141 +71,112 @@ const LandingPage = () => {
           to="about"
           smooth
           duration={600}
-          className="text-accent underline mt-4 text-sm cursor-pointer hover:text-white"
+          className="text-primary underline mt-4 text-sm cursor-pointer hover:text-black"
         >
           Mehr erfahren ↓
         </Link>
       </motion.section>
 
       {/* About */}
-      <motion.section
-        id="about"
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-        className="w-full py-20 text-center px-6"
-      >
-        <h2 className="text-4xl font-bold text-accent mb-6">Was ist diese DAO?</h2>
-        <p className="text-gray-300 text-lg max-w-3xl mx-auto">
-          Eine digitale Organisation, bei der du als Token-Holder mitbestimmen kannst. Vorschläge einreichen,
-          abstimmen, Treasury verwalten. Vollkommen dezentral.
+      <section id="about" className="py-20 px-6 text-center space-y-6">
+        <h2 className="text-3xl font-bold text-primary">Was ist diese DAO?</h2>
+        <p className="max-w-3xl mx-auto text-gray-700 text-lg">
+          Eine digitale Organisation, bei der du als Token-Holder mitbestimmen kannst.
+          Vorschläge einreichen, abstimmen, Treasury verwalten. Vollkommen dezentral.
         </p>
-      </motion.section>
+      </section>
 
       {/* Tokenomics */}
-      <motion.section
-        id="tokenomics"
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="w-full py-20 bg-gray-800 text-center px-6"
-      >
-        <h2 className="text-4xl font-bold text-accent mb-10">Tokenomics</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-6xl mx-auto text-white">
+      <section className="py-20 px-6 bg-white text-center">
+        <h2 className="text-3xl font-bold text-primary mb-12">Tokenomics</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {[
             ["🔁 Umlauf", "60% Community-basiert"],
             ["🛠 Treasury", "30% für Entwicklung & Finanzierung"],
-            ["👨‍💻 Team", "10% für Core-Contributors"]
+            ["👨‍💻 Team", "10% für Core-Contributors"],
           ].map(([title, desc], i) => (
             <motion.div
               key={i}
               whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              className="bg-gray-700 p-6 rounded-xl shadow-md hover:shadow-2xl transition-all"
+              className="bg-[#f9fafb] p-6 rounded-lg border border-gray-200 transition"
             >
-              <h3 className="text-2xl font-semibold mb-2">{title}</h3>
-              <p className="text-gray-300">{desc}</p>
+              <h3 className="text-xl font-semibold text-[#2c1c5b] mb-2">{title}</h3>
+              <p className="text-gray-600">{desc}</p>
             </motion.div>
           ))}
         </div>
-      </motion.section>
+      </section>
 
       {/* Roadmap */}
-      <motion.section
-        id="roadmap"
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="w-full py-20 text-center px-6"
-      >
-        <h2 className="text-4xl font-bold text-accent mb-10">Roadmap</h2>
-        <ol className="space-y-6 max-w-4xl mx-auto text-left">
-          <li className="border-l-4 border-green-400 pl-6"><span className="font-bold text-white">✅ Q1:</span> DAO online & Proposal System live</li>
-          <li className="border-l-4 border-yellow-400 pl-6"><span className="font-bold text-white">🛠 Q2:</span> Token Launch, Voting live</li>
-          <li className="border-l-4 border-blue-400 pl-6"><span className="font-bold text-white">📢 Q3:</span> Community Events, Staking</li>
-          <li className="border-l-4 border-gray-500 pl-6"><span className="font-bold text-white">🚀 Q4:</span> Grants, Incentives, Expansion</li>
+      <section id="roadmap" className="py-20 px-6 text-center">
+        <h2 className="text-3xl font-bold text-primary mb-10">Roadmap</h2>
+        <ol className="space-y-6 max-w-4xl mx-auto text-left text-gray-700">
+          <li className="border-l-4 border-green-400 pl-6"><strong>✅ Q1:</strong> DAO online & Proposal System live</li>
+          <li className="border-l-4 border-yellow-400 pl-6"><strong>🛠 Q2:</strong> Token Launch, Voting live</li>
+          <li className="border-l-4 border-blue-400 pl-6"><strong>📢 Q3:</strong> Community Events, Staking</li>
+          <li className="border-l-4 border-gray-400 pl-6"><strong>🚀 Q4:</strong> Grants, Incentives, Expansion</li>
         </ol>
         <a
           href="https://github.com/users/lnlmrbch/projects/2"
           target="_blank"
           rel="noreferrer"
-          className="mt-10 inline-block text-sm text-accent underline hover:text-white"
+          className="mt-10 inline-block text-sm text-primary underline hover:text-black"
         >
           → Vollständige GitHub-Roadmap ansehen
         </a>
-      </motion.section>
+      </section>
 
       {/* FAQ */}
-      <motion.section
-        id="faq"
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        className="w-full py-20 bg-gray-900 text-center px-6"
-      >
-        <h2 className="text-4xl font-bold text-accent mb-10">Häufige Fragen</h2>
+      <section className="py-20 px-6 bg-white text-center">
+        <h2 className="text-3xl font-bold text-primary mb-10">Häufige Fragen</h2>
         <div className="max-w-3xl mx-auto text-left space-y-4">
           {faqs.map((faq, i) => (
-            <div key={i} className="border border-gray-700 rounded-lg">
+            <div key={i} className="border border-gray-200 rounded-md overflow-hidden">
               <button
                 onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                className="w-full text-left px-6 py-4 text-white font-semibold flex justify-between items-center"
+                className="w-full text-left px-6 py-4 font-semibold text-black flex justify-between items-center"
               >
                 {faq.q}
                 <span>{openFaq === i ? "−" : "+"}</span>
               </button>
-              {openFaq === i && <div className="px-6 pb-4 text-gray-400">{faq.a}</div>}
+              {openFaq === i && <div className="px-6 pb-4 text-gray-600">{faq.a}</div>}
             </div>
           ))}
         </div>
-      </motion.section>
+      </section>
 
       {/* CTA */}
-      <motion.section
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        className="w-full py-20 bg-darkbg text-center px-6"
-      >
-        <h2 className="text-4xl font-bold text-accent mb-4">Bereit mitzumachen?</h2>
-        <p className="text-gray-300 mb-6">
+      <section className="py-20 px-6 text-center bg-[#F5F7FB]">
+        <h2 className="text-3xl font-bold text-primary mb-4">Bereit mitzumachen?</h2>
+        <p className="text-gray-600 mb-6">
           Werde Teil unserer Community. Diskutiere, vote, entwickle, verwalte.
         </p>
         <motion.button
-          whileHover={{ scale: 1.05 }}
+          whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.95 }}
           onClick={connectWallet}
-          className="px-8 py-3 bg-accent text-black font-bold rounded-full hover:brightness-110 transition text-lg"
+          className="px-8 py-3 bg-accent text-black font-bold rounded-md transition text-lg"
         >
           Jetzt Wallet verbinden
         </motion.button>
-      </motion.section>
+      </section>
 
       {/* Scroll to Top */}
       {showTop && (
         <motion.button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed bottom-6 right-6 z-50 bg-accent text-black px-4 py-2 rounded-full shadow-lg hover:brightness-110"
+          className="fixed bottom-6 right-6 z-50 bg-primary text-white px-4 py-2 rounded-full shadow-lg hover:brightness-110"
         >
           ↑ Top
         </motion.button>
       )}
 
       {/* Footer */}
-      <footer className="w-full py-10 px-6 bg-cardbg text-center text-sm text-gray-600">
-        <p>© {new Date().getFullYear()} Thesis DAO – Built on <span className="text-accent font-semibold">NEAR Protocol</span></p>
+      <footer className="py-10 px-6 bg-white text-center text-sm text-gray-500 border-t border-gray-200">
+        <p>
+          © {new Date().getFullYear()} Thesis DAO – Built on{" "}
+          <span className="text-primary font-medium">NEAR Protocol</span>
+        </p>
       </footer>
     </div>
   );

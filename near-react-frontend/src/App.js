@@ -7,6 +7,9 @@ import DashboardPage from "./pages/DashboardPage";
 import CoreDashboard from "./pages/CoreDashboard";
 import BuyTokensPage from "./pages/BuyTokensPage";
 import TokenPurchaseSuccess from "./pages/TokenPurchaseSuccess";
+import ProposalsPage from "./pages/ProposalsPage";
+import CreateProposalPage from "./pages/CreateProposalPage";
+import ProposalDetailPage from "./pages/ProposalDetailPage";
 import { providers } from "near-api-js";
 
 function App() {
@@ -21,6 +24,7 @@ function App() {
   const [wallet, setWallet] = useState(null);
 
   const location = useLocation();
+  const isLanding = location.pathname === "/";
   const contractId = "dao.lioneluser.testnet";
 
   const fetchContractData = async () => {
@@ -87,10 +91,12 @@ function App() {
     if (accountId) fetchContractData();
   }, [accountId]);
 
-  const isLanding = location.pathname === "/";
-
   return (
-    <div className="min-h-screen bg-darkbg text-gray-100 font-sans w-full overflow-x-hidden flex">
+    <div
+      className={`min-h-screen text-gray-100 font-sans w-full overflow-x-hidden ${
+        isLanding ? "bg-white" : "bg-darkbg flex"
+      }`}
+    >
       {!isLanding && (
         <Sidebar
           accountId={accountId}
@@ -100,8 +106,8 @@ function App() {
           modal={modal}
         />
       )}
-
-      <main className="flex-1 ml-0 lg:ml-64 p-4">
+  
+      <main className={`flex-1 p-4 ${!isLanding ? "ml-0 lg:ml-64" : ""}`}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           {accountId && (
@@ -126,6 +132,38 @@ function App() {
                 element={<BuyTokensPage wallet={wallet} accountId={accountId} />}
               />
               <Route path="/success" element={<TokenPurchaseSuccess />} />
+  
+              {/* Proposal Pages */}
+              <Route
+                path="/proposals"
+                element={
+                  <ProposalsPage
+                    selector={selector}
+                    accountId={accountId}
+                    contractId={contractId}
+                    metadata={metadata}
+                    userBalance={userBalance}
+                    totalSupply={totalSupply}
+                    proposals={proposals}
+                  />
+                }
+              />
+              <Route
+                path="/proposals/new"
+                element={<CreateProposalPage selector={selector} contractId={contractId} />}
+              />
+              <Route
+                path="/proposals/:id"
+                element={
+                  <ProposalDetailPage
+                    selector={selector}
+                    contractId={contractId}
+                    accountId={accountId}
+                    userRole={userRole}
+                  />
+                }
+              />
+  
               {userRole === "core" && (
                 <Route
                   path="/core"

@@ -1,20 +1,10 @@
 // src/pages/DashboardPage.js
 import React from "react";
-import {
-  FaUserShield,
-  FaWallet,
-  FaExchangeAlt,
-  FaPlus,
-  FaListAlt,
-} from "react-icons/fa";
+import { FaUserShield, FaWallet, FaListAlt } from "react-icons/fa";
 import TokenInfo from "../components/TokenInfo";
-import CreateProposalForm from "../components/CreateProposalForm";
-import TokenTransferForm from "../components/TransferForm";
-import ProposalList from "../components/ProposalList";
-import AllBalances from "../components/AllBalances";
+import ProposalOverview from "../components/ProposalOverview.js";
 
 const DashboardPage = ({
-  selector,
   accountId,
   contractId,
   metadata,
@@ -23,80 +13,52 @@ const DashboardPage = ({
   proposals,
   userRole,
 }) => {
-  const cardBase =
-    "flex items-center gap-4 p-6 bg-white/5 border border-white/10 rounded-xl shadow hover:shadow-lg transition";
+  const cardStyle =
+    "flex items-center gap-4 p-6 bg-white shadow-sm rounded-xl border border-gray-200";
 
   return (
-    <div className="px-8 py-12 space-y-16 bg-[#F5F7FB] text-black min-h-screen">
-      {/* Header Cards */}
+    <div className="px-8 py-12 bg-[#F5F7FB] text-black min-h-screen space-y-16">
+      {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className={cardBase}>
-          <FaUserShield className="text-3xl text-[#673AB7]" />
+        <div className={cardStyle}>
+          <FaUserShield className="text-2xl text-secondary" />
           <div>
-            <p className="text-sm text-gray-600">Deine Rolle</p>
-            <p className="font-semibold text-[#2c1c5b] capitalize">{userRole}</p>
+            <p className="text-sm text-gray-500">Deine Rolle</p>
+            <p className="text-lg font-semibold capitalize text-[#2c1c5b]">{userRole}</p>
           </div>
         </div>
-        <div className={cardBase}>
-          <FaWallet className="text-3xl text-[#673AB7]" />
+        <div className={cardStyle}>
+          <FaWallet className="text-2xl text-secondary" />
           <div>
-            <p className="text-sm text-gray-600">Token Balance</p>
-            <p className="font-semibold text-[#2c1c5b]">
-              {(parseFloat(userBalance) / Math.pow(10, metadata?.decimals || 24)).toFixed(2)}{" "}
-              {metadata?.symbol}
+            <p className="text-sm text-gray-500">Token Balance</p>
+            <p className="text-lg font-semibold text-[#2c1c5b]">
+              {(parseFloat(userBalance) / Math.pow(10, metadata?.decimals || 24)).toFixed(2)} {metadata?.symbol}
             </p>
           </div>
         </div>
-        <div className={cardBase}>
-          <FaListAlt className="text-3xl text-[#673AB7]" />
+        <div className={cardStyle}>
+          <FaListAlt className="text-2xl text-secondary" />
           <div>
-            <p className="text-sm text-gray-600">Proposals gesamt</p>
-            <p className="font-semibold text-[#2c1c5b]">{proposals.length}</p>
+            <p className="text-sm text-gray-500">Proposals gesamt</p>
+            <p className="text-lg font-semibold text-[#2c1c5b]">{proposals.length}</p>
           </div>
         </div>
       </div>
 
-      {/* Main Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        <div className="space-y-10">
-          <div className={cardBase + " flex-col items-start"}>
-            <div className="flex items-center gap-3 text-[#2c1c5b] mb-2">
-              <FaExchangeAlt />
-              <h2 className="text-lg font-bold">Token übertragen</h2>
-            </div>
-            <TokenTransferForm
-              selector={selector}
-              accountId={accountId}
-              contractId={contractId}
-            />
-          </div>
-
-          <div className={cardBase + " flex-col items-start"}>
-            <div className="flex items-center gap-3 text-[#2c1c5b] mb-2">
-              <FaPlus />
-              <h2 className="text-lg font-bold">Proposal erstellen</h2>
-            </div>
-            <CreateProposalForm selector={selector} contractId={contractId} />
-          </div>
-        </div>
-
-        <div>
-          <ProposalList
-            selector={selector}
-            contractId={contractId}
-            accountId={accountId}
-            metadata={metadata}
-            userBalance={userBalance}
-            totalSupply={totalSupply}
-            proposals={proposals}
-          />
-        </div>
+      {/* Proposal Übersicht */}
+      <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-10 max-w-6xl mx-auto">
+        <ProposalOverview
+          proposals={proposals}
+          metadata={metadata}
+          totalSupply={totalSupply}
+          userBalance={userBalance}
+        />
       </div>
 
-      {/* Full Token Info + All Balances */}
-      <div className="space-y-16">
-        <TokenInfo accountId={accountId} contractId={contractId} />
-        <AllBalances selector={selector} contractId={contractId} />
+      {/* Token Infos */}
+      <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-6 max-w-6xl mx-auto">
+        <h2 className="text-xl font-bold text-[#2c1c5b] flex items-center gap-2">📊 Token Details</h2>
+        <TokenInfo accountId={accountId} contractId={contractId} showTitle={false} />
       </div>
     </div>
   );

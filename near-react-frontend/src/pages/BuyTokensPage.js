@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+// src/pages/BuyTokensPage.js
+import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const BuyTokensPage = ({ wallet, accountId }) => {
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 📦 Wenn NEAR Wallet redirectet → automatisch auf /success weiterleiten
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const txHash = params.get("transactionHashes");
@@ -14,8 +14,7 @@ const BuyTokensPage = ({ wallet, accountId }) => {
     if (txHash) {
       const storedAmount = localStorage.getItem("lastBuyAmount") || "unbekannt";
       localStorage.removeItem("lastBuyAmount");
-
-      navigate('/success', {
+      navigate("/success", {
         state: {
           amount: storedAmount,
           timestamp: new Date().toLocaleString(),
@@ -29,66 +28,91 @@ const BuyTokensPage = ({ wallet, accountId }) => {
 
     const parsedAmount = parseFloat(amount);
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
-      alert('Bitte gib eine gültige NEAR-Menge ein.');
+      alert("Bitte gib eine gültige NEAR-Menge ein.");
       return;
     }
 
     const yoctoAmount = BigInt(parsedAmount * 1e24).toString();
-    localStorage.setItem("lastBuyAmount", parsedAmount); // 💾 Zwischenspeichern
+    localStorage.setItem("lastBuyAmount", parsedAmount);
 
     try {
       await wallet.signAndSendTransaction({
         signerId: accountId,
-        receiverId: 'dao.lioneluser.testnet',
+        receiverId: "dao.lioneluser.testnet",
         actions: [
           {
-            type: 'FunctionCall',
+            type: "FunctionCall",
             params: {
-              methodName: 'buy_tokens',
+              methodName: "buy_tokens",
               args: {},
-              gas: '300000000000000',
+              gas: "300000000000000",
               deposit: yoctoAmount,
             },
           },
         ],
       });
-
-      // 🚀 Weiterleitung erfolgt nach Wallet-Redirect (siehe oben)
     } catch (err) {
-      console.error('❌ Kauf fehlgeschlagen:', err);
-      alert('Fehler beim Token-Kauf.');
+      console.error("❌ Kauf fehlgeschlagen:", err);
+      alert("Fehler beim Token-Kauf.");
     }
   };
 
   if (!wallet || !accountId) {
     return (
-      <div className="p-8 text-center text-red-500 font-semibold">
+      <div className="p-12 text-center text-red-500 font-semibold">
         ❌ Bitte melde dich an, um Token zu kaufen.
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-darkbg text-white flex items-center justify-center px-4">
-      <div className="bg-cardbg p-10 rounded-xl border border-gray-700 shadow-2xl space-y-6 max-w-md w-full">
-        <h2 className="text-3xl font-bold text-accent text-center">💸 Token kaufen</h2>
-        <p className="text-center text-gray-400">
-          Eingeloggt als: <span className="text-white">{accountId}</span>
-        </p>
-        <div className="space-y-4">
-          <input
-            type="number"
-            placeholder="Menge in NEAR"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="w-full p-3 bg-gray-800 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-accent"
-          />
+    <div className="min-h-screen bg-[#F5F7FB] text-black py-16 px-6">
+      <div className="max-w-2xl mx-auto space-y-12">
+        <div className="space-y-3">
+          <h1 className="text-3xl font-bold text-[#2c1c5b]">💸 Token kaufen</h1>
+          <p className="text-sm text-gray-600">
+            Eingeloggt als: <span className="font-semibold">{accountId}</span>
+          </p>
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-6 shadow-sm">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Betrag in NEAR
+            </label>
+            <input
+              type="number"
+              placeholder="z. B. 10"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
           <button
             onClick={handleBuy}
-            className="w-full py-3 bg-gradient-to-r from-green-400 to-accent text-black font-bold rounded-full hover:brightness-110 transition"
+            className="w-full py-3 bg-primary text-white font-semibold rounded-md hover:brightness-105 transition"
           >
-            Kaufen
+            Jetzt kaufen
           </button>
+        </div>
+
+        <div className="space-y-8 mt-8">
+          <div className="text-sm text-gray-700">
+            <h2 className="text-md font-semibold mb-2 text-[#2c1c5b]">Warum Tokens kaufen?</h2>
+            <ul className="list-disc list-inside space-y-1 text-gray-600">
+              <li>Erhalte Stimmrechte in der DAO</li>
+              <li>Unterstütze neue Vorschläge</li>
+              <li>Werde Teil einer aktiven Community</li>
+            </ul>
+          </div>
+
+          <div className="text-sm text-gray-700">
+            <h2 className="text-md font-semibold mb-2 text-[#2c1c5b]">Sicherheitshinweise</h2>
+            <p>
+              Transaktionen werden über die NEAR Wallet signiert. Stelle sicher, dass du genügend
+              NEAR für Gebühren hast.
+            </p>
+          </div>
         </div>
       </div>
     </div>

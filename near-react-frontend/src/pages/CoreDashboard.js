@@ -1,9 +1,15 @@
+// src/pages/CoreDashboard.js
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import TokenInfo from "../components/TokenInfo";
 import AllBalances from "../components/AllBalances";
+import DaoSettings from "../components/DaoSettings";
 
-export default function CoreDashboard({ selector, accountId, contractId, userRole }) {
+export default function CoreDashboard({
+  selector,
+  accountId,
+  contractId,
+  userRole,
+}) {
   const [roleToAssign, setRoleToAssign] = useState("");
   const [targetAccount, setTargetAccount] = useState("");
   const [status, setStatus] = useState(null);
@@ -11,7 +17,7 @@ export default function CoreDashboard({ selector, accountId, contractId, userRol
 
   useEffect(() => {
     if (userRole !== "core") {
-      navigate("/"); // Redirect non-core users
+      navigate("/");
     }
   }, [userRole, navigate]);
 
@@ -51,21 +57,22 @@ export default function CoreDashboard({ selector, accountId, contractId, userRol
   };
 
   return (
-    <div className="min-h-screen bg-darkbg text-white px-6 py-12 max-w-4xl mx-auto space-y-10">
-      <h1 className="text-4xl font-bold text-accent">⚙️ Core Member Dashboard</h1>
+    <div className="min-h-screen bg-[#F5F7FB] text-black px-6 py-12 m-full">
+      <h1 className="text-3xl font-bold text-[#2c1c5b] mb-4">⚙️ Core Dashboard</h1>
 
-      <section className="bg-cardbg p-6 rounded-xl border border-gray-700 shadow-md space-y-6">
-        <h2 className="text-2xl font-semibold">👤 Rolle zuweisen</h2>
-        <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Rolle zuweisen */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-4">
+          <h2 className="text-xl font-semibold text-[#2c1c5b]">👤 Rolle zuweisen</h2>
           <input
             type="text"
             placeholder="Ziel-Account ID"
-            className="w-full p-3 bg-gray-800 border border-gray-600 rounded-md"
+            className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md"
             value={targetAccount}
             onChange={(e) => setTargetAccount(e.target.value)}
           />
           <select
-            className="w-full p-3 bg-gray-800 border border-gray-600 rounded-md"
+            className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md"
             value={roleToAssign}
             onChange={(e) => setRoleToAssign(e.target.value)}
           >
@@ -76,16 +83,27 @@ export default function CoreDashboard({ selector, accountId, contractId, userRol
           </select>
           <button
             onClick={assignRole}
-            className="px-6 py-3 bg-gradient-to-r from-green-400 to-accent text-black font-bold rounded-full hover:brightness-110"
+            className="w-full py-3 bg-primary text-white font-semibold rounded-md hover:brightness-110 transition"
           >
             Rolle zuweisen
           </button>
-          {status && <p className="text-sm text-accent">{status}</p>}
+          {status && <p className="text-sm text-primary">{status}</p>}
         </div>
-      </section>
 
-      <TokenInfo accountId={accountId} contractId={contractId} />
-      <AllBalances selector={selector} contractId={contractId} />
+        {/* DAO Settings */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+          <DaoSettings
+            selector={selector}
+            accountId={accountId}
+            contractId={contractId}
+          />
+        </div>
+
+        {/* Alle Balances */}
+        <div className="md:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+          <AllBalances selector={selector} contractId={contractId} />
+        </div>
+      </div>
     </div>
   );
 }
