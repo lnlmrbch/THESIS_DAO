@@ -10,6 +10,7 @@ import TokenPurchaseSuccess from "./pages/TokenPurchaseSuccess";
 import ProposalsPage from "./pages/ProposalsPage";
 import CreateProposalPage from "./pages/CreateProposalPage";
 import ProposalDetailPage from "./pages/ProposalDetailPage";
+import TokenTransferPage from "./pages/TokenTransferPage";
 import { providers } from "near-api-js";
 
 function App() {
@@ -93,9 +94,8 @@ function App() {
 
   return (
     <div
-      className={`min-h-screen text-gray-100 font-sans w-full overflow-x-hidden ${
-        isLanding ? "bg-white" : "bg-darkbg flex"
-      }`}
+      className={`min-h-screen text-gray-100 font-sans w-full overflow-x-hidden ${isLanding ? "bg-white" : "bg-darkbg flex"
+        }`}
     >
       {!isLanding && (
         <Sidebar
@@ -106,7 +106,7 @@ function App() {
           modal={modal}
         />
       )}
-  
+
       <main className={`flex-1 p-4 ${!isLanding ? "ml-0 lg:ml-64" : ""}`}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
@@ -132,7 +132,7 @@ function App() {
                 element={<BuyTokensPage wallet={wallet} accountId={accountId} />}
               />
               <Route path="/success" element={<TokenPurchaseSuccess />} />
-  
+
               {/* Proposal Pages */}
               <Route
                 path="/proposals"
@@ -163,7 +163,17 @@ function App() {
                   />
                 }
               />
-  
+              <Route
+                path="/transfer"
+                element={
+                  <TokenTransferPage
+                    selector={selector}
+                    accountId={accountId}
+                    contractId={contractId}
+                  />
+                }
+              />
+
               {userRole === "core" && (
                 <Route
                   path="/core"
