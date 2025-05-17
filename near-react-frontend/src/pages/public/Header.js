@@ -6,7 +6,7 @@ const Header = () => {
   return (
     <header className="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
       <nav className="container mx-auto flex justify-between items-center p-4">
-        <div className="text-xl font-bold text-primary">Lionel DAO</div>
+        <div className="text-xl font-bold text-primary">Thesis DAO</div>
         <ul className="flex space-x-6">
           <li>
             <Link to="about" smooth duration={500} className="cursor-pointer text-gray-700 hover:text-primary">

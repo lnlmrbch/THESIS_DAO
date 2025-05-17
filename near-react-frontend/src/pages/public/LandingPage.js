@@ -107,7 +107,7 @@ const LandingPage = () => {
             transition={{ delay: 0.3, duration: 0.8 }}
             className="text-5xl md:text-6xl font-bold mb-4 text-gray-800 drop-shadow-lg"
           >
-            Lionel Thesis DAO
+            Thesis DAO
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
