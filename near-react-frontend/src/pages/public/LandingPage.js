@@ -252,7 +252,7 @@ const LandingPage = () => {
           >
             <img src="/placeholder-dashboard-3.png" alt="Dashboard Screenshot 3" className="rounded-lg mb-4 w-full h-auto object-cover" />
             <h3 className="text-xl font-semibold text-[#2c1c5b] mb-3">Token Management</h3>
-            <p className="text-gray-600 text-base">Verwalte deine LIONEL Tokens und verfolge den Fortschritt des Token Sales.</p>
+            <p className="text-gray-600 text-base">Verwalte deine THESISDAO Tokens und verfolge den Fortschritt des Token Sales.</p>
           </motion.div>
            {/* Add more screenshot items here if needed */}
         </div>

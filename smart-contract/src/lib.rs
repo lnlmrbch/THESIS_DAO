@@ -67,8 +67,8 @@ impl Contract {
             total_supply,
             FungibleTokenMetadata {
                 spec: FT_METADATA_SPEC.to_string(),
-                name: "Lionel's Thesis Token".to_string(),
-                symbol: "LIONEL".to_string(),
+                name: "THESISDAO Token".to_string(),
+                symbol: "THESISDAO".to_string(),
                 icon: Some(DATA_IMAGE_SVG_GT_ICON.to_string()),
                 reference: None,
                 reference_hash: None,

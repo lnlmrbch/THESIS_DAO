@@ -150,7 +150,7 @@ export default function ProposalDetailPage({ contractId, accountId, selector, us
               proposal.votes_for.map(([accountId, weight], index) => (
                 <li key={index} className="text-sm text-gray-700 flex items-center gap-2">
                   <FaUserCircle className="text-[#6B46C1] flex-shrink-0"/>
-                  <span>{maskAccountId(accountId)} ({ (parseFloat(weight) / 1e24).toFixed(2) } LIONEL)</span>
+                  <span>{maskAccountId(accountId)} ({ (parseFloat(weight) / 1e24).toFixed(2) } THESISDAO)</span>
                 </li>
               ))
             )}
@@ -167,7 +167,7 @@ export default function ProposalDetailPage({ contractId, accountId, selector, us
               proposal.votes_against.map(([accountId, weight], index) => (
                 <li key={index} className="text-sm text-gray-700 flex items-center gap-2">
                   <FaUserCircle className="text-[#6B46C1] flex-shrink-0"/>
-                  <span>{maskAccountId(accountId)} ({ (parseFloat(weight) / 1e24).toFixed(2) } LIONEL)</span>
+                  <span>{maskAccountId(accountId)} ({ (parseFloat(weight) / 1e24).toFixed(2) } THESISDAO)</span>
                 </li>
               ))
             )}
@@ -180,7 +180,7 @@ export default function ProposalDetailPage({ contractId, accountId, selector, us
           <InfoCard icon={<FaLink />} label="Link" value={proposal.link} desc="Verweis auf weiterführende Inhalte." isLink />
         )}
         {proposal.amount && (
-          <InfoCard icon={<FaMoneyBillWave />} label="Betrag" value={`${formatYocto(proposal.amount)} LIONEL`} desc="Beantragte Summe." />
+          <InfoCard icon={<FaMoneyBillWave />} label="Betrag" value={`${formatYocto(proposal.amount)} THESISDAO`} desc="Beantragte Summe." />
         )}
         {proposal.target_account && (
           <InfoCard icon={<FaUser />} label="Zielkonto" value={proposal.target_account} desc="Empfänger bei Auszahlung." />
@@ -200,7 +200,7 @@ export default function ProposalDetailPage({ contractId, accountId, selector, us
           <InfoCard icon={<FaUserShield />} label="Erforderliche Rolle" value={proposal.required_role} desc="Nur diese Rolle darf abstimmen." />
         )}
         {proposal.quorum && (
-          <InfoCard icon={<FaBalanceScale />} label="Quorum" value={`${formatYocto(proposal.quorum)} LIONEL`} desc="Benötigte Gesamtstimmen." />
+          <InfoCard icon={<FaBalanceScale />} label="Quorum" value={`${formatYocto(proposal.quorum)} THESISDAO`} desc="Benötigte Gesamtstimmen." />
         )}
       </div>
 

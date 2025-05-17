@@ -62,7 +62,7 @@ export default function AllBalances({ contractId }) {
               <th className="py-4 px-6 text-left font-medium text-gray-700">
                 <div className="flex items-center gap-2">
                   <FaCoins className="text-[#6B46C1]" />
-                  Balance (LIONEL)
+                  Balance (THESISDAO)
                 </div>
               </th>
               <th className="py-4 px-6 text-left font-medium text-gray-700">

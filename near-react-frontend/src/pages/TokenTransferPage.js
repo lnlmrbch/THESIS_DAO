@@ -41,7 +41,7 @@ export default function TokenTransferPage({ selector, accountId, contractId }) {
         body: JSON.stringify({
           accountId,
           type: "transfer",
-          description: `Token Transfer an ${receiver} – ${amount} LIONEL`,
+          description: `Token Transfer an ${receiver} – ${amount} THESISDAO`,
           timestamp: new Date().toISOString(),
         }),
       });

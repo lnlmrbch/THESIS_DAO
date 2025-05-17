@@ -140,7 +140,7 @@ export default function CreateProposalPage({ selector, accountId, contractId }) 
     { name: "title", label: "Titel", icon: <FaHeading />, description: "Kurzer, prägnanter Titel deines Proposals.", type: "text", required: true },
     { name: "description", label: "Beschreibung", icon: <FaAlignLeft />, description: "Detaillierte Beschreibung deines Vorschlags.", type: "textarea", required: true },
     { name: "link", label: "Externer Link", icon: <FaLink />, description: "Optionaler Verweis auf weiterführende Inhalte.", type: "text" },
-    { name: "amount", label: "Betrag (in LIONEL)", icon: <FaMoneyBillWave />, description: "Gewünschter Betrag für dieses Proposal.", type: "number", min: "0", step: "0.01" },
+    { name: "amount", label: "Betrag (in THESISDAO)", icon: <FaMoneyBillWave />, description: "Gewünschter Betrag für dieses Proposal.", type: "number", min: "0", step: "0.01" },
     { name: "target_account", label: "Zielaccount", icon: <FaUserCircle />, description: "Konto, an den das Geld ggf. gesendet wird.", type: "text" },
     {
       name: "category", label: "Kategorie", icon: <FaFolderOpen />, description: "Wähle einen Bereich, zu dem dein Proposal gehört.",
