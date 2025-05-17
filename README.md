@@ -202,5 +202,6 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
 - [Ollama LLM](https://ollama.ai/)
 - [MongoDB](https://www.mongodb.com/)
 - [Tailwind CSS](https://tailwindcss.com/)
+- [API Dokumentation (Postman Collection)](https://documenter.getpostman.com/view/33908680/2sB2qXj2dz)
 
 ---
