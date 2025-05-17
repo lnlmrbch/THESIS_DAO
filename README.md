@@ -113,7 +113,7 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
   - **Aktivitäten**
     - `GET /api/activities` – Liste der letzten 50 Aktivitäten (sortiert nach Zeitstempel)
     - `POST /api/activities` – Neue Aktivität erstellen (nur Käufe erlaubt)
-  - <a href="https://documenter.getpostman.com/view/33908680/2sB2qXj2dz" target="_blank">API-Dokumentation</a>
+  - [API-Dokumentation](https://documenter.getpostman.com/view/33908680/2sB2qXj2dz)
 - **Setup:**
   ```bash
   cd dao-member-registry
@@ -133,7 +133,7 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
 - **API-Endpunkte:**
   - `POST /api/chat` – Chatbot-Anfrage senden
   - `GET /api/health` – Health-Check-Endpunkt
-  - <a href="https://documenter.getpostman.com/view/33908680/2sB2qXj2dz" target="_blank">API-Dokumentation</a>
+  - [API-Dokumentation](https://documenter.getpostman.com/view/33908680/2sB2qXj2dz)
 - **Setup:**
   ```bash
   cd chatbot-backend
@@ -196,14 +196,14 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
 
 ## Ressourcen & Links
 
-- <a href="https://near.org/" target="_blank">NEAR Protokoll</a>
-- <a href="https://docs.near.org/sdk/rust/introduction" target="_blank">NEAR Rust SDK</a>
-- <a href="https://react.dev/" target="_blank">React</a>
-- <a href="https://expressjs.com/" target="_blank">Express.js</a>
-- <a href="https://fastapi.tiangolo.com/" target="_blank">FastAPI</a>
-- <a href="https://ollama.ai/" target="_blank">Ollama LLM</a>
-- <a href="https://www.mongodb.com/" target="_blank">MongoDB</a>
-- <a href="https://tailwindcss.com/" target="_blank">Tailwind CSS</a>
-- <a href="https://documenter.getpostman.com/view/33908680/2sB2qXj2dz" target="_blank">API Dokumentation (Postman Collection)</a>
+- [NEAR Protokoll](https://near.org/)
+- [NEAR Rust SDK](https://docs.near.org/sdk/rust/introduction)
+- [React](https://react.dev/)
+- [Express.js](https://expressjs.com/)
+- [FastAPI](https://fastapi.tiangolo.com/)
+- [Ollama LLM](https://ollama.ai/)
+- [MongoDB](https://www.mongodb.com/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [API Dokumentation (Postman Collection)](https://documenter.getpostman.com/view/33908680/2sB2qXj2dz)
 
 ---
