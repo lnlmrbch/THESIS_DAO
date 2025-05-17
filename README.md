@@ -22,6 +22,9 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
   - [Deployment](#deployment)
   - [Roadmap \& Projekte](#roadmap--projekte)
   - [Ressourcen \& Links](#ressourcen--links)
+  - [API-Endpunkte](#api-endpunkte)
+    - [DAO Member Registry](#dao-member-registry)
+    - [Chatbot Backend](#chatbot-backend)
 
 ---
 
@@ -198,5 +201,25 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
 - [Ollama LLM](https://ollama.ai/)
 - [MongoDB](https://www.mongodb.com/)
 - [Tailwind CSS](https://tailwindcss.com/)
+
+---
+
+## API-Endpunkte
+
+### DAO Member Registry
+
+- **Mitglieder**
+  - `GET /api/members` – Liste aller Mitglieder
+  - `POST /api/members` – Neues Mitglied anlegen oder vorhandenes aktualisieren
+  - `GET /api/members/by-id/:account_id` – Einzelnes Mitglied anhand der account_id abrufen
+
+- **Aktivitäten**
+  - `GET /api/activities` – Liste der letzten 50 Aktivitäten (sortiert nach Zeitstempel)
+  - `POST /api/activities` – Neue Aktivität erstellen (nur Käufe erlaubt)
+
+### Chatbot Backend
+
+- `POST /api/chat` – Chatbot-Anfrage senden
+- `GET /api/health` – Health-Check-Endpunkt
 
 ---
