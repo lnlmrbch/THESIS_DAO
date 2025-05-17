@@ -48,35 +48,51 @@ export default function AllBalances({ contractId }) {
   };
 
   return (
-    <section className="max-w-6xl mx-auto mt-16 px-6">
-      <h3 className="text-2xl font-semibold text-[#2c1c5b] mb-6 flex items-center gap-2">
-        <FaCoins className="text-[#3c228c]" /> Alle Token-Balances & Rollen
-      </h3>
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 overflow-x-auto">
-        <table className="min-w-full text-sm text-left">
-          <thead className="text-[#3c228c] border-b border-gray-200">
-            <tr>
-              <th className="py-3 px-4"><FaUser className="inline mr-2" />Account</th>
-              <th className="py-3 px-4"><FaCoins className="inline mr-2" />Balance (LIONEL)</th>
-              <th className="py-3 px-4"><FaUserShield className="inline mr-2" />Rolle</th>
+    <div className="bg-white/50 backdrop-blur-sm rounded-lg border border-gray-100 overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-sm">
+          <thead>
+            <tr className="bg-gray-50/50 border-b border-gray-200">
+              <th className="py-4 px-6 text-left font-medium text-gray-700">
+                <div className="flex items-center gap-2">
+                  <FaUser className="text-[#6B46C1]" />
+                  Account
+                </div>
+              </th>
+              <th className="py-4 px-6 text-left font-medium text-gray-700">
+                <div className="flex items-center gap-2">
+                  <FaCoins className="text-[#6B46C1]" />
+                  Balance (LIONEL)
+                </div>
+              </th>
+              <th className="py-4 px-6 text-left font-medium text-gray-700">
+                <div className="flex items-center gap-2">
+                  <FaUserShield className="text-[#6B46C1]" />
+                  Rolle
+                </div>
+              </th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-100">
             {balances.map(([account, rawBalance], index) => (
               <tr
                 key={index}
-                className="border-b border-gray-100 hover:bg-gray-50 transition"
+                className="hover:bg-gray-50/50 transition-colors duration-150"
               >
-                <td className="py-3 px-4 text-gray-800">{account}</td>
-                <td className="py-3 px-4 text-[#3c228c] font-medium">
+                <td className="py-4 px-6 text-gray-800 font-medium">{account}</td>
+                <td className="py-4 px-6 text-[#6B46C1] font-semibold">
                   {(parseFloat(rawBalance) / 1e24).toFixed(2)}
                 </td>
-                <td className="py-3 px-4 text-gray-600">{getRoleForAccount(account)}</td>
+                <td className="py-4 px-6">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                    {getRoleForAccount(account)}
+                  </span>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-    </section>
+    </div>
   );
 }

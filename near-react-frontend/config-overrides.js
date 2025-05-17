@@ -1,33 +1,23 @@
 const webpack = require("webpack");
 
 module.exports = function override(config) {
-  config.resolve.fallback = {
-    ...config.resolve.fallback,
-    crypto: require.resolve("crypto-browserify"),
-    stream: require.resolve("stream-browserify"),
-    https: require.resolve("https-browserify"),
-    http: require.resolve("stream-http"),
-    util: require.resolve("util/"),
-    assert: require.resolve("assert/"),
-    buffer: require.resolve("buffer/"),
-    process: require.resolve("process/browser"),
-    url: require.resolve("url/")
-  };
-
-  config.plugins = [
-    ...(config.plugins || []),
-    new webpack.ProvidePlugin({
-      Buffer: ["buffer", "Buffer"],
-      process: "process/browser",
-    }),
-  ];
-  
-  config.module.rules = config.module.rules.map(rule => {
-    if (rule.use && rule.use.loader === 'source-map-loader') {
-      rule.exclude = [/node_modules\/@meteorwallet\/sdk/];
-    }
-    return rule;
+  const fallback = config.resolve.fallback || {};
+  Object.assign(fallback, {
+    "crypto": require.resolve("crypto-browserify"),
+    "stream": require.resolve("stream-browserify"),
+    "assert": require.resolve("assert"),
+    "http": require.resolve("stream-http"),
+    "https": require.resolve("https-browserify"),
+    "os": require.resolve("os-browserify"),
+    "url": require.resolve("url"),
+    "process": require.resolve("process/browser"),
   });
-
+  config.resolve.fallback = fallback;
+  config.plugins = (config.plugins || []).concat([
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+      Buffer: ['buffer', 'Buffer']
+    })
+  ]);
   return config;
 };

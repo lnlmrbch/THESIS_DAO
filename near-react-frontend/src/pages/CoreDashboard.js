@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AllBalances from "../components/AllBalances";
 import DaoSettings from "../components/DaoSettings";
-import { FaUserPlus, FaUserShield, FaCheckCircle } from "react-icons/fa";
+import { FaUserPlus, FaUserShield, FaCheckCircle, FaCoins } from "react-icons/fa";
 
 export default function CoreDashboard({ selector, accountId, contractId, userRole }) {
   const [roleToAssign, setRoleToAssign] = useState("");
@@ -53,72 +53,122 @@ export default function CoreDashboard({ selector, accountId, contractId, userRol
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F7FB] text-black px-6 py-12 max-w-6xl mx-auto space-y-10">
-      <h1 className="text-3xl font-bold text-[#2c1c5b] flex items-center gap-3">
-        <FaUserShield className="text-[#3c228c]" />
-        Core Dashboard
-      </h1>
+    <div className="min-h-screen bg-pattern text-black px-6 py-12">
+      <div className="max-w-6xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="glass-effect p-8">
+          <h1 className="text-3xl font-bold text-[#2c1c5b] mb-2 flex items-center gap-2">
+            <FaUserShield className="text-[#6B46C1]" />
+            Core Dashboard
+          </h1>
+          <p className="text-gray-600">
+            Verwaltung und Überwachung des DAO-Systems
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Rolle zuweisen */}
-        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200 space-y-4">
-          <h2 className="text-xl font-semibold text-[#2c1c5b] flex items-center gap-2">
-            <FaUserPlus className="text-[#3c228c]" />
-            Rolle zuweisen
-          </h2>
+        {/* Role Management */}
+        <div className="glass-effect p-6">
+          <div className="card-header">
+            <h2 className="text-xl font-bold text-[#2c1c5b] flex items-center gap-2">
+              <FaUserPlus className="text-[#6B46C1]" />
+              Rollen verwalten
+            </h2>
+          </div>
+          <div className="card-content">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Account ID
+                </label>
+                <input
+                  type="text"
+                  value={targetAccount}
+                  onChange={(e) => setTargetAccount(e.target.value)}
+                  placeholder="account.near"
+                  className="w-full px-4 py-2 glass-effect focus:ring-2 focus:ring-[#6B46C1] focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Rolle
+                </label>
+                <select
+                  value={roleToAssign}
+                  onChange={(e) => setRoleToAssign(e.target.value)}
+                  className="w-full px-4 py-2 glass-effect focus:ring-2 focus:ring-[#6B46C1] focus:border-transparent"
+                >
+                  <option value="">Rolle auswählen</option>
+                  <option value="core">Core</option>
+                  <option value="community">Community</option>
+                  <option value="finance">Finance</option>
+                </select>
+              </div>
+            </div>
+            <button
+              onClick={assignRole}
+              className="modern-button mt-4"
+            >
+              Rolle zuweisen
+            </button>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              Ziel-Account ID
-            </label>
-            <input
-              type="text"
-              placeholder="z.B. user.testnet"
-              className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md"
-              value={targetAccount}
-              onChange={(e) => setTargetAccount(e.target.value)}
+            {status && (
+              <div className="glass-effect p-4 mt-4 bg-opacity-50">
+                <p className="text-sm text-[#6B46C1]">{status}</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* DAO Settings */}
+        <div className="glass-effect p-6">
+          <div className="card-header">
+            <h2 className="text-xl font-bold text-[#2c1c5b] flex items-center gap-2">
+              <FaCheckCircle className="text-[#6B46C1]" />
+              DAO Einstellungen
+            </h2>
+          </div>
+          <div className="mt-4">
+            <DaoSettings
+              selector={selector}
+              accountId={accountId}
+              contractId={contractId}
             />
           </div>
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              Rolle auswählen
-            </label>
-            <select
-              className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md"
-              value={roleToAssign}
-              onChange={(e) => setRoleToAssign(e.target.value)}
-            >
-              <option value="">-- Rolle auswählen --</option>
-              <option value="core">Core</option>
-              <option value="community">Community</option>
-              <option value="finance">Finance</option>
-            </select>
+        {/* Dividend Distribution */}
+        <div className="glass-effect p-6">
+          <div className="card-header">
+            <h2 className="text-xl font-bold text-[#2c1c5b] flex items-center gap-2">
+              <FaCoins className="text-[#6B46C1]" />
+              Gewinne verteilen
+            </h2>
           </div>
-
-          <button
-            onClick={assignRole}
-            className="w-full py-3 bg-primary text-white font-semibold rounded-md hover:brightness-110 transition flex items-center justify-center gap-2"
-          >
-            <FaCheckCircle /> Rolle zuweisen
-          </button>
-
-          {status && <p className="text-sm text-primary mt-2">{status}</p>}
+          <div className="mt-4">
+            <p className="text-sm text-gray-600 mb-4">
+              Verteile monatliche Gewinne an alle Tokenholder basierend auf deren Anteil.
+            </p>
+            <button
+              onClick={() => navigate("/distribute-dividends")}
+              className="modern-button"
+            >
+              Zur Auszahlungsübersicht
+            </button>
+          </div>
         </div>
 
-        {/* DAO Settings (jetzt einheitlich gestylt) */}
-        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-          <DaoSettings
-            selector={selector}
-            accountId={accountId}
-            contractId={contractId}
-          />
+        {/* All Balances */}
+        <div className="glass-effect p-6">
+          <div className="card-header">
+            <h2 className="text-xl font-bold text-[#2c1c5b] flex items-center gap-2">
+              <FaCoins className="text-[#6B46C1]" />
+              Alle Balances
+            </h2>
+          </div>
+          <div className="mt-4">
+            <AllBalances contractId={contractId} />
+          </div>
         </div>
-      </div>
-
-      {/* Alle Balances */}
-      <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-        <AllBalances contractId={contractId} />
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { FaPlus } from "react-icons/fa";
 
 const CreateProposalForm = ({ selector, contractId }) => {
   const [description, setDescription] = useState("");
@@ -6,22 +7,41 @@ const CreateProposalForm = ({ selector, contractId }) => {
   const submitProposal = async () => {
     if (!description.trim()) return;
     const wallet = await selector.wallet();
-    await wallet.signAndSendTransaction({
-      signerId: await wallet.getAccounts().then((a) => a[0].accountId),
-      receiverId: contractId,
-      actions: [
-        {
-          type: "FunctionCall",
-          params: {
-            methodName: "create_proposal",
-            args: { description },
-            gas: "30000000000000",
-            deposit: "1000000000000000000000", // 0.001 NEAR
+    const accountId = await wallet.getAccounts().then((a) => a[0].accountId);
+
+    try {
+      await wallet.signAndSendTransaction({
+        signerId: accountId,
+        receiverId: contractId,
+        actions: [
+          {
+            type: "FunctionCall",
+            params: {
+              methodName: "create_proposal",
+              args: { description },
+              gas: "30000000000000",
+              deposit: "1000000000000000000000", // 0.001 NEAR
+            },
           },
-        },
-      ],
-    });
-    setDescription("");
+        ],
+      });
+
+      // API-Aufruf zur Aktivitätsaufzeichnung
+      await fetch("http://localhost:8000/api/activities", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          accountId,
+          type: "proposal",
+          description: `Proposal erstellt: "${description}"`,
+          timestamp: new Date().toISOString(),
+        }),
+      });
+
+      setDescription("");
+    } catch (err) {
+      console.error("❌ Fehler beim Erstellen des Vorschlags:", err);
+    }
   };
 
   return (
@@ -40,9 +60,9 @@ const CreateProposalForm = ({ selector, contractId }) => {
 
       <button
         onClick={submitProposal}
-        className="w-full bg-[#4F46E5] hover:bg-[#4338CA] text-white font-semibold py-3 rounded-md transition"
+        className="w-full modern-button"
       >
-        Vorschlag einreichen
+        <FaPlus className="mr-2" /> Vorschlag einreichen
       </button>
     </div>
   );

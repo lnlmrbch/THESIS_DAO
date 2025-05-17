@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { initWalletSelector } from "./wallet";
 import Sidebar from "./components/Sidebar";
-import LandingPage from "./pages/LandingPage";
+import LandingPage from "./pages/public/LandingPage";
 import DashboardPage from "./pages/DashboardPage";
 import CoreDashboard from "./pages/CoreDashboard";
 import BuyTokensPage from "./pages/BuyTokensPage";
@@ -11,6 +11,10 @@ import ProposalsPage from "./pages/ProposalsPage";
 import CreateProposalPage from "./pages/CreateProposalPage";
 import ProposalDetailPage from "./pages/ProposalDetailPage";
 import TokenTransferPage from "./pages/TokenTransferPage";
+import DistributeDividendsPage from "./pages/DistributeDividendsPage";
+import UserProfilePage from "./pages/UserProfilePage";
+import GettingStartedPage from "./pages/GettingStartedPage";
+import DAOChatbot from "./components/DaoChatbot";
 import { providers } from "near-api-js";
 
 function App() {
@@ -23,8 +27,12 @@ function App() {
   const [proposals, setProposals] = useState([]);
   const [userRole, setUserRole] = useState(null);
   const [wallet, setWallet] = useState(null);
+  const [hasProfile, setHasProfile] = useState(null);
+  const [hasRedirected, setHasRedirected] = useState(false);
+  const [justLoggedIn, setJustLoggedIn] = useState(false);
 
   const location = useLocation();
+  const navigate = useNavigate();
   const isLanding = location.pathname === "/";
   const contractId = "dao.lioneluser.testnet";
 
@@ -65,6 +73,7 @@ function App() {
       await wallet.signOut();
       setAccountId(null);
       setUserRole(null);
+      setHasProfile(null);
     }
   };
 
@@ -73,15 +82,16 @@ function App() {
       const { selector, modal } = await initWalletSelector();
       setSelector(selector);
       setModal(modal);
-
+      
       try {
         const state = selector.store.getState();
         const accounts = state.accounts;
         if (accounts.length === 0) return;
-
+      
         const wallet = await selector.wallet();
         setWallet(wallet);
         setAccountId(accounts[0].accountId);
+        setJustLoggedIn(true); // <- markiere als frisch eingeloggt
       } catch (err) {
         console.error("Wallet init error:", err);
       }
@@ -92,11 +102,50 @@ function App() {
     if (accountId) fetchContractData();
   }, [accountId]);
 
+  useEffect(() => {
+    const checkUserProfile = async () => {
+      if (!accountId) return;
+
+      try {
+        const res = await fetch(`/api/members/by-id/${accountId}`);
+        if (res.status === 404) {
+          setHasProfile(false);
+          if (location.pathname !== "/profile") navigate("/profile");
+        } else if (res.ok) {
+          setHasProfile(true);
+        }
+      } catch (err) {
+        console.error("❌ Fehler beim Profilcheck:", err);
+        setHasProfile(false);
+      }
+    };
+
+    checkUserProfile();
+  }, [accountId, location.pathname, navigate]);
+
+  useEffect(() => {
+    if (!accountId || hasProfile === null || userBalance === null) return;
+  
+    const progress =
+      (!!accountId ? 1 : 0) +
+      (hasProfile ? 1 : 0) +
+      (userBalance > 0 ? 1 : 0);
+  
+    const state = selector?.store.getState();
+    const loggedInViaLogin = state?.lastModal === "signIn";
+  
+    if (
+      loggedInViaLogin &&
+      progress < 3 &&
+      location.pathname === "/dashboard"
+    ) {
+      navigate("/getting-started");
+    }
+  }, [accountId, hasProfile, userBalance, selector, location.pathname, navigate]);
+
+
   return (
-    <div
-      className={`min-h-screen text-gray-100 font-sans w-full overflow-x-hidden ${isLanding ? "bg-white" : "bg-darkbg flex"
-        }`}
-    >
+    <div className={`min-h-screen text-gray-100 font-sans w-full overflow-x-hidden ${isLanding ? "bg-white" : "bg-darkbg flex"}`}>
       {!isLanding && (
         <Sidebar
           accountId={accountId}
@@ -110,87 +159,92 @@ function App() {
       <main className={`flex-1 p-4 ${!isLanding ? "ml-0 lg:ml-64" : ""}`}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          {accountId && (
+
+          {accountId && hasProfile !== null && (
             <>
-              <Route
-                path="/dashboard"
-                element={
-                  <DashboardPage
-                    selector={selector}
-                    accountId={accountId}
-                    contractId={contractId}
-                    metadata={metadata}
-                    userBalance={userBalance}
-                    totalSupply={totalSupply}
-                    proposals={proposals}
-                    userRole={userRole}
-                  />
-                }
-              />
-              <Route
-                path="/buy-tokens"
-                element={<BuyTokensPage wallet={wallet} accountId={accountId} />}
-              />
-              <Route path="/success" element={<TokenPurchaseSuccess />} />
-
-              {/* Proposal Pages */}
-              <Route
-                path="/proposals"
-                element={
-                  <ProposalsPage
-                    selector={selector}
-                    accountId={accountId}
-                    contractId={contractId}
-                    metadata={metadata}
-                    userBalance={userBalance}
-                    totalSupply={totalSupply}
-                    proposals={proposals}
-                  />
-                }
-              />
-              <Route
-                path="/proposals/new"
-                element={<CreateProposalPage selector={selector} contractId={contractId} />}
-              />
-              <Route
-                path="/proposals/:id"
-                element={
-                  <ProposalDetailPage
-                    selector={selector}
-                    contractId={contractId}
-                    accountId={accountId}
-                    userRole={userRole}
-                  />
-                }
-              />
-              <Route
-                path="/transfer"
-                element={
-                  <TokenTransferPage
-                    selector={selector}
-                    accountId={accountId}
-                    contractId={contractId}
-                  />
-                }
-              />
-
-              {userRole === "core" && (
-                <Route
-                  path="/core"
-                  element={
-                    <CoreDashboard
-                      accountId={accountId}
+              {!hasProfile ? (
+                <Route path="/profile" element={<UserProfilePage accountId={accountId} />} />
+              ) : (
+                <>
+                  <Route path="/dashboard" element={
+                    <DashboardPage
                       selector={selector}
+                      accountId={accountId}
                       contractId={contractId}
+                      metadata={metadata}
+                      userBalance={userBalance}
+                      totalSupply={totalSupply}
+                      proposals={proposals}
                       userRole={userRole}
                     />
-                  }
-                />
+                  } />
+                  <Route path="/buy-tokens" element={<BuyTokensPage wallet={wallet} accountId={accountId} />} />
+                  <Route path="/success" element={<TokenPurchaseSuccess />} />
+                  <Route path="/proposals" element={
+                    <ProposalsPage
+                      selector={selector}
+                      accountId={accountId}
+                      contractId={contractId}
+                      metadata={metadata}
+                      userBalance={userBalance}
+                      totalSupply={totalSupply}
+                      proposals={proposals}
+                    />
+                  } />
+                  <Route path="/proposals/new" element={<CreateProposalPage selector={selector} contractId={contractId} accountId={accountId} />} />
+                  <Route path="/proposals/:id" element={
+                    <ProposalDetailPage
+                      selector={selector}
+                      contractId={contractId}
+                      accountId={accountId}
+                      userRole={userRole}
+                    />
+                  } />
+                  <Route path="/transfer" element={
+                    <TokenTransferPage
+                      selector={selector}
+                      accountId={accountId}
+                      contractId={contractId}
+                    />
+                  } />
+                  <Route
+                    path="/getting-started"
+                    element={
+                      <GettingStartedPage
+                        accountId={accountId}
+                        userBalance={userBalance}
+                      />
+                    }
+                  />
+                  <Route path="/profile" element={<UserProfilePage accountId={accountId} />} />
+
+                  {userRole === "core" && (
+                    <>
+                      <Route path="/core" element={
+                        <CoreDashboard
+                          accountId={accountId}
+                          selector={selector}
+                          contractId={contractId}
+                          userRole={userRole}
+                        />
+                      } />
+                      <Route path="/distribute-dividends" element={
+                        <DistributeDividendsPage
+                          selector={selector}
+                          accountId={accountId}
+                          contractId={contractId}
+                        />
+                      } />
+                    </>
+                  )}
+                </>
               )}
             </>
           )}
         </Routes>
       </main>
+
+      {!isLanding && <DAOChatbot />}
     </div>
   );
 }

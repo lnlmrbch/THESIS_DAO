@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { FaWallet } from "react-icons/fa";
 
 export default function Navbar({ accountId, contractId, userRole, onLogout, modal }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -82,9 +83,9 @@ export default function Navbar({ accountId, contractId, userRole, onLogout, moda
         ) : (
           <button
             onClick={() => modal && modal.show()}
-            className="bg-accent text-black font-bold px-6 py-2 rounded-full hover:brightness-110 transition"
+            className="modern-button"
           >
-            Wallet verbinden
+            <FaWallet className="mr-2" /> Wallet verbinden
           </button>
         )}
       </div>

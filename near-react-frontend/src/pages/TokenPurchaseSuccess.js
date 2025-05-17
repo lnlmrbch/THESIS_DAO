@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { FaPlus, FaHome } from 'react-icons/fa';
 
 const TokenPurchaseSuccess = () => {
   const location = useLocation();
@@ -23,15 +24,15 @@ const TokenPurchaseSuccess = () => {
         <div className="flex justify-center space-x-4 pt-4">
           <button
             onClick={() => navigate('/buy-tokens')}
-            className="px-5 py-2 bg-gradient-to-r from-green-400 to-accent text-black font-bold rounded-full hover:brightness-110 transition"
+            className="modern-button"
           >
-            Mehr kaufen
+            <FaPlus className="mr-2" /> Mehr kaufen
           </button>
           <button
             onClick={() => navigate('/')}
-            className="px-5 py-2 bg-gray-700 text-white font-medium rounded-full hover:bg-gray-600 transition"
+            className="modern-button bg-gray-700 hover:bg-gray-600"
           >
-            Zurück zur DAO
+            <FaHome className="mr-2" /> Zurück zur DAO
           </button>
         </div>
       </div>

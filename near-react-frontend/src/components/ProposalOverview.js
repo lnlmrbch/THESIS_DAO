@@ -1,5 +1,6 @@
 // src/components/ProposalOverview.js
 import React from "react";
+import { FaVoteYea, FaThumbsDown, FaPoll } from "react-icons/fa";
 
 const ProposalOverview = ({ proposals, metadata, userBalance, totalSupply }) => {
   const formatYocto = (amount) => {
@@ -10,8 +11,11 @@ const ProposalOverview = ({ proposals, metadata, userBalance, totalSupply }) => 
   return (
     <section className="max-w-6xl mx-auto px-4 space-y-10">
       <div>
-        <h2 className="text-2xl font-bold text-[#2c1c5b]">📋 Proposals Übersicht</h2>
-        <p className="text-sm text-gray-500">
+        <h2 className="text-2xl font-bold text-[#2c1c5b] flex items-center gap-2">
+          <FaPoll className="text-[#6B46C1]" />
+          Proposals Übersicht
+        </h2>
+        <p className="text-sm text-gray-500 mt-1">
           Deine Stimmrechte:{" "}
           <span className="text-primary font-medium">
             {formatYocto(userBalance)} / {formatYocto(totalSupply)} {metadata?.symbol || "TOKEN"}
@@ -22,18 +26,18 @@ const ProposalOverview = ({ proposals, metadata, userBalance, totalSupply }) => 
       {proposals.length === 0 ? (
         <p className="text-gray-500 text-center">Noch keine Proposals vorhanden.</p>
       ) : (
-        <div className="grid grid-cols-1 gap-6">
+        <div className="grid grid-cols-1 gap-4">
           {proposals.map((p) => (
             <div
               key={p.id}
-              className="border border-gray-200 bg-white rounded-xl p-4 shadow-sm"
+              className="border border-gray-200 bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition"
             >
               <div className="flex justify-between items-center mb-2">
                 <h4 className="font-semibold text-[#2c1c5b]">
-                  #{p.id} – {p.description}
+                  #{p.id} · {p.description}
                 </h4>
                 <span
-                  className={`text-xs px-3 py-1 rounded-full font-medium tracking-wide ${
+                  className={`text-xs px-3 py-1 rounded-full font-semibold tracking-wide ${
                     p.status === "Accepted"
                       ? "bg-green-100 text-green-700"
                       : p.status === "Rejected"
@@ -44,9 +48,14 @@ const ProposalOverview = ({ proposals, metadata, userBalance, totalSupply }) => 
                   {p.status}
                 </span>
               </div>
-              <p className="text-xs text-gray-500">
-                Ja-Stimmen: {p.votes_for?.length || 0} · Nein-Stimmen: {p.votes_against?.length || 0}
-              </p>
+              <div className="text-sm text-gray-600 flex gap-4">
+                <span className="flex items-center gap-1">
+                  <FaVoteYea className="text-[#6B46C1]" /> {p.votes_for?.length || 0} Ja
+                </span>
+                <span className="flex items-center gap-1">
+                  <FaThumbsDown className="text-red-500" /> {p.votes_against?.length || 0} Nein
+                </span>
+              </div>
             </div>
           ))}
         </div>

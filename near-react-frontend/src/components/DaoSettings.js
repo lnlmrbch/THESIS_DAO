@@ -1,5 +1,6 @@
 // src/components/DaoSettings.js
 import React, { useState } from "react";
+import { FaTools, FaCoins, FaClock, FaSave, FaTimes } from "react-icons/fa";
 
 const DaoSettings = ({ selector, accountId, contractId }) => {
   const [minDeposit, setMinDeposit] = useState("");
@@ -35,39 +36,61 @@ const DaoSettings = ({ selector, accountId, contractId }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-6">
-      <h2 className="text-xl font-bold text-[#2c1c5b]">🛠 DAO Einstellungen</h2>
-
+    <div className="space-y-6">
       <div className="space-y-4">
-        <div>
-          <label className="text-sm font-medium text-gray-600">Minimale Deposit für Proposal (NEAR)</label>
+        <div className="bg-white/50 backdrop-blur-sm rounded-lg p-4 border border-gray-100">
+          <label className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-2">
+            <FaCoins className="text-[#6B46C1]" />
+            Minimale Deposit für Proposal (NEAR)
+          </label>
           <input
             type="number"
             value={minDeposit}
             onChange={(e) => setMinDeposit(e.target.value)}
-            className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md focus:outline-none"
+            className="w-full p-3 bg-white/80 rounded-lg border border-gray-200 focus:ring-2 focus:ring-[#6B46C1] focus:border-transparent transition-all"
+            placeholder="z.B. 0.01"
           />
         </div>
 
-        <div>
-          <label className="text-sm font-medium text-gray-600">Voting-Dauer (Sekunden)</label>
+        <div className="bg-white/50 backdrop-blur-sm rounded-lg p-4 border border-gray-100">
+          <label className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-2">
+            <FaClock className="text-[#6B46C1]" />
+            Voting-Dauer (Sekunden)
+          </label>
           <input
             type="number"
             value={votingDuration}
             onChange={(e) => setVotingDuration(e.target.value)}
-            className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md focus:outline-none"
+            className="w-full p-3 bg-white/80 rounded-lg border border-gray-200 focus:ring-2 focus:ring-[#6B46C1] focus:border-transparent transition-all"
+            placeholder="z.B. 86400 (für 24 Stunden)"
           />
         </div>
+      </div>
 
+      <div className="flex justify-end gap-4">
+        <button
+          onClick={() => {
+            setMinDeposit("");
+            setVotingDuration("");
+            setStatus(null);
+          }}
+          className="modern-button bg-gray-600 hover:bg-gray-500"
+        >
+          <FaTimes className="mr-2" /> Zurücksetzen
+        </button>
         <button
           onClick={handleSubmit}
-          className="px-6 py-3 bg-primary text-white font-semibold rounded-md hover:brightness-110 transition"
+          className="modern-button"
         >
-          Speichern
+          <FaSave className="mr-2" /> Speichern
         </button>
-
-        {status && <p className="text-sm text-gray-600">{status}</p>}
       </div>
+
+      {status && (
+        <div className="bg-white/50 backdrop-blur-sm rounded-lg p-4 border border-gray-100">
+          <p className="text-sm text-[#6B46C1]">{status}</p>
+        </div>
+      )}
     </div>
   );
 };
