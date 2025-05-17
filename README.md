@@ -22,9 +22,7 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
   - [Deployment](#deployment)
   - [Roadmap \& Projekte](#roadmap--projekte)
   - [Ressourcen \& Links](#ressourcen--links)
-  - [API-Endpunkte](#api-endpunkte)
-    - [DAO Member Registry](#dao-member-registry)
-    - [Chatbot Backend](#chatbot-backend)
+  - [Lizenz](#lizenz)
 
 ---
 
@@ -108,16 +106,20 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
   - Verwaltung und Speicherung von DAO-Mitgliedern
   - REST-API für Mitglieder- und Aktivitätsdaten
   - Anbindung an das Frontend für Profil- und Aktivitätsverwaltung
+- **API-Endpunkte:**
+  - **Mitglieder**
+    - `GET /api/members` – Liste aller Mitglieder
+    - `POST /api/members` – Neues Mitglied anlegen oder vorhandenes aktualisieren
+    - `GET /api/members/by-id/:account_id` – Einzelnes Mitglied anhand der account_id abrufen
+  - **Aktivitäten**
+    - `GET /api/activities` – Liste der letzten 50 Aktivitäten (sortiert nach Zeitstempel)
+    - `POST /api/activities` – Neue Aktivität erstellen (nur Käufe erlaubt)
 - **Setup:**
   ```bash
   cd dao-member-registry
   npm install
   npm start
   ```
-- **Wichtige Endpunkte:**
-  - `GET /api/members` – Liste aller Mitglieder
-  - `POST /api/members` – Neues Mitglied anlegen
-  - `GET /api/activities` – Aktivitäten-Log
 - **Konfiguration:**  
   `.env` mit MongoDB-URI benötigt
 
@@ -128,6 +130,9 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
   - KI-gestützter Chatbot für DAO-Fragen und -Support
   - Training mit eigenen Daten (`training_data.json`)
   - REST-API für Chat- und Health-Check
+- **API-Endpunkte:**
+  - `POST /api/chat` – Chatbot-Anfrage senden
+  - `GET /api/health` – Health-Check-Endpunkt
 - **Setup:**
   ```bash
   cd chatbot-backend
@@ -138,9 +143,6 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
   python train.py
   uvicorn main:app --reload
   ```
-- **Wichtige Endpunkte:**
-  - `POST /api/chat` – Chatbot-Anfrage
-  - `GET /api/health` – Health-Check
 
 ---
 
@@ -204,22 +206,4 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
 
 ---
 
-## API-Endpunkte
-
-### DAO Member Registry
-
-- **Mitglieder**
-  - `GET /api/members` – Liste aller Mitglieder
-  - `POST /api/members` – Neues Mitglied anlegen oder vorhandenes aktualisieren
-  - `GET /api/members/by-id/:account_id` – Einzelnes Mitglied anhand der account_id abrufen
-
-- **Aktivitäten**
-  - `GET /api/activities` – Liste der letzten 50 Aktivitäten (sortiert nach Zeitstempel)
-  - `POST /api/activities` – Neue Aktivität erstellen (nur Käufe erlaubt)
-
-### Chatbot Backend
-
-- `POST /api/chat` – Chatbot-Anfrage senden
-- `GET /api/health` – Health-Check-Endpunkt
-
----
+## Lizenz
