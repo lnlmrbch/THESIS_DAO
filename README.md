@@ -22,7 +22,6 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
   - [Deployment](#deployment)
   - [Roadmap \& Projekte](#roadmap--projekte)
   - [Ressourcen \& Links](#ressourcen--links)
-  - [Lizenz](#lizenz)
 
 ---
 
@@ -205,5 +204,3 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
 - [Tailwind CSS](https://tailwindcss.com/)
 
 ---
-
-## Lizenz
