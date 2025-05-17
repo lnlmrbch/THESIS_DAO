@@ -32,4 +32,7 @@ yarn-error.log*
 # Rust
 target/
 **/*.rs.bk
-Cargo.lock 
+Cargo.lock
+
+# Near React Frontend
+near-react-frontend/node_modules/.cache/ 
