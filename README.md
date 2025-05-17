@@ -113,6 +113,7 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
   - **Aktivitäten**
     - `GET /api/activities` – Liste der letzten 50 Aktivitäten (sortiert nach Zeitstempel)
     - `POST /api/activities` – Neue Aktivität erstellen (nur Käufe erlaubt)
+  - [API-Dokumentation](https://documenter.getpostman.com/view/33908680/2sB2qXj2dz)
 - **Setup:**
   ```bash
   cd dao-member-registry
@@ -132,6 +133,7 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
 - **API-Endpunkte:**
   - `POST /api/chat` – Chatbot-Anfrage senden
   - `GET /api/health` – Health-Check-Endpunkt
+  - [API-Dokumentation](https://documenter.getpostman.com/view/33908680/2sB2qXj2dz)
 - **Setup:**
   ```bash
   cd chatbot-backend
