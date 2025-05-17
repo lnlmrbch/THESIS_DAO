@@ -1,0 +1,3 @@
+chatbot-backend/venv/ linguist-language= detection=false
+near-react-frontend/node_modules/ linguist-language= detection=false
+dao-member-registry/node_modules/ linguist-language= detection=false 
