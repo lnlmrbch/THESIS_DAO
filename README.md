@@ -8,19 +8,20 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
 
 ## Inhaltsverzeichnis
 
-- [Projektüberblick](#projektüberblick)
-- [Architektur](#architektur)
-- [Komponenten](#komponenten)
-  - [1. smart-contract (Rust, NEAR)](#1-smart-contract)
-  - [2. near-react-frontend (React, NEAR)](#2-near-react-frontend)
-  - [3. dao-member-registry (Node.js, Express, MongoDB)](#3-dao-member-registry)
-  - [4. chatbot-backend (Python, FastAPI, Ollama)](#4-chatbot-backend)
-- [Setup & Installation](#setup--installation)
-- [Entwickler- und Nutzer-Workflows](#entwickler--und-nutzer-workflows)
-- [Deployment](#deployment)
-- [Roadmap & Projekte](#roadmap--projekte)
-- [Ressourcen & Links](#ressourcen--links)
-- [Lizenz](#lizenz)
+- [THESIS DAO – Vollständige Projektübersicht](#thesis-dao--vollständige-projektübersicht)
+  - [Inhaltsverzeichnis](#inhaltsverzeichnis)
+  - [Projektüberblick](#projektüberblick)
+  - [Architektur](#architektur)
+  - [Komponenten](#komponenten)
+    - [1. smart-contract](#1-smart-contract)
+    - [2. near-react-frontend](#2-near-react-frontend)
+    - [3. dao-member-registry](#3-dao-member-registry)
+    - [4. chatbot-backend](#4-chatbot-backend)
+  - [Setup \& Installation](#setup--installation)
+  - [Entwickler- und Nutzer-Workflows](#entwickler--und-nutzer-workflows)
+  - [Deployment](#deployment)
+  - [Roadmap \& Projekte](#roadmap--projekte)
+  - [Ressourcen \& Links](#ressourcen--links)
 
 ---
 
@@ -199,15 +200,3 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
 - [Tailwind CSS](https://tailwindcss.com/)
 
 ---
-
-## Lizenz
-
-Dieses Projekt steht unter der MIT-Lizenz.  
-Siehe [LICENSE](LICENSE) für Details.
-
----
-
-**Kontakt & Support:**  
-Für Fragen, Issues oder Feature-Requests bitte GitHub-Issues nutzen oder direkt an den Maintainer wenden.
-
---- 
