@@ -156,7 +156,7 @@ function App() {
         />
       )}
 
-      <main className={`flex-1 p-4 ${!isLanding ? "ml-0 lg:ml-64" : ""}`}>
+      <main className={`flex-1 ${!isLanding ? "ml-0 lg:ml-64" : ""}`}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
 
