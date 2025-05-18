@@ -105,9 +105,9 @@ const DashboardPage = ({
   }, [proposals, userBalance, totalSupply]);
 
   return (
-    <div className="px-8 py-12 bg-pattern text-black min-h-screen space-y-8">
+    <div className="px-6 py-10 bg-pattern text-black min-h-screen space-y-8">
       {/* Welcome Section */}
-      <div className="glass-effect p-8">
+      <div className="glass-effect p-8 rounded-xl">
         <h1 className="text-3xl font-bold text-[#2c1c5b] mb-2 flex items-center gap-3">
           <FaHandPaper className="text-[#6B46C1]" />
           {getGreeting()}, {userName || accountId.split(".")[0]}
@@ -117,7 +117,7 @@ const DashboardPage = ({
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="glass-effect p-6">
+        <div className="glass-effect p-6 rounded-xl">
           <FaUserShield className="text-2xl text-[#6B46C1]" />
           <div>
             <p className="text-sm text-gray-500">Deine Rolle</p>
@@ -126,7 +126,7 @@ const DashboardPage = ({
             </p>
           </div>
         </div>
-        <div className="glass-effect p-6">
+        <div className="glass-effect p-6 rounded-xl">
           <FaWallet className="text-2xl text-[#6B46C1]" />
           <div>
             <p className="text-sm text-gray-500">Token Balance</p>
@@ -136,7 +136,7 @@ const DashboardPage = ({
             </p>
           </div>
         </div>
-        <div className="glass-effect p-6">
+        <div className="glass-effect p-6 rounded-xl">
           <FaVoteYea className="text-2xl text-[#6B46C1]" />
           <div>
             <p className="text-sm text-gray-500">Voting Power</p>
@@ -145,7 +145,7 @@ const DashboardPage = ({
             </p>
           </div>
         </div>
-        <div className="glass-effect p-6">
+        <div className="glass-effect p-6 rounded-xl">
           <FaListAlt className="text-2xl text-[#6B46C1]" />
           <div>
             <p className="text-sm text-gray-500">Aktive Proposals</p>
@@ -161,8 +161,8 @@ const DashboardPage = ({
         {/* Left Column - Active Proposals & More */}
         <div className="lg:col-span-2 space-y-8">
           {/* Active Proposals Card */}
-          <div className="glass-effect">
-            <div className="card-header">
+          <div className="glass-effect rounded-xl">
+            <div className="card-header px-6 py-4">
               <div className="flex justify-between items-center">
                 <h2 className="text-xl font-bold text-[#2c1c5b] flex items-center gap-2">
                   <FaClock className="text-[#6B46C1]" /> Aktive Proposals
@@ -176,7 +176,7 @@ const DashboardPage = ({
                 </button>
               </div>
             </div>
-            <div className="card-content">
+            <div className="card-content px-6 py-4">
               {activeProposals.length === 0 ? (
                 <p className="text-gray-500 text-center py-4">Keine aktiven Proposals vorhanden.</p>
               ) : (
@@ -185,7 +185,7 @@ const DashboardPage = ({
                     <div
                       key={proposal.id}
                       onClick={() => navigate(`/proposals/${proposal.id}`)}
-                      className="glass-effect p-4 hover:scale-[1.02] cursor-pointer transition-all"
+                      className="glass-effect p-4 rounded-lg hover:scale-[1.02] cursor-pointer transition-all"
                     >
                       <div className="flex justify-between items-start">
                         <div>
@@ -222,13 +222,13 @@ const DashboardPage = ({
           </div>
 
           {/* Activity Overview */}
-          <div className="glass-effect">
-            <div className="card-header">
+          <div className="glass-effect rounded-xl">
+            <div className="card-header px-6 py-4">
               <h2 className="text-xl font-bold text-[#2c1c5b] flex items-center gap-2">
                 <FaHistory className="text-[#6B46C1]" /> Letzte Kaufaktivitäten
               </h2>
             </div>
-            <div className="card-content">
+            <div className="card-content px-6 py-4">
               {activities.length === 0 ? (
                 <p className="text-gray-500 text-center py-4">Keine Aktivitäten vorhanden.</p>
               ) : (
@@ -266,13 +266,13 @@ const DashboardPage = ({
         {/* Right Column - Additional Info */}
         <div className="space-y-8">
           {/* Token Sale Progress */}
-          <div className="glass-effect">
-            <div className="card-header">
+          <div className="glass-effect rounded-xl">
+            <div className="card-header px-6 py-4">
               <h2 className="text-xl font-bold text-[#2c1c5b] flex items-center gap-2">
                 <FaChartLine className="text-[#6B46C1]" /> Token Sale Fortschritt
               </h2>
             </div>
-            <div className="card-content">
+            <div className="card-content px-6 py-4">
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Verkaufte Tokens</span>
@@ -292,13 +292,13 @@ const DashboardPage = ({
           </div>
 
           {/* Token Distribution */}
-          <div className="glass-effect">
-            <div className="card-header">
+          <div className="glass-effect rounded-xl">
+            <div className="card-header px-6 py-4">
               <h2 className="text-xl font-bold text-[#2c1c5b] flex items-center gap-2">
                 <FaChartPie className="text-[#6B46C1]" /> Token Verteilung
               </h2>
             </div>
-            <div className="card-content">
+            <div className="card-content px-6 py-4">
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between items-center mb-1">
@@ -332,13 +332,13 @@ const DashboardPage = ({
           </div>
 
           {/* Upcoming Events */}
-          <div className="glass-effect">
-            <div className="card-header">
+          <div className="glass-effect rounded-xl">
+            <div className="card-header px-6 py-4">
               <h2 className="text-xl font-bold text-[#2c1c5b] flex items-center gap-2">
                 <FaCalendarAlt className="text-[#6B46C1]" /> Kommende Events
               </h2>
             </div>
-            <div className="card-content">
+            <div className="card-content px-6 py-4">
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <div className="p-2 bg-[#6B46C1] bg-opacity-10 rounded-lg">

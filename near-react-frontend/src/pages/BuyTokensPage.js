@@ -138,8 +138,8 @@ const BuyTokensPage = ({ wallet, accountId }) => {
           <div className="flex items-center justify-between">
             <div className="space-y-2">
               <h1 className="text-2xl sm:text-3xl font-bold text-[#2c1c5b] flex items-center gap-3">
-                <FaWineGlassAlt className="text-[#6B46C1]" />
-                Wine DAO Token kaufen
+                <FaCoins className="text-[#6B46C1]" />
+                Thesis DAO Token kaufen
               </h1>
               <p className="text-gray-600 flex items-center gap-2">
                 <FaWallet className="text-gray-500" />
@@ -179,8 +179,8 @@ const BuyTokensPage = ({ wallet, accountId }) => {
                       className="mt-2"
                     >
                       <div className="text-sm text-[#6B46C1] font-medium flex items-center gap-2">
-                        <FaWineGlassAlt />
-                        Du erhältst {calculateTokens(amount)} Wine DAO Tokens
+                        <FaCoins />
+                        Du erhältst {calculateTokens(amount)} Thesis DAO Tokens
                       </div>
                     </motion.div>
                   )}
@@ -286,7 +286,7 @@ const BuyTokensPage = ({ wallet, accountId }) => {
                 <div className="flex items-start gap-3">
                   <FaChartLine className="text-[#6B46C1] mt-1" />
                   <p className="text-gray-600">
-                    Token-Preis: 1 Wine DAO Token = {TOKEN_PRICE_CHF} CHF
+                    Token-Preis: 1 Thesis DAO Token = {TOKEN_PRICE_CHF} CHF
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
