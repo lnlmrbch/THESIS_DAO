@@ -331,4 +331,14 @@ impl Contract {
             }
         }
     }
+
+    /// Gibt die Gesamtmenge aller Tokens zurück (bleibt immer gleich)
+    pub fn get_total_supply(&self) -> near_sdk::json_types::U128 {
+        near_sdk::json_types::U128(self.total_supply.as_yoctonear())
+    }
+
+    /// Gibt den aktuellen Token-Pool zurück (wie viele noch verkauft werden können)
+    pub fn get_token_pool(&self) -> near_sdk::json_types::U128 {
+        near_sdk::json_types::U128(self.token_pool.as_yoctonear())
+    }
 }

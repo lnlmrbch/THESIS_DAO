@@ -30,6 +30,7 @@ function App() {
   const [hasProfile, setHasProfile] = useState(null);
   const [hasRedirected, setHasRedirected] = useState(false);
   const [justLoggedIn, setJustLoggedIn] = useState(false);
+  const [tokenPool, setTokenPool] = useState(null);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -51,12 +52,13 @@ function App() {
     };
 
     if (accountId) {
-      const [meta, balance, supply, props, role] = await Promise.all([
+      const [meta, balance, supply, props, role, pool] = await Promise.all([
         fetchView("ft_metadata"),
         fetchView("ft_balance_of", { account_id: accountId }),
         fetchView("ft_total_supply"),
         fetchView("get_proposals"),
         fetchView("get_role", { account_id: accountId }),
+        fetchView("get_token_pool"),
       ]);
 
       setMetadata(meta);
@@ -64,6 +66,7 @@ function App() {
       setTotalSupply(supply);
       setProposals(props);
       setUserRole(role);
+      setTokenPool(pool);
     }
   };
 
@@ -174,6 +177,7 @@ function App() {
                       metadata={metadata}
                       userBalance={userBalance}
                       totalSupply={totalSupply}
+                      tokenPool={tokenPool}
                       proposals={proposals}
                       userRole={userRole}
                     />

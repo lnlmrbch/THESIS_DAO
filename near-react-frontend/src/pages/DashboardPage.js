@@ -31,6 +31,7 @@ const DashboardPage = ({
   totalSupply,
   proposals,
   userRole,
+  tokenPool,
 }) => {
   const cardStyle =
     "flex items-center gap-4 p-6 bg-white shadow-sm rounded-xl border border-gray-200 hover:shadow-md transition-shadow duration-200";
@@ -103,6 +104,12 @@ const DashboardPage = ({
     const power = (parseFloat(userBalance) / parseFloat(totalSupply)) * 100;
     setVotingPower(power);
   }, [proposals, userBalance, totalSupply]);
+
+  // Hilfswerte für menschenlesbare Anzeige
+  const HARDCAP = 10_000_000;
+  const decimals = metadata?.decimals || 24;
+  const sold = (parseFloat(totalSupply) - parseFloat(tokenPool)) / Math.pow(10, decimals);
+  const percent = sold ? Math.min(100, (sold / HARDCAP) * 100) : 0;
 
   return (
     <div className="px-6 py-10 bg-pattern text-black min-h-screen space-y-8">
@@ -277,16 +284,16 @@ const DashboardPage = ({
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Verkaufte Tokens</span>
                   <span className="font-semibold text-[#2c1c5b]">
-                    {(parseFloat(totalSupply) / Math.pow(10, metadata?.decimals || 24)).toLocaleString()} / {(10000000).toLocaleString()} {metadata?.symbol}
+                    {sold.toLocaleString(undefined, { maximumFractionDigits: 2 })} / {HARDCAP.toLocaleString()} {metadata?.symbol}
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2.5">
                   <div
                     className="bg-[#6B46C1] h-2.5 rounded-full"
-                    style={{ width: `${Math.min(100, (parseFloat(totalSupply) / (10000000 * Math.pow(10, metadata?.decimals || 24))) * 100).toFixed(2)}%` }}
+                    style={{ width: `${percent}%` }}
                   ></div>
                 </div>
-                <p className="text-sm text-gray-500 text-right">{`${Math.min(100, (parseFloat(totalSupply) / (10000000 * Math.pow(10, metadata?.decimals || 24))) * 100).toFixed(2)}% abgeschlossen`}</p>
+                <p className="text-sm text-gray-500 text-right">{`${percent.toFixed(2)}% abgeschlossen`}</p>
               </div>
             </div>
           </div>

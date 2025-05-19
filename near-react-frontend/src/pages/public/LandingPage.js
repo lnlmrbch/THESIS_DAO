@@ -125,9 +125,11 @@ const LandingPage = () => {
   }, []);
 
   // Token Sale State
-  const HARDCAP = 10000000; // 10 Millionen Token
+  const HARDCAP = 10_000_000; // 10 Millionen Token
   const [tokenSale, setTokenSale] = useState({
     totalSupply: null,
+    tokenPool: null,
+    sold: null,
     symbol: null,
     decimals: 24,
     loading: true,
@@ -152,9 +154,13 @@ const LandingPage = () => {
           return JSON.parse(decoded);
         };
         const meta = await fetchView("ft_metadata");
-        const totalSupply = await fetchView("ft_total_supply");
+        const totalSupply = await fetchView("get_total_supply");
+        const tokenPool = await fetchView("get_token_pool");
+        const sold = (parseFloat(totalSupply) - parseFloat(tokenPool)).toString();
         setTokenSale({
           totalSupply,
+          tokenPool,
+          sold,
           symbol: meta?.symbol || "TOKEN",
           decimals: meta?.decimals || 24,
           loading: false,
@@ -167,11 +173,13 @@ const LandingPage = () => {
     fetchTokenSale();
   }, []);
 
+  // Hilfsfunktionen für menschenlesbare Werte
   const formatAmount = (amount) => {
     if (!tokenSale.decimals || !amount) return "0.00";
-    return (parseFloat(amount) / Math.pow(10, tokenSale.decimals)).toLocaleString();
+    return (parseFloat(amount) / Math.pow(10, tokenSale.decimals)).toLocaleString(undefined, { maximumFractionDigits: 2 });
   };
-  const percent = tokenSale.totalSupply ? Math.min(100, (parseFloat(tokenSale.totalSupply) / (HARDCAP * Math.pow(10, tokenSale.decimals))) * 100) : 0;
+  const soldHuman = tokenSale.sold ? parseFloat(tokenSale.sold) / Math.pow(10, tokenSale.decimals) : 0;
+  const percent = soldHuman ? Math.min(100, (soldHuman / HARDCAP) * 100) : 0;
 
   return (
     <div className="w-screen bg-gradient-to-br from-[#F5F7FB] via-white to-[#F5F7FB] text-black overflow-x-hidden scroll-smooth min-h-screen">
@@ -238,7 +246,7 @@ const LandingPage = () => {
                     <div className="flex items-center gap-2 mb-1">
                       <FaGem className="text-accent text-lg" />
                       <span className="text-sm text-gray-700 font-medium">Token Sale:</span>
-                      <span className="text-sm font-bold text-primary">{formatAmount(tokenSale.totalSupply)} / {HARDCAP.toLocaleString()} {tokenSale.symbol}</span>
+                      <span className="text-sm font-bold text-primary">{formatAmount(tokenSale.sold)} / {HARDCAP.toLocaleString()} {tokenSale.symbol}</span>
                       <span className="text-xs text-gray-500">({percent.toFixed(2)}%)</span>
                     </div>
                     <div className="w-full h-3 bg-blue-100 rounded-full overflow-hidden">
