@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/THESIS_DAO/static/css/main.bb6ac001.css",
+    "main.js": "/THESIS_DAO/static/js/main.7ccfe887.js",
+    "index.html": "/THESIS_DAO/index.html",
+    "main.bb6ac001.css.map": "/THESIS_DAO/static/css/main.bb6ac001.css.map",
+    "main.7ccfe887.js.map": "/THESIS_DAO/static/js/main.7ccfe887.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.bb6ac001.css",
+    "static/js/main.7ccfe887.js"
+  ]
+}
