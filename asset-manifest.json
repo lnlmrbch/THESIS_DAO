@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/THESIS_DAO/static/css/main.bb6ac001.css",
-    "main.js": "/THESIS_DAO/static/js/main.5275f57e.js",
+    "main.css": "/THESIS_DAO/static/css/main.99de5b79.css",
+    "main.js": "/THESIS_DAO/static/js/main.66c03eca.js",
     "index.html": "/THESIS_DAO/index.html",
-    "main.bb6ac001.css.map": "/THESIS_DAO/static/css/main.bb6ac001.css.map",
-    "main.5275f57e.js.map": "/THESIS_DAO/static/js/main.5275f57e.js.map"
+    "main.99de5b79.css.map": "/THESIS_DAO/static/css/main.99de5b79.css.map",
+    "main.66c03eca.js.map": "/THESIS_DAO/static/js/main.66c03eca.js.map"
   },
   "entrypoints": [
-    "static/css/main.bb6ac001.css",
-    "static/js/main.5275f57e.js"
+    "static/css/main.99de5b79.css",
+    "static/js/main.66c03eca.js"
   ]
 }
