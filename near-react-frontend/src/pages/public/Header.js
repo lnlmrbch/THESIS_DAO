@@ -35,10 +35,10 @@ const Header = ({ connectWallet }) => {
                   onClick={() => setMenuOpen(false)}
                 >
                   {link.label}
-                </Link>
-              </li>
+            </Link>
+          </li>
             ))}
-          </ul>
+        </ul>
           <button
             onClick={connectWallet}
             className="ml-4 flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-primary via-blue-500 to-accent text-white font-semibold shadow-lg hover:brightness-110 hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-white"

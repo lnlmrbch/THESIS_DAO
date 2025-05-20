@@ -94,7 +94,7 @@ function App() {
         const wallet = await selector.wallet();
         setWallet(wallet);
         setAccountId(accounts[0].accountId);
-        setJustLoggedIn(true); // <- markiere als frisch eingeloggt
+        setJustLoggedIn(true);
       } catch (err) {
         console.error("Wallet init error:", err);
       }
@@ -146,6 +146,16 @@ function App() {
     }
   }, [accountId, hasProfile, userBalance, selector, location.pathname, navigate]);
 
+  useEffect(() => {
+    // Nur im Production-Build auf GitHub Pages umleiten
+    if (
+      process.env.NODE_ENV === "production" &&
+      window.location.hostname === "lnlmrbch.github.io" &&
+      window.location.pathname === "/"
+    ) {
+      window.location.replace("/THESIS_DAO/");
+    }
+  }, []);
 
   return (
     <div className={`min-h-screen text-gray-100 font-sans w-full overflow-x-hidden ${isLanding ? "bg-white" : "bg-darkbg flex"}`}>
