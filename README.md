@@ -18,8 +18,9 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
     - [3. dao-member-registry](#3-dao-member-registry)
     - [4. chatbot-backend](#4-chatbot-backend)
   - [Setup \& Installation](#setup--installation)
-  - [Entwickler- und Nutzer-Workflows](#entwickler--und-nutzer-workflows)
+  - [Dynamische API-URL \& Umgebungsvariablen](#dynamische-api-url--umgebungsvariablen)
   - [Deployment](#deployment)
+  - [UptimeRobot für Demo-Zwecke](#uptimerobot-für-demo-zwecke)
   - [Roadmap \& Projekte](#roadmap--projekte)
   - [Ressourcen \& Links](#ressourcen--links)
 
@@ -87,6 +88,7 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
   - Mitgliederprofil, Onboarding, Getting Started
   - Chatbot-Integration
   - Responsive Design (Tailwind CSS)
+  - **Dynamische API-URL:** Das Frontend erkennt automatisch, ob es lokal oder online läuft und verwendet die passende Backend-URL (siehe unten).
 - **Setup:**
   ```bash
   cd near-react-frontend
@@ -96,7 +98,10 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
 - **Wichtige Seiten/Komponenten:**
   - `DashboardPage`, `ProposalsPage`, `CreateProposalPage`, `UserProfilePage`
   - `DaoChatbot`, `Sidebar`, `Navbar`
-- **Proxy:** Standardmäßig auf `localhost:5050` (für Backend-APIs)
+- **API-URL:** Wird dynamisch über Umgebungsvariablen gesetzt (siehe unten).
+- **Deployment:**
+  - **Production:** GitHub Pages (Branch: `gh-pages`)
+  - **Lokal:** Mit `.env`-Datei (siehe unten)
 
 ### 3. dao-member-registry
 
@@ -121,7 +126,10 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
   npm start
   ```
 - **Konfiguration:**  
-  `.env` mit MongoDB-URI benötigt
+  `.env` mit `MONGO_URI` anlegen (siehe unten)
+- **Deployment:**
+  - **Production:** Render.com (kostenlos, aber mit Cold Starts)
+  - **Lokal:** Mit `.env`-Datei
 
 ### 4. chatbot-backend
 
@@ -159,32 +167,53 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
 
 3. **Umgebungsvariablen setzen:**  
    - Für `dao-member-registry` eine `.env` mit `MONGO_URI` anlegen.
+   - Für das Frontend (`near-react-frontend`):
+     - `.env` für lokale Entwicklung:
+       ```
+       REACT_APP_API_URL=http://localhost:5050
+       ```
+     - `.env.production` für Production-Build (GitHub Pages):
+       ```
+       REACT_APP_API_URL=https://thesis-dao.onrender.com
+       ```
 
 4. **Smart Contract auf NEAR deployen** (Testnet empfohlen).
 
 ---
 
-## Entwickler- und Nutzer-Workflows
+## Dynamische API-URL & Umgebungsvariablen
 
-- **Smart Contract Entwicklung:**  
-  Rust-Code im `smart-contract`-Ordner anpassen, testen und deployen.
-- **Frontend Entwicklung:**  
-  React-Komponenten im `near-react-frontend`-Ordner anpassen, lokal testen.
-- **Backend Entwicklung:**  
-  Node.js- und Python-Backends für Mitgliederverwaltung und Chatbot anpassen.
-- **CI/CD:**  
-  GitHub Actions für automatisiertes Deployment nutzen.
+- Das Frontend verwendet überall `process.env.REACT_APP_API_URL` für API-Requests.
+- **Lokal:** `.env` → `REACT_APP_API_URL=http://localhost:5050`
+- **Production:** `.env.production` → `REACT_APP_API_URL=https://thesis-dao.onrender.com`
+- Beim Build für GitHub Pages wird automatisch `.env.production` verwendet.
+- **Wichtig:** `.env`-Dateien sind nicht im Repository enthalten (siehe `.gitignore`).
 
 ---
 
 ## Deployment
 
 - **Smart Contract:**  
-  Automatisiert via GitHub Actions oder manuell mit `cargo near deploy`.
+  Automatisiert via GitHub Actions.
 - **Frontend:**  
-  Deployment auf Vercel, Netlify oder eigenem Server möglich.
+  Deployment auf **GitHub Pages** (Branch: `gh-pages`).  
+  - Für Production-Build: `.env.production` mit passender API-URL anlegen, dann `npm run build` und `npm run deploy` ausführen.
 - **Backends:**  
-  Deployment auf beliebigem Node.js/Python-Server (z.B. Heroku, Render, AWS).
+  Deployment auf **Render.com** (kostenlos, aber mit Cold Starts).  
+  - Im Render-Dashboard Umgebungsvariablen wie `MONGO_URI` setzen.
+  - Nach dem Deploy ist das Backend z.B. unter `https://thesis-dao.onrender.com` erreichbar.
+
+---
+
+## UptimeRobot für Demo-Zwecke
+
+- Render Free-Tier-Backends schlafen nach Inaktivität ein (Cold Start).
+- Für Demos kann [UptimeRobot](https://uptimerobot.com/) genutzt werden, um das Backend "wach" zu halten:
+  - Monitor Type: HTTP(s)
+  - URL: `https://thesis-dao.onrender.com/test`
+  - Interval: 5 Minuten
+- **Status-Monitor:** [UptimeRobot Status](https://stats.uptimerobot.com/Do6s123gnW)
+- **Hinweis:** Offiziell ist das von Render nicht erlaubt, für Demos aber gängige Praxis.
 
 ---
 
@@ -205,6 +234,4 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
 - [MongoDB](https://www.mongodb.com/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [API Dokumentation (Postman Collection)](https://documenter.getpostman.com/view/33908680/2sB2qXj2dz)
-
----
-stats.uptimerobot.com/Do6s123gnW 
+- [UptimeRobot Status](https://stats.uptimerobot.com/Do6s123gnW) 
