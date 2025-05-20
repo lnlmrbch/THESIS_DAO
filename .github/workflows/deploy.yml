@@ -31,4 +31,5 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: near-react-frontend/build
-          branch: gh-pages 
+          branch: gh-pages
+          clean: true 
