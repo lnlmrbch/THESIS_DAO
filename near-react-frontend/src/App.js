@@ -151,9 +151,11 @@ function App() {
     if (
       process.env.NODE_ENV === "production" &&
       window.location.hostname === "lnlmrbch.github.io" &&
-      window.location.pathname === "/"
+      (window.location.pathname === "/" || window.location.pathname === "/index.html")
     ) {
-      window.location.replace("/THESIS_DAO/");
+      // Query-Parameter erhalten
+      const search = window.location.search || "";
+      window.location.replace("/THESIS_DAO/" + search);
     }
   }, []);
 
