@@ -11,6 +11,8 @@ import {
 } from "react-icons/fa";
 import { HiArrowCircleRight } from "react-icons/hi";
 
+const API_URL = process.env.REACT_APP_API_URL || "";
+
 const Sidebar = ({ accountId, onLogout, userRole }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -23,7 +25,7 @@ const Sidebar = ({ accountId, onLogout, userRole }) => {
       if (!accountId) return;
 
       try {
-        const res = await fetch(`/api/members/by-id/${accountId}`);
+        const res = await fetch(`${API_URL}/api/members/by-id/${accountId}`);
         setHasProfile(res.ok);
       } catch {
         setHasProfile(false);

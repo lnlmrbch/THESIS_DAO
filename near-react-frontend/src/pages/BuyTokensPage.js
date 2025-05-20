@@ -19,6 +19,7 @@ import {
 
 const TOKEN_PRICE_CHF = 1; // 1 Token = 1 CHF
 const NEAR_TO_CHF_RATE = 5; // Beispiel: 1 NEAR = 5 CHF
+const API_URL = process.env.REACT_APP_API_URL || "";
 
 const BuyTokensPage = ({ wallet, accountId }) => {
   const [amount, setAmount] = useState("");
@@ -48,7 +49,7 @@ const BuyTokensPage = ({ wallet, accountId }) => {
       localStorage.removeItem("lastBuyAmount");
 
       // Aktivität in die DB schreiben
-      fetch("/api/activities", {
+      fetch(`${API_URL}/api/activities`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

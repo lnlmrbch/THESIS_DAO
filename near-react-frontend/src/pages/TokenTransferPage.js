@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { FaPaperPlane, FaUser, FaCoins, FaExchangeAlt } from "react-icons/fa";
 
+const API_URL = process.env.REACT_APP_API_URL || "";
+
 export default function TokenTransferPage({ selector, accountId, contractId }) {
   const [receiver, setReceiver] = useState("");
   const [amount, setAmount] = useState("");
@@ -35,7 +37,7 @@ export default function TokenTransferPage({ selector, accountId, contractId }) {
       });
 
       // Aktivität in die DB schreiben
-      await fetch("/api/activities", {
+      await fetch(`${API_URL}/api/activities`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

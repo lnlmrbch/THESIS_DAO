@@ -12,6 +12,8 @@ import {
   FaShieldAlt,
 } from "react-icons/fa";
 
+const API_URL = process.env.REACT_APP_API_URL || "";
+
 export default function UserProfilePage({ accountId }) {
   const navigate = useNavigate();
   const [form, setForm] = useState({
@@ -29,7 +31,7 @@ export default function UserProfilePage({ accountId }) {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await fetch(`/api/members/by-id/${accountId}`);
+        const res = await fetch(`${API_URL}/api/members/by-id/${accountId}`);
         if (res.ok) {
           const existing = await res.json();
           setForm({
@@ -71,7 +73,7 @@ export default function UserProfilePage({ accountId }) {
     e.preventDefault();
     if (!form) return;
 
-    const response = await fetch("/api/members", {
+    const response = await fetch(`${API_URL}/api/members`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

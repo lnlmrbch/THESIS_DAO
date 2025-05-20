@@ -23,6 +23,8 @@ import {
 import TokenInfo from "../components/TokenInfo";
 import ProposalOverview from "../components/ProposalOverview";
 
+const API_URL = process.env.REACT_APP_API_URL || "";
+
 const DashboardPage = ({
   accountId,
   contractId,
@@ -69,7 +71,7 @@ const DashboardPage = ({
   useEffect(() => {
     const fetchName = async () => {
       try {
-        const res = await fetch(`/api/members/by-id/${accountId}`);
+        const res = await fetch(`${API_URL}/api/members/by-id/${accountId}`);
         if (res.ok) {
           const data = await res.json();
           setUserName(data.name);
@@ -85,7 +87,7 @@ const DashboardPage = ({
   useEffect(() => {
     const fetchActivity = async () => {
       try {
-        const res = await fetch("/api/activities");
+        const res = await fetch(`${API_URL}/api/activities`);
         const data = await res.json();
         setActivities(data);
       } catch (err) {

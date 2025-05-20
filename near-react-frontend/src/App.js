@@ -54,6 +54,7 @@ function App() {
   const navigate = useNavigate();
   const isLanding = location.pathname === "/";
   const contractId = "dao.lioneluser.testnet";
+  const API_URL = process.env.REACT_APP_API_URL || "";
 
   const fetchContractData = async () => {
     const provider = new providers.JsonRpcProvider("https://rpc.testnet.near.org");
@@ -128,7 +129,7 @@ function App() {
       if (!accountId) return;
 
       try {
-        const res = await fetch(`/api/members/by-id/${accountId}`);
+        const res = await fetch(`${API_URL}/api/members/by-id/${accountId}`);
         if (res.status === 404) {
           setHasProfile(false);
           if (location.pathname !== "/profile") navigate("/profile");

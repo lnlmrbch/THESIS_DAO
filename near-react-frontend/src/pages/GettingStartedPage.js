@@ -38,6 +38,8 @@ const steps = [
   },
 ];
 
+const API_URL = process.env.REACT_APP_API_URL || "";
+
 export default function GettingStartedPage({ accountId, userBalance }) {
   const [hasProfile, setHasProfile] = useState(null);
   const navigate = useNavigate();
@@ -46,7 +48,7 @@ export default function GettingStartedPage({ accountId, userBalance }) {
     const checkProfile = async () => {
       if (!accountId) return;
       try {
-        const res = await fetch(`/api/members/by-id/${accountId}`);
+        const res = await fetch(`${API_URL}/api/members/by-id/${accountId}`);
         setHasProfile(res.ok);
       } catch (err) {
         console.error("Fehler beim Profilcheck:", err);

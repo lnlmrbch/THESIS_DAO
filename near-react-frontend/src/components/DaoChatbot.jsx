@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { FaRobot, FaTimes, FaPaperPlane, FaSpinner } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
+const API_URL = process.env.REACT_APP_API_URL || "";
+
 const DaoChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
@@ -32,7 +34,7 @@ const DaoChatbot = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8000/api/chat", {
+      const response = await fetch(`${API_URL}/api/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
