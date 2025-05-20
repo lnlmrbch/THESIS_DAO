@@ -17,6 +17,24 @@ import GettingStartedPage from "./pages/GettingStartedPage";
 import DAOChatbot from "./components/DaoChatbot";
 import { providers } from "near-api-js";
 
+function ProfileRequired({ children }) {
+  // Blockiert alle Seiten, wenn kein Profil vorhanden ist
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-white text-black">
+      <div className="bg-red-100 border border-red-400 text-red-700 px-8 py-6 rounded-xl shadow text-center max-w-md">
+        <h2 className="text-xl font-bold mb-2">Profil erforderlich</h2>
+        <p className="mb-4">Bitte erstelle zuerst dein Profil, um diese Seite nutzen zu können.</p>
+        <button
+          className="modern-button bg-primary text-white px-6 py-2 rounded"
+          onClick={() => window.location.href = "/getting-started"}
+        >
+          Zum Onboarding
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const [selector, setSelector] = useState(null);
   const [modal, setModal] = useState(null);
@@ -147,6 +165,12 @@ function App() {
   }, [accountId, hasProfile, userBalance, selector, location.pathname, navigate]);
 
   useEffect(() => {
+    if (accountId && hasProfile === false && location.pathname !== "/profile" && location.pathname !== "/getting-started") {
+      navigate("/getting-started", { replace: true });
+    }
+  }, [accountId, hasProfile, location.pathname, navigate]);
+
+  useEffect(() => {
     // Nur im Production-Build auf GitHub Pages umleiten
     if (
       process.env.NODE_ENV === "production" &&
@@ -178,9 +202,15 @@ function App() {
           {accountId && hasProfile !== null && (
             <>
               {!hasProfile ? (
-                <Route path="/profile" element={<UserProfilePage accountId={accountId} />} />
+                <>
+                  <Route path="/profile" element={<UserProfilePage accountId={accountId} />} />
+                  <Route path="/getting-started" element={<GettingStartedPage accountId={accountId} userBalance={userBalance} />} />
+                  {/* Blockiere alle anderen Seiten */}
+                  <Route path="*" element={<ProfileRequired />} />
+                </>
               ) : (
                 <>
+                  {/* Alle "normalen" Seiten */}
                   <Route path="/dashboard" element={
                     <DashboardPage
                       selector={selector}
