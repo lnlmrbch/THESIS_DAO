@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/THESIS_DAO/near-react-frontend/static/css/main.bb6ac001.css",
-    "main.js": "/THESIS_DAO/near-react-frontend/static/js/main.3d2c4c87.js",
-    "index.html": "/THESIS_DAO/near-react-frontend/index.html",
-    "main.bb6ac001.css.map": "/THESIS_DAO/near-react-frontend/static/css/main.bb6ac001.css.map",
-    "main.3d2c4c87.js.map": "/THESIS_DAO/near-react-frontend/static/js/main.3d2c4c87.js.map"
+    "main.css": "/THESIS_DAO/static/css/main.bb6ac001.css",
+    "main.js": "/THESIS_DAO/static/js/main.7ccfe887.js",
+    "index.html": "/THESIS_DAO/index.html",
+    "main.bb6ac001.css.map": "/THESIS_DAO/static/css/main.bb6ac001.css.map",
+    "main.7ccfe887.js.map": "/THESIS_DAO/static/js/main.7ccfe887.js.map"
   },
   "entrypoints": [
     "static/css/main.bb6ac001.css",
-    "static/js/main.3d2c4c87.js"
+    "static/js/main.7ccfe887.js"
   ]
 }
