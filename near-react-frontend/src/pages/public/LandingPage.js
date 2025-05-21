@@ -261,7 +261,8 @@ const LandingPage = () => {
                 transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
                 className="text-base text-gray-500 max-w-xl italic"
               >
-                Ein Prototyp im Rahmen einer Bachelor Thesis an der ZHAW
+                Ein Prototyp im Rahmen einer Bachelor Thesis an der ZHAW<br />
+                <span className="text-sm text-gray-400">von Lionel Murbach</span>
               </motion.p>
               <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center md:justify-start mt-6 mb-2">
                 <motion.button
@@ -760,6 +761,9 @@ const LandingPage = () => {
           <p className="text-lg">
             © {new Date().getFullYear()} Thesis DAO – Built on{" "}
             <span className="text-primary font-medium">NEAR Protocol</span>
+          </p>
+          <p className="text-sm text-gray-400 mt-2">
+            Projekt von Lionel Murbach
           </p>
         </footer>
         </div>
