@@ -126,7 +126,7 @@ impl Contract {
         }
 
         // Token-Betrag berechnen und gutschreiben
-        let tokens_to_buy = deposit.as_yoctonear() * USDT_TO_TOKEN_RATE / (NEAR_TO_CHF_RATE * TOKEN_PRICE_CHF);
+        let tokens_to_buy = deposit.as_yoctonear() * NEAR_TO_CHF_RATE;
         self.internal_deposit(&buyer, NearToken::from_yoctonear(tokens_to_buy));
         self.token_pool = NearToken::from_yoctonear(self.token_pool.as_yoctonear() - tokens_to_buy);
 
