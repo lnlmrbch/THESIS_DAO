@@ -102,10 +102,14 @@ const DashboardPage = ({
     // Show all proposals
     setActiveProposals(proposals);
 
-    // Calculate voting power based on token balance
-    const power = (parseFloat(userBalance) / parseFloat(totalSupply)) * 100;
+    // Calculate voting power based on circulating supply
+    const circulatingSupply = parseFloat(totalSupply) - parseFloat(tokenPool);
+    let power = 0;
+    if (circulatingSupply > 0) {
+      power = (parseFloat(userBalance) / circulatingSupply) * 100;
+    }
     setVotingPower(power);
-  }, [proposals, userBalance, totalSupply]);
+  }, [proposals, userBalance, totalSupply, tokenPool]);
 
   // Hilfswerte für menschenlesbare Anzeige
   const HARDCAP = 10_000_000;
@@ -114,7 +118,23 @@ const DashboardPage = ({
   const percent = sold ? Math.min(100, (sold / HARDCAP) * 100) : 0;
 
   return (
-    <div className="px-6 py-10 bg-pattern text-black min-h-screen space-y-8">
+    <div className="px-6 py-10 bg-pattern text-black min-h-screen space-y-8 relative">
+      {/* Overlay für Nutzer ohne Token-Balance */}
+      {parseFloat(userBalance) <= 0 && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+          <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-8 py-6 rounded-xl shadow text-center max-w-md">
+            <h2 className="text-xl font-bold mb-2">Tokens erforderlich</h2>
+            <p className="mb-4">Du benötigst THESISDAO Tokens, um alle Dashboard-Funktionen zu sehen.</p>
+            <a
+              href="/buy-tokens"
+              className="modern-button bg-primary text-white px-6 py-2 rounded"
+            >
+              Jetzt Tokens kaufen
+            </a>
+          </div>
+        </div>
+      )}
+
       {/* Welcome Section */}
       <div className="glass-effect p-8 rounded-xl">
         <h1 className="text-3xl font-bold text-[#2c1c5b] mb-2 flex items-center gap-3">
@@ -150,7 +170,7 @@ const DashboardPage = ({
           <div>
             <p className="text-sm text-gray-500">Voting Power</p>
             <p className="text-lg font-semibold text-[#2c1c5b]">
-              {votingPower.toFixed(2)}%
+              {votingPower.toFixed(5)}%
             </p>
           </div>
         </div>

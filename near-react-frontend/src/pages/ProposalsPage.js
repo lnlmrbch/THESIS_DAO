@@ -21,6 +21,7 @@ export default function ProposalsPage({
   userBalance,
   totalSupply,
   proposals,
+  tokenPool,
 }) {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
@@ -63,7 +64,9 @@ export default function ProposalsPage({
   };
 
   const getVotingPower = () => {
-    return ((parseFloat(userBalance) / parseFloat(totalSupply)) * 100).toFixed(2);
+    const circulatingSupply = parseFloat(totalSupply) - parseFloat(tokenPool);
+    if (circulatingSupply <= 0) return "0.00000";
+    return ((parseFloat(userBalance) / circulatingSupply) * 100).toFixed(5);
   };
 
   const getStatusColor = (status) => {
@@ -129,6 +132,8 @@ export default function ProposalsPage({
       ],
     });
   };
+
+  console.log("userBalance:", userBalance, "totalSupply:", totalSupply);
 
   return (
     <div className="min-h-screen bg-pattern text-black px-6 py-12">
