@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate, Navigate } from "react-router-dom";
 import { initWalletSelector } from "./wallet";
 import Sidebar from "./components/Sidebar";
 import LandingPage from "./pages/public/LandingPage";
@@ -213,17 +213,21 @@ function App() {
                 <>
                   {/* Alle "normalen" Seiten */}
                   <Route path="/dashboard" element={
-                    <DashboardPage
-                      selector={selector}
-                      accountId={accountId}
-                      contractId={contractId}
-                      metadata={metadata}
-                      userBalance={userBalance}
-                      totalSupply={totalSupply}
-                      tokenPool={tokenPool}
-                      proposals={proposals}
-                      userRole={userRole}
-                    />
+                    accountId ? (
+                      <DashboardPage
+                        selector={selector}
+                        accountId={accountId}
+                        contractId={contractId}
+                        metadata={metadata}
+                        userBalance={userBalance}
+                        totalSupply={totalSupply}
+                        tokenPool={tokenPool}
+                        proposals={proposals}
+                        userRole={userRole}
+                      />
+                    ) : (
+                      <Navigate to="/" replace />
+                    )
                   } />
                   <Route path="/buy-tokens" element={<BuyTokensPage wallet={wallet} accountId={accountId} />} />
                   <Route path="/success" element={<TokenPurchaseSuccess />} />
