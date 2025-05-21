@@ -35,6 +35,23 @@ function ProfileRequired({ children }) {
   );
 }
 
+function TokenRequiredNotice() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-white text-black">
+      <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-8 py-6 rounded-xl shadow text-center max-w-md">
+        <h2 className="text-xl font-bold mb-2">Tokens erforderlich</h2>
+        <p className="mb-4">Du benötigst THESISDAO Tokens, um Proposals zu sehen oder daran teilzunehmen.</p>
+        <a
+          href="/buy-tokens"
+          className="modern-button bg-primary text-white px-6 py-2 rounded"
+        >
+          Jetzt Tokens kaufen
+        </a>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const [selector, setSelector] = useState(null);
   const [modal, setModal] = useState(null);
@@ -232,24 +249,39 @@ function App() {
                   <Route path="/buy-tokens" element={<BuyTokensPage wallet={wallet} accountId={accountId} />} />
                   <Route path="/success" element={<TokenPurchaseSuccess />} />
                   <Route path="/proposals" element={
-                    <ProposalsPage
-                      selector={selector}
-                      accountId={accountId}
-                      contractId={contractId}
-                      metadata={metadata}
-                      userBalance={userBalance}
-                      totalSupply={totalSupply}
-                      proposals={proposals}
-                    />
+                    parseFloat(userBalance) > 0 ? (
+                      <ProposalsPage
+                        selector={selector}
+                        accountId={accountId}
+                        contractId={contractId}
+                        metadata={metadata}
+                        userBalance={userBalance}
+                        totalSupply={totalSupply}
+                        proposals={proposals}
+                        tokenPool={tokenPool}
+                      />
+                    ) : (
+                      <TokenRequiredNotice />
+                    )
                   } />
-                  <Route path="/proposals/new" element={<CreateProposalPage selector={selector} contractId={contractId} accountId={accountId} />} />
+                  <Route path="/proposals/new" element={
+                    parseFloat(userBalance) > 0 ? (
+                      <CreateProposalPage selector={selector} contractId={contractId} accountId={accountId} />
+                    ) : (
+                      <TokenRequiredNotice />
+                    )
+                  } />
                   <Route path="/proposals/:id" element={
-                    <ProposalDetailPage
-                      selector={selector}
-                      contractId={contractId}
-                      accountId={accountId}
-                      userRole={userRole}
-                    />
+                    parseFloat(userBalance) > 0 ? (
+                      <ProposalDetailPage
+                        selector={selector}
+                        contractId={contractId}
+                        accountId={accountId}
+                        userRole={userRole}
+                      />
+                    ) : (
+                      <TokenRequiredNotice />
+                    )
                   } />
                   <Route path="/transfer" element={
                     <TokenTransferPage

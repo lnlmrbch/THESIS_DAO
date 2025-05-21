@@ -203,7 +203,7 @@ export default function ProposalsPage({
 
       {/* Proposals List */}
       {filteredProposals.length === 0 ? (
-        <div className="glass-effect p-8 text-center">
+        <div className="glass-effect proposal-hover p-8 text-center">
           <p className="text-gray-500 text-lg">Keine Proposals gefunden.</p>
         </div>
       ) : (
@@ -212,7 +212,8 @@ export default function ProposalsPage({
             <div
               key={p.id}
               onClick={() => navigate(`/proposals/${p.id}`)}
-              className="glass-effect p-6 hover:scale-[1.02] cursor-pointer transition-all"
+              className="glass-effect proposal-hover p-6 cursor-pointer transition-all"
+              style={{ willChange: 'transform', backfaceVisibility: 'hidden', transformStyle: 'preserve-3d' }}
             >
               <div className="flex justify-between items-start mb-3">
                 <div>

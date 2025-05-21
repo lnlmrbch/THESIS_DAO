@@ -136,7 +136,7 @@ const BuyTokensPage = ({ wallet, accountId }) => {
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-effect rounded-xl p-6 sm:p-8 shadow-sm mb-8"
+          className="glass-effect proposal-hover rounded-xl p-6 sm:p-8 shadow-sm mb-8"
         >
           <div className="flex items-center justify-between">
             <div className="space-y-2">
@@ -158,7 +158,7 @@ const BuyTokensPage = ({ wallet, accountId }) => {
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="glass-effect rounded-xl p-6 sm:p-8 shadow-sm h-full"
+              className="glass-effect proposal-hover rounded-xl p-6 sm:p-8 shadow-sm h-full"
             >
               <div className="space-y-6">
                 <div>
@@ -239,7 +239,7 @@ const BuyTokensPage = ({ wallet, accountId }) => {
             <motion.div 
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="glass-effect rounded-xl p-6 shadow-sm"
+              className="glass-effect proposal-hover rounded-xl p-6 shadow-sm"
             >
               <h2 className="text-lg font-semibold text-[#2c1c5b] mb-4 flex items-center gap-2">
                 <FaUsers className="text-[#6B46C1]" /> Vorteile
@@ -274,7 +274,7 @@ const BuyTokensPage = ({ wallet, accountId }) => {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
-              className="glass-effect rounded-xl p-6 shadow-sm"
+              className="glass-effect proposal-hover rounded-xl p-6 shadow-sm"
             >
               <h2 className="text-lg font-semibold text-[#2c1c5b] mb-4 flex items-center gap-2">
                 <FaShieldAlt className="text-[#6B46C1]" /> Sicherheit & Transparenz

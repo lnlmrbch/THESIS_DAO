@@ -81,7 +81,7 @@ export default function GettingStartedPage({ accountId, userBalance }) {
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-effect rounded-xl p-8 text-center"
+          className="glass-effect proposal-hover rounded-xl p-8 text-center"
         >
           <h1 className="text-4xl font-bold text-[#2c1c5b] mb-4">
             Willkommen in der DAO!
@@ -95,7 +95,7 @@ export default function GettingStartedPage({ accountId, userBalance }) {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-effect rounded-xl p-6"
+          className="glass-effect proposal-hover rounded-xl p-6"
         >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-[#2c1c5b]">
@@ -125,7 +125,7 @@ export default function GettingStartedPage({ accountId, userBalance }) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className={`glass-effect rounded-xl p-6 ${
+                className={`glass-effect proposal-hover rounded-xl p-6 ${
                   done ? "border-2 border-green-500" : ""
               }`}
             >
@@ -194,7 +194,7 @@ export default function GettingStartedPage({ accountId, userBalance }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="glass-effect rounded-xl p-6 bg-[#6B46C1]/5"
+          className="glass-effect proposal-hover rounded-xl p-6 bg-[#6B46C1]/5"
         >
           <div className="flex items-center gap-3">
             <FaLock className="text-[#6B46C1] text-xl" />

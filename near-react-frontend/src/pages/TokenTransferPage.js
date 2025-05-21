@@ -149,7 +149,7 @@ export default function TokenTransferPage({ selector, accountId, contractId }) {
             )}
 
             {success && (
-              <div className="glass-effect p-4 bg-green-50 border border-green-200">
+              <div className="glass-effect proposal-hover p-4 bg-green-50 border border-green-200">
                 <p className="text-sm text-green-600">{success}</p>
               </div>
             )}

@@ -17,6 +17,9 @@ impl Contract {
         let balance = self.internal_unwrap_balance_of(account_id);
         if let Some(new_balance) = balance.checked_add(amount) {
             self.accounts.insert(account_id, &new_balance);
+            if !self.registered_accounts.iter().any(|a| a == *account_id) {
+                self.registered_accounts.push(account_id);
+            }
         } else {
             env::panic_str("Balance overflow");
         }
@@ -63,6 +66,9 @@ impl Contract {
         if self.accounts.get(account_id).is_none() {
             self.accounts.insert(account_id, &ZERO_TOKEN);
             self.registered_accounts.push(account_id);
+            if self.roles.get(account_id).is_none() {
+                self.roles.insert(account_id, &ROLE_VISITOR.to_string());
+            }
         } else {
             env::panic_str("The account is already registered");
         }

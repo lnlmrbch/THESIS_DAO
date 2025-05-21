@@ -119,7 +119,7 @@ export default function UserProfilePage({ accountId }) {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Account Info */}
-          <div className="glass-effect p-6">
+          <div className="glass-effect proposal-hover p-6">
             <h2 className="text-xl font-semibold text-[#2c1c5b] mb-4 flex items-center gap-2">
               <FaShieldAlt className="text-[#6B46C1]" />
               Account Information
@@ -141,7 +141,7 @@ export default function UserProfilePage({ accountId }) {
           </div>
 
           {/* Personal Info */}
-          <div className="glass-effect p-6">
+          <div className="glass-effect proposal-hover p-6">
             <h2 className="text-xl font-semibold text-[#2c1c5b] mb-4 flex items-center gap-2">
               <FaUser className="text-[#6B46C1]" />
               Persönliche Informationen
@@ -182,7 +182,7 @@ export default function UserProfilePage({ accountId }) {
           </div>
 
           {/* Preferences */}
-          <div className="glass-effect p-6">
+          <div className="glass-effect proposal-hover p-6">
             <h2 className="text-xl font-semibold text-[#2c1c5b] mb-4 flex items-center gap-2">
               <FaGlobe className="text-[#6B46C1]" />
               Einstellungen

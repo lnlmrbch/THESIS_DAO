@@ -31,6 +31,7 @@ pub const NEAR_TO_CHF_RATE: u128 = 5; // Beispiel: 1 NEAR = 5 CHF (dieser Wert s
 pub const ROLE_CORE: &str = "core";
 pub const ROLE_COMMUNITY: &str = "community";
 pub const ROLE_FINANCE: &str = "finance";
+pub const ROLE_VISITOR: &str = "visitor";
 
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize, PanicOnDefault)]
@@ -119,27 +120,20 @@ impl Contract {
             "You must send a positive amount of NEAR"
         );
 
-        // Berechne die Anzahl der Tokens basierend auf CHF
-        let near_amount = deposit.as_yoctonear();
-        let chf_amount = (near_amount * NEAR_TO_CHF_RATE) / 1_000_000_000_000_000_000_000_000; // Konvertiere von yoctoNEAR zu CHF
-        let token_amount = chf_amount; // 1 Token = 1 CHF
+        // Registrierung sicherstellen
+        if self.accounts.get(&buyer).is_none() {
+            self.internal_register_account(&buyer);
+        }
 
-        let pool = self.token_pool.as_yoctonear();
-        let requested = token_amount * 1_000_000_000_000_000_000_000_000; // Konvertiere zurück zu yoctoNEAR
+        // Token-Betrag berechnen und gutschreiben
+        let tokens_to_buy = deposit.as_yoctonear() * USDT_TO_TOKEN_RATE / (NEAR_TO_CHF_RATE * TOKEN_PRICE_CHF);
+        self.internal_deposit(&buyer, NearToken::from_yoctonear(tokens_to_buy));
+        self.token_pool = NearToken::from_yoctonear(self.token_pool.as_yoctonear() - tokens_to_buy);
 
-        require!(
-            pool >= requested,
-            format!(
-                "Nicht genug Tokens im Verkaufspool: noch {} verfügbar",
-                pool / 1_000_000_000_000_000_000_000_000
-            )
-        );
-
-        let buyer_balance = self.accounts.get(&buyer).unwrap_or(ZERO_TOKEN);
-        let new_balance = NearToken::from_yoctonear(buyer_balance.as_yoctonear() + requested);
-        self.accounts.insert(&buyer, &new_balance);
-
-        self.token_pool = NearToken::from_yoctonear(pool - requested);
+        // Automatisch Rolle auf community setzen, wenn Balance > 0
+        if self.accounts.get(&buyer).unwrap_or(ZERO_TOKEN).as_yoctonear() > 0 {
+            self.roles.insert(&buyer, &ROLE_COMMUNITY.to_string());
+        }
     }
 
     #[payable]

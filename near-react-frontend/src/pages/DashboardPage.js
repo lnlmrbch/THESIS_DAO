@@ -146,7 +146,7 @@ const DashboardPage = ({
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="glass-effect p-6 rounded-xl">
+        <div className="glass-effect proposal-hover p-6 rounded-xl">
           <FaUserShield className="text-2xl text-[#6B46C1]" />
           <div>
             <p className="text-sm text-gray-500">Deine Rolle</p>
@@ -155,7 +155,7 @@ const DashboardPage = ({
             </p>
           </div>
         </div>
-        <div className="glass-effect p-6 rounded-xl">
+        <div className="glass-effect proposal-hover p-6 rounded-xl">
           <FaWallet className="text-2xl text-[#6B46C1]" />
           <div>
             <p className="text-sm text-gray-500">Token Balance</p>
@@ -165,7 +165,7 @@ const DashboardPage = ({
             </p>
           </div>
         </div>
-        <div className="glass-effect p-6 rounded-xl">
+        <div className="glass-effect proposal-hover p-6 rounded-xl">
           <FaVoteYea className="text-2xl text-[#6B46C1]" />
           <div>
             <p className="text-sm text-gray-500">Voting Power</p>
@@ -174,7 +174,7 @@ const DashboardPage = ({
             </p>
           </div>
         </div>
-        <div className="glass-effect p-6 rounded-xl">
+        <div className="glass-effect proposal-hover p-6 rounded-xl">
           <FaListAlt className="text-2xl text-[#6B46C1]" />
           <div>
             <p className="text-sm text-gray-500">Aktive Proposals</p>
@@ -190,7 +190,7 @@ const DashboardPage = ({
         {/* Left Column - Active Proposals & More */}
         <div className="lg:col-span-2 space-y-8">
           {/* Active Proposals Card */}
-          <div className="glass-effect rounded-xl">
+          <div className="glass-effect proposal-hover rounded-xl">
             <div className="card-header px-6 py-4">
               <div className="flex justify-between items-center">
                 <h2 className="text-xl font-bold text-[#2c1c5b] flex items-center gap-2">
@@ -251,7 +251,7 @@ const DashboardPage = ({
           </div>
 
           {/* Activity Overview */}
-          <div className="glass-effect rounded-xl">
+          <div className="glass-effect proposal-hover rounded-xl">
             <div className="card-header px-6 py-4">
               <h2 className="text-xl font-bold text-[#2c1c5b] flex items-center gap-2">
                 <FaHistory className="text-[#6B46C1]" /> Letzte Kaufaktivitäten
@@ -295,7 +295,7 @@ const DashboardPage = ({
         {/* Right Column - Additional Info */}
         <div className="space-y-8">
           {/* Token Sale Progress */}
-          <div className="glass-effect rounded-xl">
+          <div className="glass-effect proposal-hover rounded-xl">
             <div className="card-header px-6 py-4">
               <h2 className="text-xl font-bold text-[#2c1c5b] flex items-center gap-2">
                 <FaChartLine className="text-[#6B46C1]" /> Token Sale Fortschritt
@@ -321,7 +321,7 @@ const DashboardPage = ({
           </div>
 
           {/* Token Distribution */}
-          <div className="glass-effect rounded-xl">
+          <div className="glass-effect proposal-hover rounded-xl">
             <div className="card-header px-6 py-4">
               <h2 className="text-xl font-bold text-[#2c1c5b] flex items-center gap-2">
                 <FaChartPie className="text-[#6B46C1]" /> Token Verteilung
@@ -361,7 +361,7 @@ const DashboardPage = ({
           </div>
 
           {/* Upcoming Events */}
-          <div className="glass-effect rounded-xl">
+          <div className="glass-effect proposal-hover rounded-xl">
             <div className="card-header px-6 py-4">
               <h2 className="text-xl font-bold text-[#2c1c5b] flex items-center gap-2">
                 <FaCalendarAlt className="text-[#6B46C1]" /> Kommende Events

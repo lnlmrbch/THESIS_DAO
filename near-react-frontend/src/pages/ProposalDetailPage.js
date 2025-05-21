@@ -139,7 +139,7 @@ export default function ProposalDetailPage({ contractId, accountId, selector, us
 
       {/* Vote Lists */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <div className="glass-effect p-6">
+        <div className="glass-effect proposal-hover p-6">
           <h3 className="text-lg font-semibold text-[#2c1c5b] mb-4 flex items-center gap-2">
             <FaThumbsUp className="text-green-600"/> Zustimmungen ({proposal.votes_for.length})
           </h3>
@@ -156,7 +156,7 @@ export default function ProposalDetailPage({ contractId, accountId, selector, us
             )}
           </ul>
         </div>
-        <div className="glass-effect p-6">
+        <div className="glass-effect proposal-hover p-6">
           <h3 className="text-lg font-semibold text-[#2c1c5b] mb-4 flex items-center gap-2">
             <FaThumbsDown className="text-red-600"/> Ablehnungen ({proposal.votes_against.length})
           </h3>
