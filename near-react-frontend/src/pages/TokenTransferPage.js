@@ -3,11 +3,15 @@ import { FaPaperPlane, FaUser, FaCoins, FaExchangeAlt } from "react-icons/fa";
 
 const API_URL = process.env.REACT_APP_API_URL || "";
 
+// Hilfsfunktion für exakte Umrechnung
+function toYocto(amount) {
+  return (BigInt(Math.round(parseFloat(amount) * 1e6)) * 10n ** 18n).toString();
+}
+
 export default function TokenTransferPage({ selector, accountId, contractId }) {
   const [receiver, setReceiver] = useState("");
   const [amount, setAmount] = useState("");
   const [status, setStatus] = useState(null);
-  const [recipient, setRecipient] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
@@ -16,6 +20,7 @@ export default function TokenTransferPage({ selector, accountId, contractId }) {
   const handleTransfer = async () => {
     try {
       setIsLoading(true);
+      const yoctoAmount = toYocto(amount);
       const wallet = await selector.wallet();
       await wallet.signAndSendTransaction({
         signerId: accountId,
@@ -27,7 +32,7 @@ export default function TokenTransferPage({ selector, accountId, contractId }) {
               methodName: "ft_transfer",
               args: {
                 receiver_id: receiver,
-                amount: (parseFloat(amount) * 1e24).toString(),
+                amount: yoctoAmount,
               },
               gas: "30000000000000",
               deposit: "1",
@@ -77,8 +82,8 @@ export default function TokenTransferPage({ selector, accountId, contractId }) {
               </label>
               <input
                 type="text"
-                value={recipient}
-                onChange={(e) => setRecipient(e.target.value)}
+                value={receiver}
+                onChange={(e) => setReceiver(e.target.value)}
                 placeholder="account.near"
                 className="w-full px-4 py-2 glass-effect focus:ring-2 focus:ring-[#6B46C1] focus:border-transparent"
               />
@@ -111,7 +116,7 @@ export default function TokenTransferPage({ selector, accountId, contractId }) {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">An</span>
-                  <span className="font-medium text-[#2c1c5b]">{recipient || "-"}</span>
+                  <span className="font-medium text-[#2c1c5b]">{receiver || "-"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Betrag</span>
@@ -124,8 +129,8 @@ export default function TokenTransferPage({ selector, accountId, contractId }) {
 
             <button
               onClick={handleTransfer}
-              disabled={!recipient || !amount || isLoading}
-              className={`w-full modern-button ${(!recipient || !amount || isLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={!receiver || !amount || isLoading}
+              className={`w-full modern-button ${(!receiver || !amount || isLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">

@@ -80,10 +80,12 @@ const BuyTokensPage = ({ wallet, accountId }) => {
 
     const nearAmount = convertChfToNear(parsedAmount);
     const yoctoAmount = BigInt(parseFloat(nearAmount) * 1e24).toString();
+    alert(`BuyTokens Debug:\nCHF: ${parsedAmount}\nNEAR: ${nearAmount}\nyocto: ${yoctoAmount}`);
     localStorage.setItem("lastBuyAmount", parsedAmount);
 
     setIsLoading(true);
     try {
+      alert(`FINAL DEBUG: yoctoAmount = ${yoctoAmount}`);
       await wallet.signAndSendTransaction({
         signerId: accountId,
         receiverId: "dao.lioneluser.testnet",
