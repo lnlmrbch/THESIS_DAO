@@ -219,7 +219,7 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
 
 ## Roadmap & Projekte
 
-> **Hinweis:** Die Roadmap und laufende Projekte findest du im Bereich `projects` auf GitHub oder in der Projektverwaltung.
+> **Hinweis:** Die Roadmap und laufende Projekte findest du im Bereich `projects` auf GitHub. [Link](https://github.com/users/lnlmrbch/projects/2)
 
 ---
 
