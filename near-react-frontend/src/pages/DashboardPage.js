@@ -22,6 +22,7 @@ import {
 } from "react-icons/fa";
 import TokenInfo from "../components/TokenInfo";
 import ProposalOverview from "../components/ProposalOverview";
+import { BASENAME } from "../App";
 
 const API_URL = process.env.REACT_APP_API_URL || "";
 
@@ -126,7 +127,7 @@ const DashboardPage = ({
             <h2 className="text-xl font-bold mb-2">Tokens erforderlich</h2>
             <p className="mb-4">Du benötigst THESISDAO Tokens, um alle Dashboard-Funktionen zu sehen.</p>
             <a
-              href="/buy-tokens"
+              href={`${BASENAME}/buy-tokens`}
               className="modern-button bg-primary text-white px-6 py-2 rounded"
             >
               Jetzt Tokens kaufen

@@ -17,6 +17,8 @@ import GettingStartedPage from "./pages/GettingStartedPage";
 import DAOChatbot from "./components/DaoChatbot";
 import { providers } from "near-api-js";
 
+export const BASENAME = "/THESIS_DAO";
+
 function ProfileRequired({ children }) {
   // Blockiert alle Seiten, wenn kein Profil vorhanden ist
   return (
@@ -42,7 +44,7 @@ function TokenRequiredNotice() {
         <h2 className="text-xl font-bold mb-2">Tokens erforderlich</h2>
         <p className="mb-4">Du benötigst THESISDAO Tokens, um Proposals zu sehen oder daran teilzunehmen.</p>
         <a
-          href="/buy-tokens"
+          href={`${BASENAME}/buy-tokens`}
           className="modern-button bg-primary text-white px-6 py-2 rounded"
         >
           Jetzt Tokens kaufen
@@ -296,6 +298,7 @@ function App() {
                       <GettingStartedPage
                         accountId={accountId}
                         userBalance={userBalance}
+                        proposals={proposals}
                       />
                     }
                   />
