@@ -40,7 +40,7 @@ const steps = [
 
 const API_URL = process.env.REACT_APP_API_URL || "";
 
-export default function GettingStartedPage({ accountId, userBalance }) {
+export default function GettingStartedPage({ accountId, userBalance, proposals = [] }) {
   const [hasProfile, setHasProfile] = useState(null);
   const navigate = useNavigate();
 
@@ -66,6 +66,12 @@ export default function GettingStartedPage({ accountId, userBalance }) {
         return hasProfile === true;
       case "tokens":
         return parseFloat(userBalance) > 0;
+      case "proposal":
+        return proposals.some(p => p.proposer === accountId)
+          || proposals.some(p =>
+            (p.votes_for && p.votes_for.some(([id]) => id === accountId)) ||
+            (p.votes_against && p.votes_against.some(([id]) => id === accountId))
+          );
       default:
         return false;
     }
@@ -77,7 +83,6 @@ export default function GettingStartedPage({ accountId, userBalance }) {
   return (
     <div className="min-h-screen bg-pattern text-black px-6 py-12">
       <div className="max-w-6xl mx-auto space-y-8">
-        {/* Header Section */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -91,7 +96,6 @@ export default function GettingStartedPage({ accountId, userBalance }) {
           </p>
         </motion.div>
 
-        {/* Progress Section */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -115,7 +119,6 @@ export default function GettingStartedPage({ accountId, userBalance }) {
       </div>
         </motion.div>
 
-        {/* Steps Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {steps.map((step, index) => {
           const done = isStepDone(step);
@@ -146,7 +149,6 @@ export default function GettingStartedPage({ accountId, userBalance }) {
                     </div>
                     <p className="text-gray-600 mt-1">{step.description}</p>
                     
-                    {/* Benefits List */}
                     <div className="mt-4 space-y-2">
                       {step.benefits.map((benefit, i) => (
                         <div key={i} className="flex items-center gap-2 text-sm text-gray-600">
@@ -189,7 +191,6 @@ export default function GettingStartedPage({ accountId, userBalance }) {
         })}
         </div>
 
-        {/* Security Note */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
