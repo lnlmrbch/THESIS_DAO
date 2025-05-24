@@ -23,8 +23,11 @@ import {
 import TokenInfo from "../components/TokenInfo";
 import ProposalOverview from "../components/ProposalOverview";
 import { BASENAME } from "../App";
+import { providers } from "near-api-js";
 
 const API_URL = process.env.REACT_APP_API_URL || "";
+const TREASURY_ACCOUNT = "treasury.dao.lioneluser.testnet";
+const TEAM_ACCOUNT = "team.dao.lioneluser.testnet";
 
 const DashboardPage = ({
   accountId,
@@ -35,6 +38,8 @@ const DashboardPage = ({
   proposals,
   userRole,
   tokenPool,
+  communityTreasury,
+  teamTokens,
 }) => {
   const cardStyle =
     "flex items-center gap-4 p-6 bg-white shadow-sm rounded-xl border border-gray-200 hover:shadow-md transition-shadow duration-200";
@@ -43,6 +48,8 @@ const DashboardPage = ({
   const [activities, setActivities] = useState([]);
   const [activeProposals, setActiveProposals] = useState([]);
   const [votingPower, setVotingPower] = useState(0);
+  const [treasuryBalance, setTreasuryBalance] = useState(null);
+  const [teamBalance, setTeamBalance] = useState(null);
 
   const navigate = useNavigate();
 
@@ -104,19 +111,92 @@ const DashboardPage = ({
     setActiveProposals(proposals);
 
     // Calculate voting power based on circulating supply
-    const circulatingSupply = parseFloat(totalSupply) - parseFloat(tokenPool);
-    let power = 0;
+    const HARDCAP = 10_000_000;
+    const decimals = metadata?.decimals || 24;
+    const safeParse = (val) => {
+      const n = parseFloat(val);
+      return isNaN(n) ? 0 : n;
+    };
+    const total = safeParse(totalSupply);
+    const pool = safeParse(tokenPool);
+    const user = safeParse(userBalance);
+    const circulatingSupply = total - pool;
+
+    // Debug-Log
+    console.log({
+      total,
+      pool,
+      user,
+      circulatingSupply
+    });
+
+    let votingPower = 0;
     if (circulatingSupply > 0) {
-      power = (parseFloat(userBalance) / circulatingSupply) * 100;
+      votingPower = (user / circulatingSupply) * 100;
     }
-    setVotingPower(power);
+    setVotingPower(votingPower);
   }, [proposals, userBalance, totalSupply, tokenPool]);
+
+  useEffect(() => {
+    const fetchSpecialBalances = async () => {
+      const provider = new providers.JsonRpcProvider("https://rpc.testnet.near.org");
+      // Treasury
+      const treasuryRes = await provider.query({
+        request_type: "call_function",
+        account_id: contractId,
+        method_name: "ft_balance_of",
+        args_base64: Buffer.from(JSON.stringify({ account_id: TREASURY_ACCOUNT })).toString("base64"),
+        finality: "optimistic",
+      });
+      const decodedTreasury = new TextDecoder().decode(new Uint8Array(treasuryRes.result));
+      setTreasuryBalance(decodedTreasury);
+      // Team
+      const teamRes = await provider.query({
+        request_type: "call_function",
+        account_id: contractId,
+        method_name: "ft_balance_of",
+        args_base64: Buffer.from(JSON.stringify({ account_id: TEAM_ACCOUNT })).toString("base64"),
+        finality: "optimistic",
+      });
+      const decodedTeam = new TextDecoder().decode(new Uint8Array(teamRes.result));
+      setTeamBalance(decodedTeam);
+    };
+    fetchSpecialBalances();
+  }, [contractId]);
+
+  function formatYoctoToToken(rawBalance, decimals = 24) {
+    if (!rawBalance) return "0";
+    try {
+      const value = Number(rawBalance) / Math.pow(10, decimals);
+      return value.toLocaleString("de-CH", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      });
+    } catch (e) {
+      console.error("Error in formatYoctoToToken:", e);
+      return "0";
+    }
+  }
 
   // Hilfswerte für menschenlesbare Anzeige
   const HARDCAP = 10_000_000;
+  const safeParse = (val) => {
+    const n = parseFloat(val);
+    return isNaN(n) ? 0 : n;
+  };
   const decimals = metadata?.decimals || 24;
-  const sold = (parseFloat(totalSupply) - parseFloat(tokenPool)) / Math.pow(10, decimals);
-  const percent = sold ? Math.min(100, (sold / HARDCAP) * 100) : 0;
+  const total = safeParse(totalSupply);
+  const pool = safeParse(tokenPool);
+  const treasury = safeParse(communityTreasury);
+  const team = safeParse(teamTokens);
+  const user = safeParse(userBalance);
+  const circulatingSupply = total - pool;
+  const sold = (total - pool) / Math.pow(10, decimals);
+  const soldDisplay = sold < 0 || !isFinite(sold) ? 0 : sold;
+  const percent = soldDisplay ? Math.min(100, (soldDisplay / HARDCAP) * 100) : 0;
+  const percentDisplay = percent < 0 || !isFinite(percent) ? 0 : percent;
+
+  // Nur noch Konsolen-Logging für Debugging
 
   return (
     <div className="px-6 py-10 bg-pattern text-black min-h-screen space-y-8 relative">
@@ -171,7 +251,7 @@ const DashboardPage = ({
           <div>
             <p className="text-sm text-gray-500">Voting Power</p>
             <p className="text-lg font-semibold text-[#2c1c5b]">
-              {votingPower.toFixed(5)}%
+              {votingPower.toFixed(2)}%
             </p>
           </div>
         </div>
@@ -305,18 +385,18 @@ const DashboardPage = ({
             <div className="card-content px-6 py-4">
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Verkaufte Tokens</span>
+                  <span className="text-gray-600">Bereits verkaufte Tokens (aus dem Pool)</span>
                   <span className="font-semibold text-[#2c1c5b]">
-                    {sold.toLocaleString(undefined, { maximumFractionDigits: 2 })} / {HARDCAP.toLocaleString()} {metadata?.symbol}
+                    {soldDisplay.toLocaleString(undefined, { maximumFractionDigits: 2 })} / {HARDCAP.toLocaleString()} {metadata?.symbol}
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2.5">
                   <div
                     className="bg-[#6B46C1] h-2.5 rounded-full"
-                    style={{ width: `${percent}%` }}
+                    style={{ width: `${percentDisplay}%` }}
                   ></div>
                 </div>
-                <p className="text-sm text-gray-500 text-right">{`${percent.toFixed(2)}% abgeschlossen`}</p>
+                <p className="text-sm text-gray-500 text-right">{`${percentDisplay.toFixed(2)}% abgeschlossen`}</p>
               </div>
             </div>
           </div>
@@ -333,7 +413,11 @@ const DashboardPage = ({
                 <div>
                   <div className="flex justify-between items-center mb-1">
                     <span className="text-gray-600">Community</span>
-                    <span className="font-semibold text-[#2c1c5b]">60%</span>
+                    <span className="font-semibold text-[#2c1c5b]">
+                      60%{tokenPool !== undefined && tokenPool !== null && (
+                        <> · {formatYoctoToToken(tokenPool)} {metadata?.symbol}</>
+                      )}
+                    </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div className="bg-[#6B46C1] h-2 rounded-full" style={{ width: "60%" }}></div>
@@ -342,7 +426,11 @@ const DashboardPage = ({
                 <div>
                   <div className="flex justify-between items-center mb-1">
                     <span className="text-gray-600">Treasury</span>
-                    <span className="font-semibold text-[#2c1c5b]">30%</span>
+                    <span className="font-semibold text-[#2c1c5b]">
+                      30%{treasuryBalance !== null && (
+                        <> · {formatYoctoToToken(JSON.parse(treasuryBalance))} {metadata?.symbol}</>
+                      )}
+                    </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div className="bg-[#6B46C1] h-2 rounded-full" style={{ width: "30%" }}></div>
@@ -351,7 +439,11 @@ const DashboardPage = ({
                 <div>
                   <div className="flex justify-between items-center mb-1">
                     <span className="text-gray-600">Team</span>
-                    <span className="font-semibold text-[#2c1c5b]">10%</span>
+                    <span className="font-semibold text-[#2c1c5b]">
+                      10%{teamBalance !== null && (
+                        <> · {formatYoctoToToken(JSON.parse(teamBalance))} {metadata?.symbol}</>
+                      )}
+                    </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div className="bg-[#6B46C1] h-2 rounded-full" style={{ width: "10%" }}></div>

@@ -47,6 +47,43 @@ export default function AllBalances({ contractId }) {
     return roleEntry ? roleEntry[1] : "-";
   };
 
+  // Hilfsfunktion für exakte Umrechnung von Yocto zu Token
+  function formatYoctoToToken(rawBalance, decimals = 24) {
+    if (!rawBalance) return "0";
+    try {
+      // Convert to string first to preserve precision
+      const balanceStr = rawBalance.toString();
+      // Remove the last 24 characters (Yocto)
+      const tokens = balanceStr.slice(0, -24);
+      // Convert to number and format
+      const value = Number(tokens);
+      return value.toLocaleString("de-CH", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      });
+    } catch (e) {
+      console.error("Error in formatYoctoToToken:", e);
+      return "0";
+    }
+  }
+
+  // Hilfsfunktion für Anzeige in Millionen
+  function formatYoctoToMillions(rawBalance, decimals = 24) {
+    try {
+      // Convert to string first to preserve precision
+      const balanceStr = rawBalance.toString();
+      // Remove the last 24 characters (Yocto)
+      const tokens = balanceStr.slice(0, -24);
+      // Convert to number and calculate millions
+      const value = Number(tokens);
+      const inMillions = value / 1_000_000;
+      return `${inMillions.toFixed(2)} Mio`;
+    } catch (e) {
+      console.error("Error in formatYoctoToMillions:", e);
+      return "0 Mio";
+    }
+  }
+
   return (
     <div className="bg-white/50 backdrop-blur-sm rounded-lg border border-gray-100 overflow-hidden">
       <div className="overflow-x-auto">
@@ -74,22 +111,27 @@ export default function AllBalances({ contractId }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {balances.map(([account, rawBalance], index) => (
-              <tr
-                key={index}
-                className="hover:bg-gray-50/50 transition-colors duration-150"
-              >
-                <td className="py-4 px-6 text-gray-800 font-medium">{account}</td>
-                <td className="py-4 px-6 text-[#6B46C1] font-semibold">
-                  {(parseFloat(rawBalance) / 1e24).toFixed(2)}
-                </td>
-                <td className="py-4 px-6">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                    {getRoleForAccount(account)}
-                  </span>
-                </td>
-              </tr>
-            ))}
+            {balances.map(([account, rawBalance], index) => {
+              const tokenAmount = formatYoctoToToken(rawBalance);
+              const millionsAmount = formatYoctoToMillions(rawBalance);
+              console.log(`Account: ${account} | RawBalance: ${rawBalance} | Tokens: ${tokenAmount} | Millions: ${millionsAmount}`);
+              return (
+                <tr
+                  key={index}
+                  className="hover:bg-gray-50/50 transition-colors duration-150"
+                >
+                  <td className="py-4 px-6 text-gray-800 font-medium">{account}</td>
+                  <td className="py-4 px-6 text-[#6B46C1] font-semibold">
+                    {tokenAmount} Tokens
+                  </td>
+                  <td className="py-4 px-6">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                      {getRoleForAccount(account)}
+                    </span>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

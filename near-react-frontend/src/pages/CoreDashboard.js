@@ -378,9 +378,3 @@ export default function CoreDashboard({ selector, accountId, contractId, userRol
     </div>
   );
 }
-
-/*
-Optional: Ergänze in deiner CSS/GlobalStyles:
-.tab { background: none; border: none; cursor: pointer; }
-.tab-active { border-bottom: 2px solid #6B46C1; color: #2c1c5b; font-weight: bold; }
-*/

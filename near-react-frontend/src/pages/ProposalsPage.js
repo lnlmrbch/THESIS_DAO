@@ -238,7 +238,7 @@ export default function ProposalsPage({
                 <div className="flex items-center gap-4">
                   <span className="flex items-center">
                     <FaChartBar className="mr-1" />
-                    {p.votes_for + p.votes_against} Stimmen
+                    {((p.votes_for?.length || 0) + (p.votes_against?.length || 0))} Stimmen
                   </span>
                   <span>
                     {new Date(p.created_at).toLocaleDateString()}

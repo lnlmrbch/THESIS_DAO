@@ -34,6 +34,10 @@ pub const COMMUNITY_TREASURY_PERCENTAGE: u128 = 60; // 60%
 pub const TEAM_PERCENTAGE: u128 = 20; // 20%
 pub const INITIAL_SALE_PERCENTAGE: u128 = 20; // 20%
 
+// Feste Subaccounts für Treasury und Team
+pub const TREASURY_ACCOUNT: &str = "treasury.dao.lioneluser.testnet";
+pub const TEAM_ACCOUNT: &str = "team.dao.lioneluser.testnet";
+
 pub const ROLE_CORE: &str = "core";
 pub const ROLE_COMMUNITY: &str = "community";
 pub const ROLE_FINANCE: &str = "finance";
@@ -72,7 +76,10 @@ pub enum StorageKey {
 #[near_bindgen]
 impl Contract {
     #[init]
-    pub fn new_default_meta(owner_id: AccountId, total_supply: U128) -> Self {
+    pub fn new_default_meta(
+        owner_id: AccountId,
+        total_supply: U128
+    ) -> Self {
         Self::new(
             owner_id,
             total_supply,
@@ -89,24 +96,21 @@ impl Contract {
     }
 
     #[init]
-    pub fn new(owner_id: AccountId, total_supply: U128, metadata: FungibleTokenMetadata) -> Self {
-        let casted_total_supply = NearToken::from_yoctonear(total_supply.0);
-        
-        // Calculate token distribution
-        let community_treasury = NearToken::from_yoctonear(
-            (total_supply.0 * COMMUNITY_TREASURY_PERCENTAGE) / 100
-        );
-        let team_tokens = NearToken::from_yoctonear(
-            (total_supply.0 * TEAM_PERCENTAGE) / 100
-        );
-        let initial_sale = NearToken::from_yoctonear(
-            (total_supply.0 * INITIAL_SALE_PERCENTAGE) / 100
-        );
+    pub fn new(
+        owner_id: AccountId,
+        total_supply: U128,
+        metadata: FungibleTokenMetadata
+    ) -> Self {
+        // Neue Tokenverteilung: 60% Sale, 30% Treasury, 10% Team
+        let total_supply_yocto = total_supply.0; // 10_000_000 * 10^24
+        let token_pool = NearToken::from_yoctonear((total_supply_yocto * 60) / 100); // 60% für Verkauf
+        let treasury = NearToken::from_yoctonear((total_supply_yocto * 30) / 100);   // 30% Treasury
+        let team_tokens = NearToken::from_yoctonear((total_supply_yocto * 10) / 100); // 10% Team
 
         let mut this = Self {
-            total_supply: casted_total_supply,
-            token_pool: initial_sale,
-            community_treasury,
+            total_supply: NearToken::from_yoctonear(total_supply_yocto),
+            token_pool,
+            community_treasury: treasury,
             team_tokens,
             bytes_for_longest_account_id: 0,
             accounts: UnorderedMap::new(StorageKey::Accounts),
@@ -121,18 +125,23 @@ impl Contract {
 
         this.measure_bytes_for_longest_account_id();
         this.internal_register_account(&owner_id);
+        let treasury_account_id: AccountId = TREASURY_ACCOUNT.parse().unwrap();
+        let team_account_id: AccountId = TEAM_ACCOUNT.parse().unwrap();
+        this.internal_register_account(&treasury_account_id);
+        this.internal_register_account(&team_account_id);
         
         // Distribute initial tokens
-        this.internal_deposit(&owner_id, community_treasury); // Community Treasury
-        this.internal_deposit(&owner_id, team_tokens); // Team Tokens
-        this.internal_deposit(&owner_id, initial_sale); // Initial Sale Pool
+        this.internal_deposit(&treasury_account_id, treasury); // Treasury
+        this.internal_deposit(&team_account_id, team_tokens); // Team Tokens
 
         // Assign core role to owner
         this.roles.insert(&owner_id, &ROLE_CORE.to_string());
+        this.roles.insert(&treasury_account_id, &ROLE_FINANCE.to_string());
+        this.roles.insert(&team_account_id, &ROLE_CORE.to_string());
 
         FtMint {
             owner_id: &owner_id,
-            amount: &casted_total_supply,
+            amount: &NearToken::from_yoctonear(total_supply_yocto),
             memo: Some("Initial token supply is minted"),
         }
         .emit();
@@ -159,8 +168,9 @@ impl Contract {
         self.internal_deposit(&buyer, NearToken::from_yoctonear(tokens_to_buy));
         self.token_pool = NearToken::from_yoctonear(self.token_pool.as_yoctonear() - tokens_to_buy);
 
-        // Automatisch Rolle auf community setzen, wenn Balance > 0
-        if self.accounts.get(&buyer).unwrap_or(ZERO_TOKEN).as_yoctonear() > 0 {
+        // Rolle nur beim ersten Kauf setzen (wenn noch keine oder visitor)
+        let current_role = self.roles.get(&buyer);
+        if current_role.is_none() || current_role.as_deref() == Some(ROLE_VISITOR) {
             self.roles.insert(&buyer, &ROLE_COMMUNITY.to_string());
         }
     }
@@ -389,10 +399,15 @@ impl Contract {
         require!(!proposal.executed, "Proposal already executed");
         let amount = proposal.amount.expect("No amount specified");
         let target = proposal.target_account.clone().expect("No target specified");
-        require!(self.community_treasury.as_yoctonear() >= amount, "Not enough in treasury");
-        // Auszahlung
-        self.community_treasury = NearToken::from_yoctonear(self.community_treasury.as_yoctonear() - amount);
-        self.internal_deposit(&target.parse::<AccountId>().unwrap(), NearToken::from_yoctonear(amount));
+        // Auszahlung erfolgt vom Treasury-Account
+        let treasury_account_id: AccountId = TREASURY_ACCOUNT.parse().unwrap();
+        require!(self.accounts.get(&treasury_account_id).unwrap_or(ZERO_TOKEN).as_yoctonear() >= amount, "Not enough in treasury account");
+        let target_account: AccountId = target.parse().expect("Invalid target account");
+        if self.accounts.get(&target_account).is_none() {
+            self.internal_register_account(&target_account);
+        }
+        self.internal_withdraw(&treasury_account_id, NearToken::from_yoctonear(amount));
+        self.internal_deposit(&target_account, NearToken::from_yoctonear(amount));
         proposal.executed = true;
         self.proposals.insert(&proposal_id, &proposal);
     }
