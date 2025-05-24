@@ -81,11 +81,4 @@ impl Contract {
         self.bytes_for_longest_account_id = env::storage_usage() - initial_storage_usage;
         self.accounts.remove(&tmp_account_id);
     }
-
-    /// Internal method to check if caller is core team
-    pub(crate) fn assert_core_role(&self) {
-        let caller = env::predecessor_account_id();
-        let role = self.roles.get(&caller).unwrap_or_default();
-        require!(role == ROLE_CORE, "Only core members are allowed to perform this action");
-    }
 }
