@@ -2,14 +2,12 @@ import React, { useState, useRef, useEffect } from "react";
 import { FaRobot, FaTimes, FaPaperPlane, FaSpinner } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
-const API_URL = process.env.REACT_APP_API_URL || "";
-
 const DaoChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
       role: "assistant",
-      content: "Hallo! Ich bin dein Wine DAO Assistent. Wie kann ich dir helfen?",
+      content: "Hallo! Ich bin dein THESIS DAO Assistent. Wie kann ich dir helfen?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -33,31 +31,23 @@ const DaoChatbot = () => {
     setInput("");
     setIsLoading(true);
 
-    try {
-      const response = await fetch(`${API_URL}/api/chat`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: input }),
-      });
+    // Standard response without backend call
+    const standardResponse = {
+      role: "assistant",
+      content: `Vielen Dank für Ihre Nachricht! 
 
-      if (!response.ok) throw new Error("Network response was not ok");
+Der KI-Chatbot befindet sich aktuell noch in der Konzeptionsphase. Für Ihre Anfragen oder Feedback wenden Sie sich bitte direkt an:
 
-      const data = await response.json();
-      setMessages((prev) => [...prev, { role: "assistant", content: data.response }]);
-    } catch (error) {
-      console.error("Error:", error);
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: "Entschuldigung, es gab einen Fehler. Bitte versuche es später erneut.",
-        },
-      ]);
-    } finally {
+📧 murbalio@students.zhaw.ch
+
+Wir freuen uns über Ihr Interesse und werden uns schnellstmöglich bei Ihnen melden!`
+    };
+
+    // Simulate network delay
+    setTimeout(() => {
+      setMessages((prev) => [...prev, standardResponse]);
       setIsLoading(false);
-    }
+    }, 500);
   };
 
   const handleKeyPress = (e) => {
@@ -81,7 +71,7 @@ const DaoChatbot = () => {
             <div className="bg-gradient-to-r from-[#6B46C1] to-[#805AD5] p-4 flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <FaRobot className="text-white text-xl" />
-                <h3 className="text-white font-semibold">Wine DAO Assistent</h3>
+                <h3 className="text-white font-semibold">THESIS DAO Assistent</h3>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
