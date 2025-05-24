@@ -37,6 +37,14 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
 
 ---
 
+## Demo-Video (Platzhalter)
+
+> Hier kannst du ein kurzes Präsentationsvideo oder einen Screencast deines Prototyps einbinden.
+
+[![Demo-Video ansehen](https://img.youtube.com/vi/DEIN_VIDEO_ID_HIER/0.jpg)](https://youtube.com/watch?v=DEIN_VIDEO_ID_HIER)
+
+---
+
 ## Architektur
 
 ```
@@ -117,6 +125,22 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
   - **Aktivitäten**
     - `GET /api/activities` – Liste der letzten 50 Aktivitäten (sortiert nach Zeitstempel)
     - `POST /api/activities` – Neue Aktivität erstellen (nur Käufe erlaubt)
+  - **Team**
+    - `GET /api/team` – Liste aller Team-Mitglieder
+    - `POST /api/team` – Neues Team-Mitglied anlegen
+    - `DELETE /api/team/:accountId` – Team-Mitglied löschen
+    - `PUT /api/team/:accountId` – Beschreibung eines Team-Mitglieds ändern
+
+    **Beispiel-Antwort für GET /api/team:**
+    ```json
+    [
+      {
+        "accountId": "team.dao.lioneluser.testnet",
+        "description": "Team Wallet"
+      },
+      ...
+    ]
+    ```
   - [API-Dokumentation](https://documenter.getpostman.com/view/33908680/2sB2qXj2dz)
 - **Setup:**
   ```bash
