@@ -394,52 +394,31 @@ const LandingPage = () => {
           <p className="text-lg text-gray-500 mb-8 max-w-2xl mx-auto">
             Das Dashboard bietet dir einen schnellen Überblick über alle wichtigen DAO-Funktionen und deine persönlichen Aktivitäten.
           </p>
-          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 relative z-10">
-            {/* Example Screenshot Item 1 */}
-            <motion.div
-              className="glass-effect-neobank p-10 rounded-3xl shadow-2xl flex flex-col items-center text-center bg-white/60 backdrop-blur-md border border-blue-100 hover:shadow-blue-200 transition-all group"
-              initial={{ opacity: 0, y: 50, scale: 0.9 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-              viewport={{ once: true }}
-              whileHover={{ scale: 1.04, boxShadow: "0 8px 32px 0 rgba(80, 112, 255, 0.18)", filter: "brightness(1.05) blur(0.5px)" }}
-            >
-              <div className="w-20 h-20 flex items-center justify-center rounded-full mb-6 bg-gradient-to-br from-primary via-blue-400 to-accent shadow-lg group-hover:shadow-2xl transition-all">
-                <FaChartLine className="text-4xl text-white drop-shadow-lg" />
-              </div>
-              <h3 className="text-xl font-semibold text-[#2c1c5b] mb-3">Übersicht</h3>
-              <p className="text-gray-600 text-base">Erhalte einen schnellen Überblick über deine Rolle, Token-Balance und aktive Proposals.</p>
-            </motion.div>
-            {/* Example Screenshot Item 2 */}
-            <motion.div
-              className="glass-effect-neobank p-10 rounded-3xl shadow-2xl flex flex-col items-center text-center bg-white/60 backdrop-blur-md border border-blue-100 hover:shadow-blue-200 transition-all group"
-              initial={{ opacity: 0, y: 50, scale: 0.9 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
-              viewport={{ once: true }}
-              whileHover={{ scale: 1.04, boxShadow: "0 8px 32px 0 rgba(80, 112, 255, 0.18)", filter: "brightness(1.05) blur(0.5px)" }}
-            >
-              <div className="w-20 h-20 flex items-center justify-center rounded-full mb-6 bg-gradient-to-br from-primary via-blue-400 to-accent shadow-lg group-hover:shadow-2xl transition-all">
-                <FaVoteYea className="text-4xl text-white drop-shadow-lg" />
-              </div>
-              <h3 className="text-xl font-semibold text-[#2c1c5b] mb-3">Proposals</h3>
-              <p className="text-gray-600 text-base">Sieh dir aktive Proposals an, stimme ab oder erstelle neue Vorschläge für die Community.</p>
-            </motion.div>
-            {/* Example Screenshot Item 3 */}
-            <motion.div
-              className="glass-effect-neobank p-10 rounded-3xl shadow-2xl flex flex-col items-center text-center bg-white/60 backdrop-blur-md border border-blue-100 hover:shadow-blue-200 transition-all group"
-              initial={{ opacity: 0, y: 50, scale: 0.9 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.7, ease: "easeOut" }}
-              viewport={{ once: true }}
-              whileHover={{ scale: 1.04, boxShadow: "0 8px 32px 0 rgba(80, 112, 255, 0.18)", filter: "brightness(1.05) blur(0.5px)" }}
-            >
-              <div className="w-20 h-20 flex items-center justify-center rounded-full mb-6 bg-gradient-to-br from-primary via-blue-400 to-accent shadow-lg group-hover:shadow-2xl transition-all">
-                <FaGem className="text-4xl text-white drop-shadow-lg" />
-              </div>
-              <h3 className="text-xl font-semibold text-[#2c1c5b] mb-3">Token Management</h3>
-              <p className="text-gray-600 text-base">Verwalte deine THESISDAO Tokens und verfolge den Fortschritt des Token Sales.</p>
-            </motion.div>
+          <div className="mt-12 flex flex-col md:flex-row gap-8 justify-center items-center">
+            <div className="bg-white/70 rounded-xl shadow-lg border border-gray-200 p-4 max-w-md">
+              <img
+                src="/screenshots/screenshot_dashboard.png"
+                alt="Dashboard Übersicht"
+                className="rounded-lg shadow-md hover:scale-105 transition-transform duration-200"
+              />
+              <p className="text-center text-sm text-gray-600 mt-2">Dashboard: Token, Voting Power & Proposals</p>
+            </div>
+            <div className="bg-white/70 rounded-xl shadow-lg border border-gray-200 p-4 max-w-md">
+              <img
+                src="/screenshots/screenshot_proposal.png"
+                alt="Proposals im Dashboard"
+                className="rounded-lg shadow-md hover:scale-105 transition-transform duration-200"
+              />
+              <p className="text-center text-sm text-gray-600 mt-2">Proposals & Abstimmungen auf einen Blick</p>
+            </div>
+            <div className="bg-white/70 rounded-xl shadow-lg border border-gray-200 p-4 max-w-md">
+              <img
+                src="/screenshots/screenshot_buytokens.png"
+                alt="Token kaufen"
+                className="rounded-lg shadow-md hover:scale-105 transition-transform duration-200"
+              />
+              <p className="text-center text-sm text-gray-600 mt-2">Token kaufen & Mitglied werden</p>
+            </div>
           </div>
         </motion.section>
 
