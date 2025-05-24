@@ -26,7 +26,13 @@ pub const FT_METADATA_SPEC: &str = "ft-1.0.0";
 pub const ZERO_TOKEN: NearToken = NearToken::from_yoctonear(0);
 pub const USDT_TO_TOKEN_RATE: u128 = 1_000_000_000_000_000_000;
 pub const TOKEN_PRICE_CHF: u128 = 1; // 1 Token = 1 CHF
-pub const NEAR_TO_CHF_RATE: u128 = 5; // Beispiel: 1 NEAR = 5 CHF (dieser Wert sollte regelmäßig aktualisiert werden)
+pub const NEAR_TO_CHF_RATE: u128 = 5; // Beispiel: 1 NEAR = 5 CHF
+
+// Token Distribution Constants
+pub const TOTAL_SUPPLY: u128 = 10_000_000_000_000_000_000_000_000; // 10M Tokens
+pub const COMMUNITY_TREASURY_PERCENTAGE: u128 = 60; // 60%
+pub const TEAM_PERCENTAGE: u128 = 20; // 20%
+pub const INITIAL_SALE_PERCENTAGE: u128 = 20; // 20%
 
 pub const ROLE_CORE: &str = "core";
 pub const ROLE_COMMUNITY: &str = "community";
@@ -47,6 +53,9 @@ pub struct Contract {
     pub registered_accounts: Vector<AccountId>,
     pub roles: LookupMap<AccountId, String>,
     pub token_pool: NearToken,
+    pub community_treasury: NearToken,
+    pub team_tokens: NearToken,
+    pub team_accounts: Vector<AccountId>,
 }
 
 #[derive(BorshSerialize, BorshStorageKey)]
@@ -57,6 +66,7 @@ pub enum StorageKey {
     Proposals,
     ProposalIds,
     Roles,
+    TeamVesting,
 }
 
 #[near_bindgen]
@@ -81,9 +91,23 @@ impl Contract {
     #[init]
     pub fn new(owner_id: AccountId, total_supply: U128, metadata: FungibleTokenMetadata) -> Self {
         let casted_total_supply = NearToken::from_yoctonear(total_supply.0);
+        
+        // Calculate token distribution
+        let community_treasury = NearToken::from_yoctonear(
+            (total_supply.0 * COMMUNITY_TREASURY_PERCENTAGE) / 100
+        );
+        let team_tokens = NearToken::from_yoctonear(
+            (total_supply.0 * TEAM_PERCENTAGE) / 100
+        );
+        let initial_sale = NearToken::from_yoctonear(
+            (total_supply.0 * INITIAL_SALE_PERCENTAGE) / 100
+        );
+
         let mut this = Self {
             total_supply: casted_total_supply,
-            token_pool: casted_total_supply,
+            token_pool: initial_sale,
+            community_treasury,
+            team_tokens,
             bytes_for_longest_account_id: 0,
             accounts: UnorderedMap::new(StorageKey::Accounts),
             metadata: LazyOption::new(StorageKey::Metadata, Some(&metadata)),
@@ -92,11 +116,16 @@ impl Contract {
             registered_accounts: Vector::new(b"r".to_vec()),
             next_proposal_id: 0,
             roles: LookupMap::new(StorageKey::Roles),
+            team_accounts: Vector::new(b"t".to_vec()),
         };
 
         this.measure_bytes_for_longest_account_id();
         this.internal_register_account(&owner_id);
-        this.internal_deposit(&owner_id, casted_total_supply);
+        
+        // Distribute initial tokens
+        this.internal_deposit(&owner_id, community_treasury); // Community Treasury
+        this.internal_deposit(&owner_id, team_tokens); // Team Tokens
+        this.internal_deposit(&owner_id, initial_sale); // Initial Sale Pool
 
         // Assign core role to owner
         this.roles.insert(&owner_id, &ROLE_CORE.to_string());
@@ -334,5 +363,57 @@ impl Contract {
     /// Gibt den aktuellen Token-Pool zurück (wie viele noch verkauft werden können)
     pub fn get_token_pool(&self) -> near_sdk::json_types::U128 {
         near_sdk::json_types::U128(self.token_pool.as_yoctonear())
+    }
+
+    // Fügt einen Account als Team-Mitglied hinzu (nur Core)
+    pub fn add_team_member(&mut self, account_id: AccountId) {
+        require!(
+            self.roles.get(&env::predecessor_account_id()).unwrap_or_default() == ROLE_CORE,
+            "Only core members can add team members"
+        );
+        self.internal_register_account(&account_id);
+        self.roles.insert(&account_id, &ROLE_CORE.to_string());
+        // Team-Account hinzufügen, falls noch nicht vorhanden
+        if !self.team_accounts.iter().any(|acc| acc == account_id) {
+            self.team_accounts.push(&account_id);
+        }
+    }
+
+    pub fn execute_proposal(&mut self, proposal_id: u64) {
+        let caller = env::predecessor_account_id();
+        let role = self.roles.get(&caller).unwrap_or_else(|| "none".to_string());
+        require!(role == ROLE_CORE || role == ROLE_FINANCE, "Only core or finance members can execute proposals");
+
+        let mut proposal = self.proposals.get(&proposal_id).expect("Proposal not found");
+        require!(proposal.status == ProposalStatus::Accepted, "Proposal not accepted");
+        require!(!proposal.executed, "Proposal already executed");
+        let amount = proposal.amount.expect("No amount specified");
+        let target = proposal.target_account.clone().expect("No target specified");
+        require!(self.community_treasury.as_yoctonear() >= amount, "Not enough in treasury");
+        // Auszahlung
+        self.community_treasury = NearToken::from_yoctonear(self.community_treasury.as_yoctonear() - amount);
+        self.internal_deposit(&target.parse::<AccountId>().unwrap(), NearToken::from_yoctonear(amount));
+        proposal.executed = true;
+        self.proposals.insert(&proposal_id, &proposal);
+    }
+
+    // Entfernt ein Team-Mitglied (nur Core)
+    pub fn remove_team_member(&mut self, account_id: AccountId) {
+        require!(
+            self.roles.get(&env::predecessor_account_id()).unwrap_or_default() == ROLE_CORE,
+            "Only core members can remove team members"
+        );
+        let mut new_team = Vector::new(b"t2".to_vec());
+        for acc in self.team_accounts.iter() {
+            if acc != account_id {
+                new_team.push(&acc);
+            }
+        }
+        self.team_accounts = new_team;
+    }
+
+    // Gibt alle Team-Mitglieder zurück
+    pub fn get_team_accounts(&self) -> Vec<AccountId> {
+        self.team_accounts.iter().collect()
     }
 }

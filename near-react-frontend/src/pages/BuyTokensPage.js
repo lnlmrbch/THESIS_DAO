@@ -74,18 +74,16 @@ const BuyTokensPage = ({ wallet, accountId }) => {
 
     const parsedAmount = parseFloat(amount);
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
-      alert("Bitte gib einen gültigen CHF-Betrag ein.");
+      // Optional: Zeige eine dezente Fehlermeldung im UI, z.B. setStatus("Bitte gib einen gültigen CHF-Betrag ein.")
       return;
     }
 
     const nearAmount = convertChfToNear(parsedAmount);
     const yoctoAmount = BigInt(parseFloat(nearAmount) * 1e24).toString();
-    alert(`BuyTokens Debug:\nCHF: ${parsedAmount}\nNEAR: ${nearAmount}\nyocto: ${yoctoAmount}`);
     localStorage.setItem("lastBuyAmount", parsedAmount);
 
     setIsLoading(true);
     try {
-      alert(`FINAL DEBUG: yoctoAmount = ${yoctoAmount}`);
       await wallet.signAndSendTransaction({
         signerId: accountId,
         receiverId: "dao.lioneluser.testnet",
@@ -103,7 +101,7 @@ const BuyTokensPage = ({ wallet, accountId }) => {
       });
     } catch (err) {
       console.error("❌ Kauf fehlgeschlagen:", err);
-      alert("Fehler beim Token-Kauf.");
+      // Optional: Zeige eine dezente Fehlermeldung im UI, z.B. setStatus("Fehler beim Token-Kauf.")
     } finally {
       setIsLoading(false);
     }
