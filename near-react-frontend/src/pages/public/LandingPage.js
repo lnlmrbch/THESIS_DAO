@@ -4,7 +4,7 @@ import { initWalletSelector } from "../../wallet";
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from "framer-motion";
 import { Link } from "react-scroll";
 import Header from "../public/Header";
-import { FaRocket, FaGem, FaExchangeAlt, FaTools, FaUsers, FaChartLine, FaCheck, FaWrench, FaBullhorn, FaRocket as FaRocket2, FaChevronDown, FaPlus, FaMinus, FaHandshake, FaVoteYea, FaArrowRight, FaEnvelope, FaDiscord, FaTwitter, FaWallet, FaEye } from "react-icons/fa";
+import { FaRocket, FaGem, FaExchangeAlt, FaTools, FaUsers, FaChartLine, FaCheck, FaWrench, FaBullhorn, FaRocket as FaRocket2, FaChevronDown, FaPlus, FaMinus, FaHandshake, FaVoteYea, FaArrowRight, FaEnvelope, FaDiscord, FaTwitter, FaWallet, FaEye, FaExpand, FaTimes } from "react-icons/fa";
 import { providers } from "near-api-js";
 
 const faqs = [
@@ -180,6 +180,8 @@ const LandingPage = () => {
   };
   const soldHuman = tokenSale.sold ? parseFloat(tokenSale.sold) / Math.pow(10, tokenSale.decimals) : 0;
   const percent = soldHuman ? Math.min(100, (soldHuman / HARDCAP) * 100) : 0;
+
+  const [modalImage, setModalImage] = useState(null);
 
   return (
     <div className="w-screen bg-gradient-to-br from-[#F5F7FB] via-white to-[#F5F7FB] text-black overflow-x-hidden scroll-smooth min-h-screen">
@@ -395,28 +397,60 @@ const LandingPage = () => {
             Das Dashboard bietet dir einen schnellen Überblick über alle wichtigen DAO-Funktionen und deine persönlichen Aktivitäten.
           </p>
           <div className="mt-12 flex flex-col md:flex-row gap-8 justify-center items-center">
-            <div className="bg-white/70 rounded-xl shadow-lg border border-gray-200 p-4 max-w-md">
-              <img
-                src="/screenshots/screenshot_dashboard.png"
-                alt="Dashboard Übersicht"
-                className="rounded-lg shadow-md hover:scale-105 transition-transform duration-200"
-              />
+            {/* Dashboard Screenshot Card */}
+            <div className="bg-white/70 rounded-xl shadow-lg border border-gray-200 p-4 max-w-md relative group">
+              <div
+                className="block relative cursor-zoom-in"
+                onClick={() => setModalImage('/THESIS_DAO/screenshots/screenshot_dashboard.png')}
+              >
+                <img
+                  src="/THESIS_DAO/screenshots/screenshot_dashboard.png"
+                  alt="Dashboard Übersicht"
+                  className="rounded-lg shadow-md hover:scale-105 transition-transform duration-200"
+                />
+                {/* Overlay Icon */}
+                <span className="absolute top-2 right-2 bg-white/80 rounded-full p-2 shadow group-hover:bg-accent group-hover:text-white transition-colors z-10">
+                  <FaExpand className="text-xl" />
+                </span>
+                {/* Overlay beim Hover */}
+                <span className="absolute inset-0 rounded-lg bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity z-0" />
+              </div>
               <p className="text-center text-sm text-gray-600 mt-2">Dashboard: Token, Voting Power & Proposals</p>
             </div>
-            <div className="bg-white/70 rounded-xl shadow-lg border border-gray-200 p-4 max-w-md">
-              <img
-                src="/screenshots/screenshot_proposal.png"
-                alt="Proposals im Dashboard"
-                className="rounded-lg shadow-md hover:scale-105 transition-transform duration-200"
-              />
+            {/* Proposal Screenshot Card */}
+            <div className="bg-white/70 rounded-xl shadow-lg border border-gray-200 p-4 max-w-md relative group">
+              <div
+                className="block relative cursor-zoom-in"
+                onClick={() => setModalImage('/THESIS_DAO/screenshots/screenshot_proposal.png')}
+              >
+                <img
+                  src="/THESIS_DAO/screenshots/screenshot_proposal.png"
+                  alt="Proposals im Dashboard"
+                  className="rounded-lg shadow-md hover:scale-105 transition-transform duration-200"
+                />
+                <span className="absolute top-2 right-2 bg-white/80 rounded-full p-2 shadow group-hover:bg-accent group-hover:text-white transition-colors z-10">
+                  <FaExpand className="text-xl" />
+                </span>
+                <span className="absolute inset-0 rounded-lg bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity z-0" />
+              </div>
               <p className="text-center text-sm text-gray-600 mt-2">Proposals & Abstimmungen auf einen Blick</p>
             </div>
-            <div className="bg-white/70 rounded-xl shadow-lg border border-gray-200 p-4 max-w-md">
-              <img
-                src="/screenshots/screenshot_buytokens.png"
-                alt="Token kaufen"
-                className="rounded-lg shadow-md hover:scale-105 transition-transform duration-200"
-              />
+            {/* Buy Tokens Screenshot Card */}
+            <div className="bg-white/70 rounded-xl shadow-lg border border-gray-200 p-4 max-w-md relative group">
+              <div
+                className="block relative cursor-zoom-in"
+                onClick={() => setModalImage('/THESIS_DAO/screenshots/screenshot_buytokens.png')}
+              >
+                <img
+                  src="/THESIS_DAO/screenshots/screenshot_buytokens.png"
+                  alt="Token kaufen"
+                  className="rounded-lg shadow-md hover:scale-105 transition-transform duration-200"
+                />
+                <span className="absolute top-2 right-2 bg-white/80 rounded-full p-2 shadow group-hover:bg-accent group-hover:text-white transition-colors z-10">
+                  <FaExpand className="text-xl" />
+                </span>
+                <span className="absolute inset-0 rounded-lg bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity z-0" />
+              </div>
               <p className="text-center text-sm text-gray-600 mt-2">Token kaufen & Mitglied werden</p>
             </div>
           </div>
@@ -747,6 +781,27 @@ const LandingPage = () => {
         </footer>
         </div>
       </div>
+
+      {modalImage && (
+        <div
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+          onClick={() => setModalImage(null)}
+        >
+          <div className="relative" onClick={e => e.stopPropagation()}>
+            <img
+              src={modalImage}
+              alt="Screenshot groß"
+              className="max-h-[80vh] max-w-[90vw] rounded-xl shadow-2xl"
+            />
+            <button
+              className="absolute top-2 right-2 bg-white/80 rounded-full p-2 shadow hover:bg-accent hover:text-white transition-colors"
+              onClick={() => setModalImage(null)}
+            >
+              <FaTimes className="text-xl" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
