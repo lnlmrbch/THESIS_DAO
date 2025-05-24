@@ -9,6 +9,16 @@ const teamRouter = require("./routes/team");
 const app = express();
 const PORT = process.env.PORT || 5050;
 
+// =====================
+// SERVER SETUP
+// =====================
+// Haupt-Entry-Point für das Backend der DAO Member Registry.
+// - Verbindet zu MongoDB
+// - Lädt alle API-Routen
+// - Startet den Express-Server
+// - Konfiguriert CORS und JSON-Parsing
+// =====================
+
 // CORS korrekt konfigurieren
 app.use(cors());
 

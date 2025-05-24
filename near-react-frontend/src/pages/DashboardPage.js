@@ -385,7 +385,7 @@ const DashboardPage = ({
             <div className="card-content px-6 py-4">
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Bereits verkaufte Tokens (aus dem Pool)</span>
+                  <span className="text-gray-600">Verteilte Tokens (verkauft, Treasury & Team)</span>
                   <span className="font-semibold text-[#2c1c5b]">
                     {soldDisplay.toLocaleString(undefined, { maximumFractionDigits: 2 })} / {HARDCAP.toLocaleString()} {metadata?.symbol}
                   </span>
@@ -453,11 +453,11 @@ const DashboardPage = ({
             </div>
           </div>
 
-          {/* Upcoming Events */}
+          {/* Events */}
           <div className="glass-effect proposal-hover rounded-xl">
             <div className="card-header px-6 py-4">
               <h2 className="text-xl font-bold text-[#2c1c5b] flex items-center gap-2">
-                <FaCalendarAlt className="text-[#6B46C1]" /> Kommende Events
+                <FaCalendarAlt className="text-[#6B46C1]" /> Events
               </h2>
             </div>
             <div className="card-content px-6 py-4">
@@ -467,8 +467,8 @@ const DashboardPage = ({
                     <FaCalendarAlt className="text-[#6B46C1]" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-[#2c1c5b]">Community Call</h4>
-                    <p className="text-sm text-gray-600">15. März 2024, 18:00</p>
+                    <h4 className="font-medium text-[#2c1c5b]">Abgabe Bachelorthesis</h4>
+                    <p className="text-sm text-gray-600">28. Mai 2025</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -476,8 +476,8 @@ const DashboardPage = ({
                     <FaCalendarAlt className="text-[#6B46C1]" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-[#2c1c5b]">Token Sale Ende</h4>
-                    <p className="text-sm text-gray-600">31. März 2024</p>
+                    <h4 className="font-medium text-[#2c1c5b]">DAO Strategie-Workshop</h4>
+                    <p className="text-sm text-gray-600">15. November 2025</p>
                   </div>
                 </div>
               </div>

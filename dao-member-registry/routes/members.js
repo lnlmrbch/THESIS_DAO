@@ -2,6 +2,15 @@ const express = require("express");
 const router = express.Router();
 const Member = require("../models/Member");
 
+// =====================
+// MEMBERS ROUTES
+// =====================
+// Diese Datei enthält alle API-Endpunkte für die Verwaltung von DAO-Mitgliedern.
+// - POST /api/members: Neues Mitglied anlegen oder vorhandenes aktualisieren (upsert)
+// - GET /api/members: Alle Mitglieder abrufen
+// - GET /api/members/by-id/:account_id: Einzelnes Mitglied anhand der account_id abrufen
+// =====================
+
 // Neuen Member anlegen oder vorhandenen aktualisieren
 router.post("/", async (req, res) => {
   const { account_id } = req.body;

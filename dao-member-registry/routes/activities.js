@@ -2,6 +2,14 @@ const express = require("express");
 const router = express.Router();
 const Activity = require("../models/Activity");
 
+// =====================
+// ACTIVITIES ROUTES
+// =====================
+// Diese Datei enthält alle API-Endpunkte für die Verwaltung von Aktivitäten (z.B. Token-Käufe).
+// - POST /api/activities: Neue Aktivität anlegen (nur Käufe erlaubt)
+// - GET /api/activities: Letzte 50 Aktivitäten abrufen
+// =====================
+
 // Aktivität erstellen
 router.post("/", async (req, res) => {
   try {

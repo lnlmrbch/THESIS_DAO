@@ -2,6 +2,16 @@ const express = require('express');
 const router = express.Router();
 const TeamMember = require('../models/TeamMember');
 
+// =====================
+// TEAM ROUTES
+// =====================
+// Diese Datei enthält alle API-Endpunkte für die Verwaltung von Team-Mitgliedern.
+// - GET /api/team: Alle Team-Mitglieder abrufen
+// - POST /api/team: Neues Team-Mitglied anlegen
+// - DELETE /api/team/:accountId: Team-Mitglied löschen
+// - PUT /api/team/:accountId: Beschreibung eines Team-Mitglieds ändern
+// =====================
+
 // GET alle Team-Mitglieder
 router.get('/', async (req, res) => {
   const team = await TeamMember.find();
