@@ -4,6 +4,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 const membersRouter = require("./routes/members");
+const teamRouter = require("./routes/team");
 
 const app = express();
 const PORT = process.env.PORT || 5050;
@@ -28,6 +29,7 @@ mongoose
 
 // API-Routen
 app.use("/api/members", membersRouter);
+app.use("/api/team", teamRouter);
 
 // Start Server
 app.listen(PORT, () => {
