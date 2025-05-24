@@ -1,3 +1,14 @@
+    // =====================
+    // THESIS DAO SMART CONTRACT
+    // =====================
+    //
+    // Dieser Contract implementiert eine modulare DAO auf NEAR:
+    // - Token-Ökonomie (Fungible Token, Verkauf, Treasury, Team)
+    // - On-Chain Governance (Proposals, Voting, Rollen)
+    // - Dividenden, Team-Management, Account-Registrierung
+    //
+    // Die wichtigsten Komponenten und Funktionen sind ausführlich dokumentiert.
+
 use near_sdk::assert_one_yocto;
 use near_sdk::borsh::{BorshDeserialize, BorshSerialize};
 use near_sdk::collections::UnorderedMap;
@@ -75,6 +86,22 @@ pub enum StorageKey {
 
 #[near_bindgen]
 impl Contract {
+    // =====================
+    // 1. PROPOSAL-LOGIK
+    // =====================
+    // Die Proposal-Logik ermöglicht es DAO-Mitgliedern, Vorschläge (Proposals) zu erstellen, zu diskutieren, abzustimmen und auszuführen.
+    // - Proposals werden als eigene Structs gespeichert (mit Titel, Beschreibung, Status, Votes, etc.)
+    // - Jeder Proposal erhält eine eindeutige ID (next_proposal_id)
+    // - Nur Mitglieder mit passender Rolle dürfen Proposals erstellen
+    // - Proposals können verschiedene Felder haben: Ziel-Account, Betrag, Kategorie, Deadline, Quorum
+    // - Votes werden als Arrays von (Account, Stimmgewicht) gespeichert
+    // - Status: Open, Accepted, Rejected, Executed
+    // - Finalisierung und Ausführung sind getrennte Schritte (Governance-Checks)
+
+    // --- Initialisierung mit Standard-Metadaten ---
+    /// Erstellt den Contract mit Standard-Metadaten (Name, Symbol, Decimals, Icon)
+    /// owner_id: Account, der als Owner/Core startet
+    /// total_supply: Gesamtmenge an Tokens (in Yocto)
     #[init]
     pub fn new_default_meta(
         owner_id: AccountId,
@@ -95,18 +122,24 @@ impl Contract {
         )
     }
 
+    // --- Haupt-Initialisierung ---
+    /// Erstellt den Contract mit allen Parametern und verteilt die Token auf Treasury, Team und Pool.
+    /// - owner_id: Account, der als Core startet
+    /// - total_supply: Gesamtmenge an Tokens (in Yocto)
+    /// - metadata: Token-Metadaten (Name, Symbol, Decimals, etc.)
     #[init]
     pub fn new(
         owner_id: AccountId,
         total_supply: U128,
         metadata: FungibleTokenMetadata
     ) -> Self {
-        // Neue Tokenverteilung: 60% Sale, 30% Treasury, 10% Team
-        let total_supply_yocto = total_supply.0; // 10_000_000 * 10^24
+        // Tokenverteilung berechnen
+        let total_supply_yocto = total_supply.0; // z.B. 10_000_000 * 10^24
         let token_pool = NearToken::from_yoctonear((total_supply_yocto * 60) / 100); // 60% für Verkauf
         let treasury = NearToken::from_yoctonear((total_supply_yocto * 30) / 100);   // 30% Treasury
         let team_tokens = NearToken::from_yoctonear((total_supply_yocto * 10) / 100); // 10% Team
 
+        // Contract-Struct initialisieren
         let mut this = Self {
             total_supply: NearToken::from_yoctonear(total_supply_yocto),
             token_pool,
@@ -123,22 +156,25 @@ impl Contract {
             team_accounts: Vector::new(b"t".to_vec()),
         };
 
+        // Storage für Account-IDs messen (für Gebühren)
         this.measure_bytes_for_longest_account_id();
-        this.internal_register_account(&owner_id);
+        // Owner, Treasury und Team als Accounts registrieren
         let treasury_account_id: AccountId = TREASURY_ACCOUNT.parse().unwrap();
         let team_account_id: AccountId = TEAM_ACCOUNT.parse().unwrap();
+        this.internal_register_account(&owner_id);
         this.internal_register_account(&treasury_account_id);
         this.internal_register_account(&team_account_id);
         
-        // Distribute initial tokens
-        this.internal_deposit(&treasury_account_id, treasury); // Treasury
-        this.internal_deposit(&team_account_id, team_tokens); // Team Tokens
+        // Token verteilen
+        this.internal_deposit(&treasury_account_id, treasury); // Treasury-Account
+        this.internal_deposit(&team_account_id, team_tokens);  // Team-Account
 
-        // Assign core role to owner
+        // Rollen zuweisen
         this.roles.insert(&owner_id, &ROLE_CORE.to_string());
         this.roles.insert(&treasury_account_id, &ROLE_FINANCE.to_string());
         this.roles.insert(&team_account_id, &ROLE_CORE.to_string());
 
+        // Event für Minting
         FtMint {
             owner_id: &owner_id,
             amount: &NearToken::from_yoctonear(total_supply_yocto),
@@ -431,4 +467,15 @@ impl Contract {
     pub fn get_team_accounts(&self) -> Vec<AccountId> {
         self.team_accounts.iter().collect()
     }
+
+    // =====================
+    // 7. SONSTIGES / HILFSFUNKTIONEN
+    // =====================
+    // - StorageKey-Enum: Für NEAR Storage-Collections
+    // - measure_bytes_for_longest_account_id(): Für Gebührenberechnung
+    // - internal_deposit(), internal_withdraw(): Token-Logik für Ein-/Auszahlungen
+    // - Events: FtMint, ProposalCreated, ProposalFinalized etc. für Transparenz
+    // - get_all_balances(), get_all_roles(): Übersichtsfunktionen für das Frontend
+    // - execute_proposal(): Führt akzeptierte Proposals aus (z.B. Auszahlung aus Treasury)
+    // - Sicherheit: require!-Checks, assert_one_yocto(), Zugriffsbeschränkungen
 }
