@@ -45,7 +45,6 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
 ├── near-react-frontend/    # React-Frontend für DAO-Interaktion
 ├── dao-member-registry/    # Node.js Backend für Mitgliederverwaltung
 ├── chatbot-backend/        # Python FastAPI Backend für KI-Chatbot
-└── README.md               # Dieses Dokument
 ```
 
 ---
@@ -57,8 +56,8 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
 - **Sprache:** Rust
 - **Plattform:** NEAR Blockchain
 - **Funktionen:**
-  - DAO-Governance: Proposals, Voting, Rollen (core, community, finance)
-  - Token-Ökonomie: Minting, Kauf, Transfer, Dividenden
+  - DAO-Governance: Proposals, Voting, Rollen (core, community, visitor)
+  - Token-Ökonomie: Kauf, Transfer, Dividenden
   - On-Chain Mitgliederverwaltung (Account-Registrierung, Rollen)
   - Proposal-Logik: Erstellen, Abstimmen, Finalisieren, Quorum, Deadlines
 - **Build & Test:**
@@ -68,11 +67,11 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
   cargo test
   ```
 - **Deployment:**
-  - Automatisiert via GitHub Actions
-  - Manuell:  
-    ```bash
-    cargo near deploy build-reproducible-wasm <account-id>
-    ```
+  Manuell mit der NEAR CLI:
+  ```bash
+  cargo near build
+  cargo near deploy
+  ```
 - **Wichtige Dateien:**
   - `src/lib.rs`: Hauptlogik (Token, Proposals, Rollen, Dividenden)
   - `src/proposal.rs`: Proposal- und Voting-Logik
@@ -194,7 +193,7 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
 ## Deployment
 
 - **Smart Contract:**  
-  Automatisiert via GitHub Actions.
+  Deployment erfolgt **manuell mit der NEAR CLI** (siehe oben).
 - **Frontend:**  
   Deployment auf **GitHub Pages** (Branch: `gh-pages`).  
   - Für Production-Build: `.env.production` mit passender API-URL anlegen, dann `npm run build` und `npm run deploy` ausführen.

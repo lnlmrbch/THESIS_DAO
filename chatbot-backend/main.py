@@ -17,9 +17,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Ollama API endpoint
-OLLAMA_API = "http://localhost:11434/api"
-
 class ChatRequest(BaseModel):
     message: str
 
@@ -28,29 +25,16 @@ class ChatResponse(BaseModel):
 
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
-    try:
-        # Call Ollama API
-        response = requests.post(
-            f"{OLLAMA_API}/chat",
-            json={
-                "model": "wine-dao-assistant",
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": request.message
-                    }
-                ],
-                "stream": False
-            }
-        )
-        
-        if response.status_code != 200:
-            raise HTTPException(status_code=500, detail="Error from Ollama API")
-        
-        return ChatResponse(response=response.json()["message"]["content"])
+    # Standard response for all messages
+    response = """Vielen Dank für Ihre Nachricht! 
+
+Der KI-Chatbot befindet sich aktuell noch in der Konzeptionsphase. Für Ihre Anfragen oder Feedback wenden Sie sich bitte direkt an:
+
+📧 murbalio@students.zhaw.ch
+
+Wir freuen uns über Ihr Interesse und werden uns schnellstmöglich bei Ihnen melden!"""
     
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    return ChatResponse(response=response)
 
 @app.get("/api/health")
 async def health_check():
