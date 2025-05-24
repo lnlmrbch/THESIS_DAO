@@ -20,6 +20,8 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { providers } from "near-api-js";
 
+const API_URL = process.env.REACT_APP_API_URL || "";
+
 export default function CreateProposalPage({ selector, accountId, contractId }) {
   const [form, setForm] = useState({
     title: "",
@@ -37,6 +39,7 @@ export default function CreateProposalPage({ selector, accountId, contractId }) 
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
+  const [teamMembers, setTeamMembers] = useState([]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -46,6 +49,20 @@ export default function CreateProposalPage({ selector, accountId, contractId }) 
       navigate("/proposals", { replace: true });
     }
   }, [location, navigate]);
+
+  useEffect(() => {
+    const loadTeamMembers = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/team`);
+        if (!res.ok) throw new Error("Fehler beim Laden der Team-Mitglieder");
+        const team = await res.json();
+        setTeamMembers(team);
+      } catch (e) {
+        setTeamMembers([]);
+      }
+    };
+    loadTeamMembers();
+  }, []);
 
   const validateForm = () => {
     const newErrors = {};
@@ -141,7 +158,6 @@ export default function CreateProposalPage({ selector, accountId, contractId }) 
     { name: "description", label: "Beschreibung", icon: <FaAlignLeft />, description: "Detaillierte Beschreibung deines Vorschlags.", type: "textarea", required: true },
     { name: "link", label: "Externer Link", icon: <FaLink />, description: "Optionaler Verweis auf weiterführende Inhalte.", type: "text" },
     { name: "amount", label: "Betrag (in THESISDAO)", icon: <FaMoneyBillWave />, description: "Gewünschter Betrag für dieses Proposal.", type: "number", min: "0", step: "0.01" },
-    { name: "target_account", label: "Zielaccount", icon: <FaUserCircle />, description: "Konto, an den das Geld ggf. gesendet wird.", type: "text" },
     {
       name: "category", label: "Kategorie", icon: <FaFolderOpen />, description: "Wähle einen Bereich, zu dem dein Proposal gehört.",
       type: "select", options: [
@@ -204,99 +220,153 @@ export default function CreateProposalPage({ selector, accountId, contractId }) 
           >
             <div className="p-8 space-y-6">
               {fields.map(({ name, label, icon, description, type, options, required, min, step }, index) => (
-                <motion.div 
-                  key={name}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="space-y-2"
-                >
-                  <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
-                    <span className="text-[#6B46C1]">{icon}</span>
-                    {label}
-                    {required && (
-                      <motion.span 
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="text-red-500"
-                      >
-                        *
-                      </motion.span>
-                    )}
-                  </label>
-                  {type === "textarea" ? (
-                    <motion.textarea
-                      whileFocus={{ scale: 1.01 }}
-                      name={name}
-                      value={form[name]}
-                      onChange={handleChange}
-                      rows={4}
-                      className={`w-full p-4 bg-gray-50 border ${errors[name] ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:ring-2 focus:ring-[#6B46C1] focus:border-transparent transition-all duration-200 text-gray-800 placeholder-gray-400`}
-                      placeholder={description}
-                    />
-                  ) : type === "select" ? (
-                    <motion.select
-                      whileFocus={{ scale: 1.01 }}
-                      name={name}
-                      value={form[name]}
-                      onChange={handleChange}
-                      className={`w-full p-4 bg-gray-50 border ${errors[name] ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:ring-2 focus:ring-[#6B46C1] focus:border-transparent transition-all duration-200 text-gray-800`}
-                    >
-                      {options.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </motion.select>
-                  ) : type === "date" ? (
-                    <motion.div whileFocus={{ scale: 1.01 }}>
-                      <DatePicker
-                        selected={form.deadline}
-                        onChange={handleDateChange}
+                name === "target_account" ? null : (
+                  <motion.div 
+                    key={name}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="space-y-2"
+                  >
+                    <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <span className="text-[#6B46C1]">{icon}</span>
+                      {label}
+                      {required && (
+                        <motion.span 
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="text-red-500"
+                        >
+                          *
+                        </motion.span>
+                      )}
+                    </label>
+                    {type === "textarea" ? (
+                      <motion.textarea
+                        whileFocus={{ scale: 1.01 }}
+                        name={name}
+                        value={form[name]}
+                        onChange={handleChange}
+                        rows={4}
                         className={`w-full p-4 bg-gray-50 border ${errors[name] ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:ring-2 focus:ring-[#6B46C1] focus:border-transparent transition-all duration-200 text-gray-800 placeholder-gray-400`}
-                        placeholderText="Datum auswählen"
-                        dateFormat="dd.MM.yyyy"
-                        showMonthDropdown
-                        showYearDropdown
-                        dropdownMode="select"
-                        minDate={new Date()}
+                        placeholder={description}
                       />
-                    </motion.div>
-                  ) : (
-                    <motion.input
-                      whileFocus={{ scale: 1.01 }}
-                      type={type}
-                      name={name}
-                      value={form[name]}
-                      onChange={handleChange}
-                      min={min}
-                      step={step}
-                      className={`w-full p-4 bg-gray-50 border ${errors[name] ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:ring-2 focus:ring-[#6B46C1] focus:border-transparent transition-all duration-200 text-gray-800 placeholder-gray-400`}
-                      placeholder={description}
-                    />
-                  )}
-                  <AnimatePresence>
-                    {errors[name] ? (
-                      <motion.p 
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="text-xs text-red-500 font-medium"
+                    ) : type === "select" ? (
+                      <motion.select
+                        whileFocus={{ scale: 1.01 }}
+                        name={name}
+                        value={form[name]}
+                        onChange={handleChange}
+                        className={`w-full p-4 bg-gray-50 border ${errors[name] ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:ring-2 focus:ring-[#6B46C1] focus:border-transparent transition-all duration-200 text-gray-800`}
                       >
-                        {errors[name]}
-                      </motion.p>
+                        {options.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </motion.select>
+                    ) : type === "date" ? (
+                      <motion.div whileFocus={{ scale: 1.01 }}>
+                        <DatePicker
+                          selected={form.deadline}
+                          onChange={handleDateChange}
+                          className={`w-full p-4 bg-gray-50 border ${errors[name] ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:ring-2 focus:ring-[#6B46C1] focus:border-transparent transition-all duration-200 text-gray-800 placeholder-gray-400`}
+                          placeholderText="Datum auswählen"
+                          dateFormat="dd.MM.yyyy"
+                          showMonthDropdown
+                          showYearDropdown
+                          dropdownMode="select"
+                          minDate={new Date()}
+                        />
+                      </motion.div>
                     ) : (
-                      <motion.p 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="text-xs text-gray-500"
-                      >
-                        {description}
-                      </motion.p>
+                      <motion.input
+                        whileFocus={{ scale: 1.01 }}
+                        type={type}
+                        name={name}
+                        value={form[name]}
+                        onChange={handleChange}
+                        min={min}
+                        step={step}
+                        className={`w-full p-4 bg-gray-50 border ${errors[name] ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:ring-2 focus:ring-[#6B46C1] focus:border-transparent transition-all duration-200 text-gray-800 placeholder-gray-400`}
+                        placeholder={description}
+                      />
                     )}
-                  </AnimatePresence>
-                </motion.div>
+                    <AnimatePresence>
+                      {errors[name] ? (
+                        <motion.p 
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="text-xs text-red-500 font-medium"
+                        >
+                          {errors[name]}
+                        </motion.p>
+                      ) : (
+                        <motion.p 
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="text-xs text-gray-500"
+                        >
+                          {description}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                )
               ))}
+              {/* Zielaccount Dropdown + Freitextfeld */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="space-y-2"
+              >
+                <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <span className="text-[#6B46C1]"><FaUserCircle /></span>
+                  Zielaccount (Team-Mitglied)
+                </label>
+                <select
+                  value={form.target_account}
+                  onChange={e => setForm(f => ({ ...f, target_account: e.target.value }))}
+                  className={`w-full p-4 bg-gray-50 border ${errors.target_account ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:ring-2 focus:ring-[#6B46C1] focus:border-transparent transition-all duration-200 text-gray-800 mb-2`}
+                >
+                  <option value="">Team-Mitglied auswählen…</option>
+                  {teamMembers.map(m => (
+                    <option key={m.accountId} value={m.accountId}>
+                      {m.accountId}{m.description ? ` – ${m.description}` : ""}
+                    </option>
+                  ))}
+                </select>
+                <div className="text-xs text-gray-500 mb-2">Oder manuell eingeben:</div>
+                <input
+                  type="text"
+                  placeholder="NEAR AccountId manuell eingeben"
+                  value={form.target_account}
+                  onChange={e => setForm(f => ({ ...f, target_account: e.target.value }))}
+                  className={`w-full p-4 bg-gray-50 border ${errors.target_account ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:ring-2 focus:ring-[#6B46C1] focus:border-transparent transition-all duration-200 text-gray-800`}
+                />
+                <AnimatePresence>
+                  {errors.target_account ? (
+                    <motion.p 
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="text-xs text-red-500 font-medium"
+                    >
+                      {errors.target_account}
+                    </motion.p>
+                  ) : (
+                    <motion.p 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-xs text-gray-500"
+                    >
+                      Konto, an den das Geld ggf. gesendet wird.
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             </div>
 
             <div className="px-8 py-6 bg-gray-50 border-t border-gray-100">
