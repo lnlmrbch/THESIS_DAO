@@ -40,8 +40,6 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
 
 ## Demo-Video (Platzhalter)
 
-> Hier kannst du ein kurzes Präsentationsvideo oder einen Screencast deines Prototyps einbinden.
-
 [![Demo-Video ansehen](https://img.youtube.com/vi/tenTxuu1mlA/0.jpg)](https://www.youtube.com/watch?v=tenTxuu1mlA)
 
 ---
