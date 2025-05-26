@@ -11,7 +11,7 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
 - [THESIS DAO – Vollständige Projektübersicht](#thesis-dao--vollständige-projektübersicht)
   - [Inhaltsverzeichnis](#inhaltsverzeichnis)
   - [Projektüberblick](#projektüberblick)
-  - [Demo-Video (Platzhalter)](#demo-video-platzhalter)
+  - [Demo-Video](#demo-video)
   - [Architektur](#architektur)
   - [Komponenten](#komponenten)
     - [1. smart-contract](#1-smart-contract)
@@ -38,7 +38,7 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
 
 ---
 
-## Demo-Video (Platzhalter)
+## Demo-Video
 
 [![Demo-Video ansehen](https://img.youtube.com/vi/tenTxuu1mlA/0.jpg)](https://www.youtube.com/watch?v=tenTxuu1mlA)
 
