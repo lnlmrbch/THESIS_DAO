@@ -1,7 +1,7 @@
 # THESIS DAO – Vollständige Projektübersicht
 
 Willkommen zum **THESIS DAO**-Projekt!  
-Dieses Repository enthält eine vollständige, modulare DAO-Lösung mit Smart Contract, React-Frontend, Backend-Services und KI-Chatbot.  
+Dieses Repository enthält eine vollständige, modulare DAO-Lösung mit Smart Contract, React-Frontend und Backend-Services.  
 Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf der NEAR-Blockchain bereitzustellen.
 
 ---
