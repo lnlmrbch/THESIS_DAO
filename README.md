@@ -17,7 +17,6 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
     - [1. smart-contract](#1-smart-contract)
     - [2. near-react-frontend](#2-near-react-frontend)
     - [3. dao-member-registry](#3-dao-member-registry)
-    - [4. chatbot-backend](#4-chatbot-backend)
   - [Setup \& Installation](#setup--installation)
   - [Dynamische API-URL \& Umgebungsvariablen](#dynamische-api-url--umgebungsvariablen)
   - [Deployment](#deployment)
@@ -33,7 +32,6 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
 - On-Chain Governance (Proposals, Voting, Rollen)
 - Token-Ökonomie (Fungible Token, Dividenden, Token-Kauf)
 - Mitgliederverwaltung (Off-Chain Registry)
-- KI-gestütztem Chatbot für DAO-Interaktion
 - Modernem, responsivem Frontend
 
 ---
@@ -51,7 +49,6 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
 ├── smart-contract/         # Rust-basierter NEAR Smart Contract
 ├── near-react-frontend/    # React-Frontend für DAO-Interaktion
 ├── dao-member-registry/    # Node.js Backend für Mitgliederverwaltung
-├── chatbot-backend/        # Python FastAPI Backend für KI-Chatbot
 ```
 
 ---
@@ -92,7 +89,6 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
   - Proposal-Übersicht, -Erstellung, -Voting
   - Token-Kauf, Transfer, Dividenden-Ansicht
   - Mitgliederprofil, Onboarding, Getting Started
-  - Chatbot-Integration
   - Responsive Design (Tailwind CSS)
   - **Dynamische API-URL:** Das Frontend erkennt automatisch, ob es lokal oder online läuft und verwendet die passende Backend-URL (siehe unten).
 - **Setup:**
@@ -103,7 +99,7 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
   ```
 - **Wichtige Seiten/Komponenten:**
   - `DashboardPage`, `ProposalsPage`, `CreateProposalPage`, `UserProfilePage`
-  - `DaoChatbot`, `Sidebar`, `Navbar`
+  - `Sidebar`, `Navbar`
 - **API-URL:** Wird dynamisch über Umgebungsvariablen gesetzt (siehe unten).
 - **Deployment:**
   - **Production:** GitHub Pages (Branch: `gh-pages`)
@@ -153,28 +149,6 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
   - **Production:** Render.com (kostenlos, aber mit Cold Starts)
   - **Lokal:** Mit `.env`-Datei
 
-### 4. chatbot-backend
-
-- **Sprache:** Python (FastAPI), Ollama (LLM)
-- **Funktionen:**
-  - KI-gestützter Chatbot für DAO-Fragen und -Support
-  - Training mit eigenen Daten (`training_data.json`)
-  - REST-API für Chat- und Health-Check
-- **API-Endpunkte:**
-  - `POST /api/chat` – Chatbot-Anfrage senden
-  - `GET /api/health` – Health-Check-Endpunkt
-  - [API-Dokumentation](https://documenter.getpostman.com/view/33908680/2sB2qXj2dz)
-- **Setup:**
-  ```bash
-  cd chatbot-backend
-  python -m venv venv
-  source venv/bin/activate
-  pip install -r requirements.txt
-  ollama serve
-  python train.py
-  uvicorn main:app --reload
-  ```
-
 ---
 
 ## Setup & Installation
@@ -220,7 +194,7 @@ Das Ziel ist es, eine dezentrale, transparente und interaktive DAO-Plattform auf
 - **Frontend:**  
   Deployment auf **GitHub Pages** (Branch: `gh-pages`).  
   - Für Production-Build: `.env.production` mit passender API-URL anlegen, dann `npm run build` und `npm run deploy` ausführen.
-- **Backends:**  
+- **Backend:**  
   Deployment auf **Render.com** (kostenlos, aber mit Cold Starts).  
   - Im Render-Dashboard Umgebungsvariablen wie `MONGO_URI` setzen.
   - Nach dem Deploy ist das Backend z.B. unter `https://thesis-dao.onrender.com` erreichbar.

@@ -35,4 +35,8 @@ target/
 Cargo.lock
 
 # Near React Frontend
-near-react-frontend/node_modules/.cache/ 
+near-react-frontend/node_modules/.cache/
+
+# Chatbot Backend
+/chatbot-backend/
+/chatbot/ 
