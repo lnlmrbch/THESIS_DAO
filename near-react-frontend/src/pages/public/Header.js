@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-scroll";
+import React, { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { IconClose, LogoMark } from "./icons";
+import { scrollToId, useActiveSection } from "./scroll";
 
 const navLinks = [
   { to: "about", label: "Über uns" },
@@ -11,13 +11,12 @@ const navLinks = [
   { to: "contact", label: "Kontakt" },
 ];
 
-/* Anchors land just under the 64px bar. */
-const SCROLL_OFFSET = -64;
-
 const Header = ({ connectWallet }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [active, setActive] = useState(null);
+
+  const ids = useMemo(() => navLinks.map((l) => l.to), []);
+  const active = useActiveSection(ids);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -33,50 +32,44 @@ const Header = ({ connectWallet }) => {
     };
   }, [menuOpen]);
 
+  const go = (id) => {
+    setMenuOpen(false);
+    scrollToId(id);
+  };
+
   return (
     <>
       <header
         className={`fixed inset-x-0 top-0 z-50 border-b transition-colors duration-200 ${
           scrolled
-            ? "border-edge bg-surface-0/80 backdrop-blur-md"
+            ? "border-line bg-black/70 backdrop-blur-xl"
             : "border-transparent bg-transparent"
         }`}
       >
-        <div className="mx-auto flex h-16 max-w-shell items-center justify-between px-5 sm:px-8">
-          <Link
-            to="hero"
-            smooth
-            duration={500}
-            offset={SCROLL_OFFSET}
-            className="flex cursor-pointer items-center gap-2.5 select-none"
+        <div className="mx-auto flex h-20 max-w-shell items-center justify-between px-5 sm:px-8">
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="flex items-center gap-2.5 select-none"
             aria-label="Zum Seitenanfang"
           >
             <LogoMark size={20} />
             <span className="whitespace-nowrap text-[0.9375rem] font-medium tracking-[-0.02em] text-fg">
               Thesis DAO
             </span>
-          </Link>
+          </button>
 
-          <nav className="hidden md:block">
+          <nav className="hidden lg:block">
             <ul className="flex items-center gap-7">
               {navLinks.map((link) => (
                 <li key={link.to}>
-                  <Link
-                    to={link.to}
-                    smooth
-                    duration={500}
-                    offset={SCROLL_OFFSET}
-                    spy
-                    onSetActive={() => setActive(link.to)}
-                    onSetInactive={() =>
-                      setActive((cur) => (cur === link.to ? null : cur))
-                    }
-                    className={`lp-navlink cursor-pointer ${
+                  <button
+                    onClick={() => go(link.to)}
+                    className={`lp-navlink ${
                       active === link.to ? "is-active" : ""
                     }`}
                   >
                     {link.label}
-                  </Link>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -94,7 +87,7 @@ const Header = ({ connectWallet }) => {
             </div>
 
             <button
-              className="-mr-2 flex h-9 w-9 items-center justify-center text-fg-muted transition-colors hover:text-fg md:hidden"
+              className="-mr-2 flex h-9 w-9 items-center justify-center text-fg-muted transition-colors hover:text-fg lg:hidden"
               onClick={() => setMenuOpen(true)}
               aria-label="Menü öffnen"
               aria-expanded={menuOpen}
@@ -115,10 +108,10 @@ const Header = ({ connectWallet }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
-            className="fixed inset-0 z-[60] bg-surface-0 md:hidden"
+            className="fixed inset-0 z-[60] bg-black lg:hidden"
           >
             <div className="flex h-full flex-col">
-              <div className="flex h-16 shrink-0 items-center justify-between border-b border-edge px-5">
+              <div className="flex h-20 shrink-0 items-center justify-between border-b border-line px-5">
                 <div className="flex items-center gap-2.5">
                   <LogoMark size={20} />
                   <span className="text-[0.9375rem] font-medium tracking-[-0.02em] text-fg">
@@ -136,14 +129,10 @@ const Header = ({ connectWallet }) => {
 
               <nav className="flex-1 overflow-y-auto">
                 {navLinks.map((link, i) => (
-                  <Link
+                  <button
                     key={link.to}
-                    to={link.to}
-                    smooth
-                    duration={500}
-                    offset={SCROLL_OFFSET}
-                    onClick={() => setMenuOpen(false)}
-                    className="flex cursor-pointer items-center justify-between border-b border-edge px-5 py-5"
+                    onClick={() => go(link.to)}
+                    className="flex w-full items-center justify-between border-b border-line px-5 py-5 text-left"
                   >
                     <span className="text-[1.375rem] font-medium tracking-[-0.03em] text-fg">
                       {link.label}
@@ -151,11 +140,11 @@ const Header = ({ connectWallet }) => {
                     <span className="lp-mono text-[0.6875rem] text-fg-faint">
                       0{i + 1}
                     </span>
-                  </Link>
+                  </button>
                 ))}
               </nav>
 
-              <div className="shrink-0 border-t border-edge p-5">
+              <div className="shrink-0 border-t border-line p-5">
                 <button
                   onClick={() => {
                     setMenuOpen(false);

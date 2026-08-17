@@ -1,29 +1,31 @@
 /* ==========================================================================
    Thesis DAO — Landing Page
-   Monochrome. The layout grid is drawn with real 1px rules; there are no
-   gradients, glows or blurred shapes anywhere. Scoped under .lp.
+   Dark, spacious, high separation. Surfaces sit clearly above the black
+   ground so figure and ground actually read apart. Scoped under .lp.
    ========================================================================== */
 
 .lp {
   --bg: #000000;
-  --s1: #0a0a0a;
-  --s2: #101010;
-  --s3: #161616;
 
-  --edge-soft: #121212;
-  --edge: #1f1f1f;
-  --edge-strong: #2e2e2e;
-  --edge-loud: #454545;
+  /* Raised surfaces — each step is visibly lighter than the last. */
+  --s1: #0d0d0d;
+  --s2: #131313;
+  --s3: #1a1a1a;
 
-  --fg: #ededed;
-  --fg-muted: #a1a1a1;
-  --fg-subtle: #6e6e6e;
-  --fg-faint: #4a4a4a;
+  --line: #232323;
+  --line-strong: #333333;
+  --line-loud: #4d4d4d;
+
+  /* Foreground — headings are pure white, on purpose. */
+  --fg: #ffffff;
+  --fg-body: #adadad;
+  --fg-muted: #808080;
+  --fg-faint: #5c5c5c;
 
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
 
   background: var(--bg);
-  color: var(--fg);
+  color: var(--fg-body);
   font-family: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -31,190 +33,220 @@
 }
 
 .lp ::selection {
-  background: #ededed;
+  background: #ffffff;
   color: #000;
+}
+
+/* --- Container ------------------------------------------------------------
+   One centred column with generous gutters. No side rules — the page should
+   breathe outward, not sit inside a box.
+   -------------------------------------------------------------------------- */
+
+.lp-wrap {
+  width: 100%;
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .lp-wrap {
+    padding-inline: 2.5rem;
+  }
+}
+
+/* Vertical rhythm — deliberately roomy. */
+.lp-section {
+  padding-block: 5.5rem;
+}
+
+@media (min-width: 768px) {
+  .lp-section {
+    padding-block: 7.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lp-section {
+    padding-block: 9rem;
+  }
+}
+
+.lp-rule {
+  height: 1px;
+  background: var(--line);
 }
 
 /* --- Typography ---------------------------------------------------------- */
 
 .lp-h1 {
   font-weight: 500;
-  letter-spacing: -0.045em;
-  line-height: 0.95;
-  font-size: clamp(3rem, 9.5vw, 6.5rem);
+  letter-spacing: -0.042em;
+  line-height: 0.98;
+  font-size: clamp(3.25rem, 8.5vw, 6.75rem);
+  color: var(--fg);
 }
 
 .lp-h2 {
   font-weight: 500;
-  letter-spacing: -0.038em;
-  line-height: 1;
-  font-size: clamp(2rem, 5vw, 3.25rem);
+  letter-spacing: -0.036em;
+  line-height: 1.04;
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  color: var(--fg);
+}
+
+.lp-h3 {
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-size: 1.125rem;
+  color: var(--fg);
 }
 
 .lp-lead {
-  font-size: clamp(1rem, 1.6vw, 1.1875rem);
-  line-height: 1.6;
-  letter-spacing: -0.011em;
+  font-size: clamp(1.0625rem, 1.5vw, 1.3125rem);
+  line-height: 1.65;
+  letter-spacing: -0.012em;
+  color: var(--fg-body);
+}
+
+.lp-body {
+  font-size: 0.9375rem;
+  line-height: 1.7;
   color: var(--fg-muted);
 }
 
 .lp-mono {
   font-family: "Geist Mono", ui-monospace, SFMono-Regular, monospace;
   font-variant-numeric: tabular-nums;
-  font-feature-settings: "ss01";
 }
 
-/* Section index / label */
 .lp-label {
   font-family: "Geist Mono", ui-monospace, monospace;
   font-size: 0.6875rem;
   line-height: 1;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--fg-subtle);
+  color: var(--fg-muted);
 }
 
-/* --- The shell ------------------------------------------------------------
-   One column with permanent side rules. Every section is a horizontal band
-   inside it, so the page reads like a technical drawing rather than a stack
-   of floating cards.
+/* --- Surfaces -------------------------------------------------------------
+   Real cards with a real value step off the background, plus a top hairline
+   so the edge catches light. This is what carries the contrast.
    -------------------------------------------------------------------------- */
 
-.lp-shell {
-  max-width: 1180px;
-  margin-inline: auto;
-  border-inline: 1px solid var(--edge);
-}
-
-.lp-band + .lp-band {
-  border-top: 1px solid var(--edge);
-}
-
-/* Crosshair marker sitting on a rule intersection */
-.lp-cross {
-  position: absolute;
-  width: 9px;
-  height: 9px;
-  color: var(--edge-loud);
-  pointer-events: none;
-  z-index: 2;
-}
-
-.lp-cross::before,
-.lp-cross::after {
-  content: "";
-  position: absolute;
-  background: currentColor;
-}
-
-.lp-cross::before {
-  left: 50%;
-  top: 0;
-  bottom: 0;
-  width: 1px;
-  transform: translateX(-50%);
-}
-
-.lp-cross::after {
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 1px;
-  transform: translateY(-50%);
-}
-
-/* --- Cells ----------------------------------------------------------------
-   Grids are built from 1px gaps over an edge-coloured background, so the
-   dividers are the grid itself — not borders bolted onto each child.
-   -------------------------------------------------------------------------- */
-
-.lp-grid {
-  display: grid;
-  gap: 1px;
-  background: var(--edge);
-}
-
-.lp-cell {
-  background: var(--bg);
-  transition: background-color 0.25s var(--ease);
-}
-
-.lp-cell--hover:hover {
+.lp-card {
+  position: relative;
   background: var(--s1);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  transition: background-color 0.3s var(--ease), border-color 0.3s var(--ease),
+    transform 0.3s var(--ease);
 }
 
-/* --- Buttons --------------------------------------------------------------
-   Primary is plain white on black. No shadow, no glow, no gradient.
-   -------------------------------------------------------------------------- */
+.lp-card--hover:hover {
+  background: var(--s2);
+  border-color: var(--line-strong);
+  transform: translateY(-2px);
+}
+
+.lp-panel {
+  background: var(--s1);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+}
+
+/* Icon chip inside a card */
+.lp-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 12px;
+  background: var(--s3);
+  border: 1px solid var(--line-strong);
+  color: var(--fg);
+}
+
+/* Small pill */
+.lp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: var(--s1);
+  padding: 0.4375rem 0.875rem;
+}
+
+/* --- Buttons -------------------------------------------------------------- */
 
 .lp-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  height: 2.75rem;
-  padding-inline: 1.125rem;
-  border-radius: 8px;
+  height: 3rem;
+  padding-inline: 1.5rem;
+  border-radius: 10px;
   border: 1px solid transparent;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 500;
-  letter-spacing: -0.006em;
+  letter-spacing: -0.008em;
   white-space: nowrap;
   cursor: pointer;
-  transition: background-color 0.18s var(--ease), border-color 0.18s var(--ease),
-    color 0.18s var(--ease), opacity 0.18s var(--ease);
+  transition: background-color 0.2s var(--ease), border-color 0.2s var(--ease),
+    color 0.2s var(--ease), transform 0.2s var(--ease);
+}
+
+.lp-btn:active {
+  transform: scale(0.985);
 }
 
 .lp-btn--primary {
-  background: #ededed;
-  color: #000;
+  background: #ffffff;
+  color: #000000;
 }
 
 .lp-btn--primary:hover {
-  background: #ffffff;
+  background: #d9d9d9;
 }
 
 .lp-btn--ghost {
   background: transparent;
-  border-color: var(--edge-strong);
+  border-color: var(--line-strong);
   color: var(--fg);
 }
 
 .lp-btn--ghost:hover {
-  background: var(--s1);
-  border-color: var(--edge-loud);
+  background: var(--s2);
+  border-color: var(--line-loud);
 }
 
 .lp-btn--sm {
-  height: 2.25rem;
-  padding-inline: 0.875rem;
-  font-size: 0.8125rem;
-  border-radius: 7px;
-}
-
-.lp-btn[disabled] {
-  opacity: 0.45;
-  cursor: not-allowed;
+  height: 2.375rem;
+  padding-inline: 1rem;
+  font-size: 0.875rem;
+  border-radius: 8px;
 }
 
 /* --- Focus ---------------------------------------------------------------- */
 
 .lp :focus-visible {
-  outline: 2px solid #ededed;
-  outline-offset: 2px;
-  border-radius: 4px;
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+  border-radius: 6px;
 }
 
 /* --- Nav ------------------------------------------------------------------ */
 
 .lp-navlink {
-  position: relative;
   display: inline-block;
   padding-block: 0.25rem;
-  font-size: 0.875rem;
-  letter-spacing: -0.006em;
+  font-size: 0.9375rem;
+  letter-spacing: -0.008em;
   color: var(--fg-muted);
-  transition: color 0.18s var(--ease);
+  transition: color 0.2s var(--ease);
 }
 
 .lp-navlink:hover,
@@ -222,26 +254,31 @@
   color: var(--fg);
 }
 
-/* --- Hero backdrop --------------------------------------------------------
-   A single faint ruled grid, masked out towards the bottom. Monochrome only.
+/* --- Hero glow ------------------------------------------------------------
+   A single wide, very soft light source behind the headline. Monochrome —
+   it lifts the top of the page off pure black without introducing a hue.
    -------------------------------------------------------------------------- */
 
-.lp-rules {
+.lp-halo {
   position: absolute;
-  inset: 0;
+  left: 50%;
+  top: -18rem;
+  width: min(72rem, 130vw);
+  height: 42rem;
+  transform: translateX(-50%);
   pointer-events: none;
-  background-image: linear-gradient(var(--edge-soft) 1px, transparent 1px),
-    linear-gradient(90deg, var(--edge-soft) 1px, transparent 1px);
-  background-size: 80px 80px;
-  background-position: center top;
-  mask-image: linear-gradient(180deg, #000 0%, transparent 78%);
-  -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 78%);
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    rgba(255, 255, 255, 0.085) 0%,
+    rgba(255, 255, 255, 0.03) 45%,
+    transparent 72%
+  );
 }
 
 /* --- Meter ---------------------------------------------------------------- */
 
 .lp-meter {
-  height: 6px;
+  height: 8px;
   background: var(--s3);
   border-radius: 999px;
   overflow: hidden;
@@ -250,7 +287,7 @@
 .lp-meter > span {
   display: block;
   height: 100%;
-  background: #ededed;
+  background: #ffffff;
   border-radius: 999px;
 }
 
@@ -262,55 +299,56 @@
   width: 6px;
   height: 6px;
   border-radius: 999px;
-  background: #ededed;
+  background: #ffffff;
 }
 
 .lp-live::after {
   content: "";
   position: absolute;
-  inset: -3px;
+  inset: -4px;
   border-radius: 999px;
-  border: 1px solid #ededed;
+  border: 1px solid #ffffff;
   opacity: 0;
-  animation: lp-pulse 2.4s var(--ease) infinite;
+  animation: lp-pulse 2.6s var(--ease) infinite;
 }
 
 @keyframes lp-pulse {
   0% {
-    opacity: 0.5;
-    transform: scale(0.6);
+    opacity: 0.6;
+    transform: scale(0.5);
   }
   70%,
   100% {
     opacity: 0;
-    transform: scale(1.5);
+    transform: scale(1.6);
   }
 }
 
-/* --- Screenshot frame ----------------------------------------------------- */
+/* --- Product frame -------------------------------------------------------- */
 
 .lp-frame {
-  border: 1px solid var(--edge);
-  border-radius: 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 16px;
   overflow: hidden;
   background: var(--s1);
+  box-shadow: 0 60px 120px -40px rgba(0, 0, 0, 1);
 }
 
 .lp-frame-bar {
   display: flex;
   align-items: center;
   gap: 6px;
-  height: 34px;
-  padding-inline: 12px;
-  border-bottom: 1px solid var(--edge);
-  background: var(--s1);
+  height: 38px;
+  padding-inline: 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--s2);
 }
 
 .lp-dot {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
   border-radius: 999px;
-  background: var(--edge-strong);
+  background: var(--line-loud);
 }
 
 /* --- Marquee -------------------------------------------------------------- */
@@ -324,26 +362,11 @@
 .lp-marquee-track {
   display: flex;
   width: max-content;
-  animation: lp-marquee 46s linear infinite;
+  animation: lp-marquee 50s linear infinite;
 }
 
 .lp-marquee:hover .lp-marquee-track {
   animation-play-state: paused;
-}
-
-/* --- Link ----------------------------------------------------------------- */
-
-.lp-link {
-  color: var(--fg-muted);
-  text-decoration: underline;
-  text-decoration-color: var(--edge-loud);
-  text-underline-offset: 4px;
-  transition: color 0.18s var(--ease), text-decoration-color 0.18s var(--ease);
-}
-
-.lp-link:hover {
-  color: var(--fg);
-  text-decoration-color: currentColor;
 }
 
 /* --- Scrollbar ------------------------------------------------------------ */
@@ -358,13 +381,13 @@
 }
 
 .lp ::-webkit-scrollbar-thumb {
-  background: var(--edge-strong);
+  background: var(--line-strong);
   border-radius: 999px;
   border: 3px solid var(--bg);
 }
 
 .lp ::-webkit-scrollbar-thumb:hover {
-  background: var(--edge-loud);
+  background: var(--line-loud);
 }
 
 /* --- Reduced motion ------------------------------------------------------- */
