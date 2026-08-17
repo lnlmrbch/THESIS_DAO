@@ -187,8 +187,11 @@ export const IconX = (p) => (
   </Brand>
 );
 
-/** Wordmark glyph — a hexagonal token with an inner vote check */
-export const LogoMark = ({ size = 28, ...rest }) => (
+/**
+ * Wordmark glyph — a solid hexagonal token with the check knocked out of it.
+ * Monochrome and filled, so it stays crisp at 20px in the nav.
+ */
+export const LogoMark = ({ size = 20, ...rest }) => (
   <svg
     width={size}
     height={size}
@@ -198,24 +201,12 @@ export const LogoMark = ({ size = 28, ...rest }) => (
     focusable="false"
     {...rest}
   >
-    <defs>
-      <linearGradient id="lp-logo-g" x1="4" y1="2" x2="28" y2="30">
-        <stop offset="0%" stopColor="#5EEAD4" />
-        <stop offset="100%" stopColor="#A78BFA" />
-      </linearGradient>
-    </defs>
+    <path d="M16 2 29 9.5v13L16 30 3 22.5v-13Z" fill="currentColor" />
     <path
-      d="M16 2.6 28 9.3v13.4L16 29.4 4 22.7V9.3Z"
-      stroke="url(#lp-logo-g)"
-      strokeWidth="1.6"
-      strokeLinejoin="round"
-    />
-    <path
-      d="m11 16.2 3.4 3.4L21 12.6"
-      stroke="url(#lp-logo-g)"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      d="m10.8 16 3.6 3.6 6.8-6.8"
+      stroke="#000"
+      strokeWidth="2.6"
+      strokeLinecap="square"
     />
   </svg>
 );

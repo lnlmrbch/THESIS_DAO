@@ -1,12 +1,6 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  AnimatePresence,
-  motion,
-  useReducedMotion,
-  useScroll,
-  useSpring,
-} from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Link as ScrollLink } from "react-scroll";
 import { providers } from "near-api-js";
 
@@ -18,7 +12,6 @@ import {
   IconChart,
   IconClose,
   IconDiscord,
-  IconExchange,
   IconExpand,
   IconEye,
   IconHandshake,
@@ -26,7 +19,6 @@ import {
   IconPlus,
   IconRocket,
   IconToken,
-  IconTools,
   IconUsers,
   IconVault,
   IconVote,
@@ -93,25 +85,22 @@ const features = [
 
 const allocations = [
   {
-    icon: IconExchange,
     title: "Umlauf",
     desc: "60% Community-basiert",
     value: 60,
-    tone: "mint",
+    fill: "#EDEDED",
   },
   {
-    icon: IconTools,
     title: "Treasury",
     desc: "30% für Entwicklung & Finanzierung",
     value: 30,
-    tone: "iris",
+    fill: "#6E6E6E",
   },
   {
-    icon: IconUsers,
     title: "Team",
     desc: "10% für Core-Contributors",
     value: 10,
-    tone: "chalk",
+    fill: "#2E2E2E",
   },
 ];
 
@@ -148,82 +137,64 @@ const tickerPhrases = [
   "Built on NEAR",
 ];
 
-const heroPillars = [
+const pillars = [
   { icon: IconWallet, label: "Wallet" },
   { icon: IconToken, label: "Token" },
   { icon: IconChart, label: "Dashboard" },
   { icon: IconUsers, label: "Community" },
 ];
 
-const EASE = [0.22, 1, 0.36, 1];
+const EASE = [0.16, 1, 0.3, 1];
 const asset = (file) => `${process.env.PUBLIC_URL}/screenshots/${file}`;
 
 /* -------------------------------------------------------------------------- */
 /*  Primitives                                                                 */
 /* -------------------------------------------------------------------------- */
 
-/** Scroll reveal — opacity + a short lift only, so it can never shift layout. */
-const Reveal = ({ children, delay = 0, y = 18, className = "" }) => {
+/** Fade + 8px lift. Deliberately restrained — nothing swoops. */
+const Reveal = ({ children, delay = 0, className = "" }) => {
   const reduce = useReducedMotion();
   return (
     <motion.div
       className={className}
-      initial={reduce ? false : { opacity: 0, y }}
+      initial={reduce ? false : { opacity: 0, y: 8 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.7, delay, ease: EASE }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.5, delay, ease: EASE }}
     >
       {children}
     </motion.div>
   );
 };
 
-const SectionHeading = ({ index, eyebrow, title, lead, align = "left" }) => (
-  <div className={align === "center" ? "text-center" : ""}>
-    <Reveal>
-      <div
-        className={`flex items-center gap-3 ${
-          align === "center" ? "justify-center" : ""
-        }`}
-      >
-        <span className="lp-mono text-[0.6875rem] text-mint">{index}</span>
-        <span className="h-px w-8 bg-white/15" />
-        <span className="lp-eyebrow">{eyebrow}</span>
-      </div>
-    </Reveal>
-    <Reveal delay={0.06}>
-      <h2 className="lp-display mt-6 text-[2.25rem] sm:text-[3rem] lg:text-[3.5rem] text-white">
-        {title}
-      </h2>
-    </Reveal>
-    {lead && (
-      <Reveal delay={0.12}>
-        <p
-          className={`mt-5 max-w-2xl text-[1.0625rem] leading-relaxed text-white/55 ${
-            align === "center" ? "mx-auto" : ""
-          }`}
-        >
-          {lead}
-        </p>
-      </Reveal>
-    )}
+/** Horizontal band inside the shell. Rules come from .lp-band. */
+const Band = ({ id, className = "", children }) => (
+  <section
+    id={id}
+    className={`lp-band relative ${id ? "scroll-mt-16" : ""} ${className}`}
+  >
+    {children}
+  </section>
+);
+
+/** Section label: 01 / ÜBER UNS */
+const Label = ({ index, children }) => (
+  <div className="flex items-center gap-2.5">
+    <span className="lp-mono text-[0.6875rem] text-fg">{index}</span>
+    <span className="h-px w-6 bg-edge-strong" />
+    <span className="lp-label">{children}</span>
   </div>
 );
 
-/** Wraps a card so its border spotlight follows the pointer. */
-const SpotlightCard = ({ className = "", children, ...rest }) => {
-  const onMove = useCallback((e) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    e.currentTarget.style.setProperty("--mx", `${e.clientX - r.left}px`);
-    e.currentTarget.style.setProperty("--my", `${e.clientY - r.top}px`);
-  }, []);
-
-  return (
-    <div className={`lp-card ${className}`} onMouseMove={onMove} {...rest}>
-      {children}
-    </div>
-  );
-};
+/** Crosshairs on the four corners of a bordered block. */
+const Crosses = () => (
+  <>
+    <span className="lp-cross -left-[5px] -top-[5px]" />
+    <span className="lp-cross -right-[5px] -top-[5px]" />
+    <span className="lp-cross -bottom-[5px] -left-[5px]" />
+    <span className="lp-cross -bottom-[5px] -right-[5px]" />
+  </>
+);
 
 /* -------------------------------------------------------------------------- */
 /*  Page                                                                       */
@@ -231,25 +202,16 @@ const SpotlightCard = ({ className = "", children, ...rest }) => {
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const reduce = useReducedMotion();
-
-  const { scrollYProgress } = useScroll();
-  const progress = useSpring(scrollYProgress, {
-    stiffness: 160,
-    damping: 30,
-    restDelta: 0.001,
-  });
 
   const [openFaq, setOpenFaq] = useState(null);
   const [showTop, setShowTop] = useState(false);
   const [activeShot, setActiveShot] = useState(0);
   const [modalImage, setModalImage] = useState(null);
-  const heroRef = useRef(null);
+  const shellRef = useRef(null);
 
-  /* The landing page owns a dark canvas; the app shell is light. */
   useEffect(() => {
     const prev = document.body.style.backgroundColor;
-    document.body.style.backgroundColor = "#08090A";
+    document.body.style.backgroundColor = "#000000";
     return () => {
       document.body.style.backgroundColor = prev;
     };
@@ -259,8 +221,7 @@ const LandingPage = () => {
     (async () => {
       try {
         const { selector } = await initWalletSelector();
-        const accounts = selector.store.getState().accounts;
-        if (accounts.length > 0) navigate("/dashboard");
+        if (selector.store.getState().accounts.length > 0) navigate("/dashboard");
       } catch {
         console.log("🧠 Wallet nicht verbunden");
       }
@@ -273,26 +234,11 @@ const LandingPage = () => {
   };
 
   useEffect(() => {
-    const onScroll = () => setShowTop(window.scrollY > 700);
+    const onScroll = () => setShowTop(window.scrollY > 900);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* Pointer spotlight in the hero. */
-  useEffect(() => {
-    if (reduce) return undefined;
-    const el = heroRef.current;
-    if (!el) return undefined;
-    const onMove = (e) => {
-      const r = el.getBoundingClientRect();
-      el.style.setProperty("--sx", `${((e.clientX - r.left) / r.width) * 100}%`);
-      el.style.setProperty("--sy", `${((e.clientY - r.top) / r.height) * 100}%`);
-    };
-    el.addEventListener("mousemove", onMove);
-    return () => el.removeEventListener("mousemove", onMove);
-  }, [reduce]);
-
-  /* Close the lightbox on Escape. */
   useEffect(() => {
     if (!modalImage) return undefined;
     const onKey = (e) => e.key === "Escape" && setModalImage(null);
@@ -303,7 +249,7 @@ const LandingPage = () => {
   /* ---- Token sale ------------------------------------------------------- */
 
   const HARDCAP = 10_000_000;
-  const [tokenSale, setTokenSale] = useState({
+  const [sale, setSale] = useState({
     sold: null,
     symbol: null,
     decimals: 24,
@@ -318,7 +264,7 @@ const LandingPage = () => {
         const provider = new providers.JsonRpcProvider(
           "https://rpc.testnet.near.org"
         );
-        const fetchView = async (method, args = {}) => {
+        const view = async (method, args = {}) => {
           const res = await provider.query({
             request_type: "call_function",
             account_id: contractId,
@@ -330,7 +276,7 @@ const LandingPage = () => {
           return JSON.parse(new TextDecoder().decode(new Uint8Array(res.result)));
         };
 
-        /* Never leave the panel stuck in its skeleton if the RPC hangs. */
+        /* Never leave the strip stuck in its skeleton if the RPC hangs. */
         const withTimeout = (promise, ms = 9000) =>
           Promise.race([
             promise,
@@ -341,13 +287,13 @@ const LandingPage = () => {
 
         const [meta, totalSupply, tokenPool] = await withTimeout(
           Promise.all([
-            fetchView("ft_metadata"),
-            fetchView("get_total_supply"),
-            fetchView("get_token_pool"),
+            view("ft_metadata"),
+            view("get_total_supply"),
+            view("get_token_pool"),
           ])
         );
 
-        setTokenSale({
+        setSale({
           sold: (parseFloat(totalSupply) - parseFloat(tokenPool)).toString(),
           symbol: meta?.symbol || "TOKEN",
           decimals: meta?.decimals ?? 24,
@@ -356,301 +302,224 @@ const LandingPage = () => {
         });
       } catch (err) {
         console.error("Fehler beim Laden des Token Sale Stands:", err);
-        setTokenSale((prev) => ({ ...prev, loading: false, failed: true }));
+        setSale((prev) => ({ ...prev, loading: false, failed: true }));
       }
     })();
   }, []);
 
-  const soldHuman = tokenSale.sold
-    ? parseFloat(tokenSale.sold) / Math.pow(10, tokenSale.decimals)
+  const soldHuman = sale.sold
+    ? parseFloat(sale.sold) / Math.pow(10, sale.decimals)
     : 0;
   const percent = soldHuman ? Math.min(100, (soldHuman / HARDCAP) * 100) : 0;
-  const soldLabel = soldHuman.toLocaleString("de-CH", {
-    maximumFractionDigits: 0,
-  });
+  const nf = (n) => n.toLocaleString("de-CH", { maximumFractionDigits: 0 });
 
   return (
-    <div className="lp">
+    <div className="lp min-h-screen">
       <Header connectWallet={connectWallet} />
 
-      {/* Scroll progress */}
-      <motion.div
-        style={{ scaleX: progress }}
-        className="fixed inset-x-0 top-0 z-[70] h-px origin-left bg-gradient-to-r from-mint via-iris to-mint"
-      />
-
-      <div className="lp-grain" />
-
-      <main className="relative z-[2]">
+      <div ref={shellRef} className="lp-shell relative">
         {/* ================================================================== */}
         {/*  Hero                                                              */}
         {/* ================================================================== */}
-        <section
-          id="hero"
-          ref={heroRef}
-          className="relative overflow-hidden px-5 pb-16 pt-32 sm:px-6 sm:pt-40 lg:pb-24"
-        >
-          <div className="lp-grid" />
-          <div className="lp-spotlight" />
-          <div
-            className="lp-aurora lp-drift -left-32 -top-24 h-[440px] w-[440px] opacity-[0.22]"
-            style={{ background: "#2DD4BF" }}
-          />
-          <div
-            className="lp-aurora lp-drift-slow -right-24 top-24 h-[380px] w-[380px] opacity-[0.18]"
-            style={{ background: "#7C5CFA" }}
-          />
+        <Band id="hero" className="overflow-hidden pt-16">
+          <div className="lp-rules" />
 
-          <div className="relative mx-auto grid max-w-content items-center gap-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
-            {/* --- Copy --- */}
-            <div>
-              <Reveal>
-                <div className="inline-flex max-w-full items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5">
-                  <span className="relative flex h-1.5 w-1.5 shrink-0">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mint opacity-60" />
-                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-mint" />
-                  </span>
-                  <span className="lp-mono text-[0.6875rem] leading-snug text-white/60">
-                    Ein Prototyp im Rahmen einer Bachelor Thesis an der ZHAW
-                  </span>
-                </div>
-              </Reveal>
+          <div className="relative px-5 pb-16 pt-20 sm:px-8 sm:pb-20 sm:pt-28">
+            <Reveal>
+              <div className="inline-flex items-center gap-2.5 rounded-full border border-edge bg-surface-1 py-1 pl-2.5 pr-3.5">
+                <span className="lp-live" />
+                <span className="lp-mono text-[0.6875rem] leading-none text-fg-muted">
+                  Ein Prototyp im Rahmen einer Bachelor Thesis an der ZHAW
+                </span>
+              </div>
+            </Reveal>
 
-              <Reveal delay={0.08}>
-                <h1 className="lp-display mt-7 text-[3.25rem] leading-[0.92] sm:text-[4.5rem] lg:text-[5.25rem]">
-                  <span className="lp-sheen">Thesis DAO</span>
-                </h1>
-              </Reveal>
+            <Reveal delay={0.04}>
+              <h1 className="lp-h1 mt-8 max-w-[14ch] text-fg">Thesis DAO</h1>
+            </Reveal>
 
-              <Reveal delay={0.14}>
-                <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/55 sm:text-xl">
-                  Demokratisch. Transparent. Community Driven. Built on NEAR.
-                </p>
-              </Reveal>
+            <Reveal delay={0.08}>
+              <p className="lp-lead mt-7 max-w-[46ch]">
+                Demokratisch. Transparent. Community Driven. Built on NEAR.
+              </p>
+            </Reveal>
 
-              <Reveal delay={0.2}>
-                <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                  <button
-                    onClick={connectWallet}
-                    className="lp-btn lp-btn--primary"
-                  >
-                    <IconWallet size={17} />
-                    Wallet verbinden &amp; starten
-                  </button>
-                  <ScrollLink
-                    to="about"
-                    smooth
-                    duration={600}
-                    offset={-96}
-                    tabIndex={0}
-                    role="button"
-                    className="lp-btn lp-btn--ghost group"
-                  >
-                    Mehr erfahren
-                    <IconArrowRight
-                      size={16}
-                      className="transition-transform duration-300 group-hover:translate-x-1"
-                    />
-                  </ScrollLink>
-                </div>
-              </Reveal>
-
-              <Reveal delay={0.26}>
-                <p className="lp-mono mt-8 text-[0.6875rem] tracking-wider text-white/30">
-                  von Lionel Murbach
-                </p>
-              </Reveal>
-            </div>
-
-            {/* --- Token sale panel --- */}
-            <Reveal delay={0.18} y={26}>
-              <div className="relative">
-                <div
-                  className="lp-aurora absolute inset-8 opacity-25"
-                  style={{ background: "#5EEAD4" }}
-                />
-                <div className="lp-panel relative p-6 sm:p-7">
-                  <div className="flex items-center justify-between">
-                    <span className="lp-eyebrow">Token Sale</span>
-                    <span className="lp-mono rounded-md border border-mint/25 bg-mint/10 px-2 py-0.5 text-[0.625rem] text-mint">
-                      {tokenSale.symbol || "THESISDAO"}
-                    </span>
-                  </div>
-
-                  {tokenSale.loading ? (
-                    <div className="mt-6 space-y-3">
-                      <div className="h-9 w-40 animate-pulse rounded-md bg-white/[0.06]" />
-                      <div className="h-1.5 w-full animate-pulse rounded-full bg-white/[0.06]" />
-                    </div>
-                  ) : (
-                    <>
-                      <div className="mt-5 flex items-baseline gap-2">
-                        <span className="lp-mono text-[2.25rem] leading-none text-white">
-                          {tokenSale.failed ? "—" : soldLabel}
-                        </span>
-                        <span className="lp-mono text-sm text-white/35">
-                          / {HARDCAP.toLocaleString("de-CH")}
-                        </span>
-                      </div>
-
-                      <div className="mt-5 h-1.5 w-full overflow-hidden rounded-full bg-white/[0.07]">
-                        <motion.div
-                          className="h-full rounded-full bg-gradient-to-r from-mint-deep to-mint"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${percent}%` }}
-                          transition={{ duration: 1.4, delay: 0.3, ease: EASE }}
-                        />
-                      </div>
-
-                      <div className="mt-2.5 flex items-center justify-between">
-                        <span className="lp-mono text-[0.6875rem] text-white/35">
-                          {tokenSale.failed
-                            ? "Sale-Stand nicht verfügbar"
-                            : "verkauft"}
-                        </span>
-                        <span className="lp-mono text-[0.6875rem] text-mint">
-                          {tokenSale.failed ? "" : `${percent.toFixed(2)}%`}
-                        </span>
-                      </div>
-                    </>
-                  )}
-
-                  <div className="mt-7 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-white/[0.07] bg-white/[0.07]">
-                    {heroPillars.map(({ icon: Icon, label }) => (
-                      <div
-                        key={label}
-                        className="flex items-center gap-2.5 bg-ink-900 px-3.5 py-3.5"
-                      >
-                        <Icon size={17} className="shrink-0 text-mint" />
-                        <span className="text-[0.8125rem] text-white/70">
-                          {label}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+            <Reveal delay={0.12}>
+              <div className="mt-9 flex flex-col gap-2.5 sm:flex-row">
+                <button
+                  onClick={connectWallet}
+                  className="lp-btn lp-btn--primary !flex sm:!inline-flex"
+                >
+                  Wallet verbinden &amp; starten
+                </button>
+                <ScrollLink
+                  to="about"
+                  smooth
+                  duration={500}
+                  offset={-64}
+                  tabIndex={0}
+                  role="button"
+                  className="lp-btn lp-btn--ghost !flex sm:!inline-flex group"
+                >
+                  Mehr erfahren
+                  <IconArrowRight
+                    size={15}
+                    className="text-fg-subtle transition-transform duration-200 group-hover:translate-x-0.5"
+                  />
+                </ScrollLink>
               </div>
             </Reveal>
           </div>
-        </section>
+        </Band>
 
-        {/* --- Ticker ------------------------------------------------------- */}
-        <div className="lp-marquee relative overflow-hidden border-y border-white/[0.07] py-4">
-          <div className="lp-marquee-track">
-            {[0, 1].map((dup) => (
-              <div key={dup} className="flex shrink-0 items-center">
-                {tickerPhrases.map((phrase, i) => (
-                  <span key={`${dup}-${i}`} className="flex items-center">
-                    <span className="lp-eyebrow whitespace-nowrap px-7 text-white/40">
-                      {phrase}
+        {/* --- Token sale strip -------------------------------------------- */}
+        <Band>
+          <div className="lp-grid sm:grid-cols-[minmax(0,1fr)_auto]">
+            <div className="lp-cell px-5 py-6 sm:px-8">
+              <div className="flex items-baseline justify-between gap-4">
+                <span className="lp-label">Token Sale</span>
+                <span className="lp-mono text-[0.6875rem] text-fg-subtle">
+                  {sale.symbol || "THESISDAO"}
+                </span>
+              </div>
+
+              {sale.loading ? (
+                <div className="mt-5 h-1.5 w-full animate-pulse rounded-full bg-surface-3" />
+              ) : (
+                <>
+                  <div className="mt-5 flex items-baseline gap-2">
+                    <span className="lp-mono text-[1.75rem] leading-none tracking-tight text-fg">
+                      {sale.failed ? "—" : nf(soldHuman)}
                     </span>
-                    <LogoMark size={13} className="opacity-40" />
-                  </span>
-                ))}
-              </div>
-            ))}
-          </div>
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-ink-950 to-transparent" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-ink-950 to-transparent" />
-        </div>
-
-        {/* ================================================================== */}
-        {/*  About                                                             */}
-        {/* ================================================================== */}
-        <section
-          id="about"
-          className="relative scroll-mt-28 px-5 py-20 sm:px-6 lg:py-28"
-        >
-          <div className="mx-auto max-w-content">
-            <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
-              <div className="lg:sticky lg:top-28 lg:self-start">
-                <SectionHeading
-                  index="01"
-                  eyebrow="Über uns"
-                  title="Was ist diese DAO?"
-                />
-              </div>
-
-              <div className="space-y-6">
-                <Reveal>
-                  <p className="text-[1.0625rem] leading-[1.75] text-white/70 sm:text-lg">
-                    Eine DAO (Decentralized Autonomous Organization) ist eine
-                    digitale Organisation, die von ihren Mitgliedern
-                    gemeinschaftlich gesteuert wird. Entscheidungen werden
-                    transparent und demokratisch getroffen – ohne zentrale
-                    Instanz.
+                    <span className="lp-mono text-sm text-fg-faint">
+                      / {nf(HARDCAP)}
+                    </span>
+                    <span className="lp-mono ml-auto text-sm text-fg-muted">
+                      {sale.failed ? "n/a" : `${percent.toFixed(2)}%`}
+                    </span>
+                  </div>
+                  <div className="lp-meter mt-4">
+                    <motion.span
+                      initial={{ width: 0 }}
+                      animate={{ width: `${percent}%` }}
+                      transition={{ duration: 1, delay: 0.2, ease: EASE }}
+                    />
+                  </div>
+                  <p className="lp-mono mt-3 text-[0.6875rem] text-fg-faint">
+                    {sale.failed ? "Sale-Stand nicht verfügbar" : "verkauft"}
                   </p>
-                </Reveal>
-                <Reveal delay={0.06}>
-                  <p className="text-[1.0625rem] leading-[1.75] text-white/70 sm:text-lg">
-                    Mit dem Kauf von Tokens wirst du Teil der DAO und erhältst
-                    die gleichen Rechte wie ein Aktionär einer traditionellen AG
-                    – oder sogar noch mehr: Du kannst mitbestimmen, Vorschläge
-                    einbringen und direkt an der Entwicklung und Verwaltung der
-                    Organisation teilnehmen.
-                  </p>
-                </Reveal>
-                <Reveal delay={0.12}>
-                  <p className="border-l border-mint/30 pl-5 text-[0.9375rem] leading-[1.75] text-white/45">
-                    Diese DAO wurde als Prototyp im Rahmen einer Bachelor Thesis
-                    an der ZHAW entwickelt, um die praktische Umsetzung und
-                    Anwendbarkeit von DAOs in der modernen
-                    Organisationsgestaltung zu erforschen.
-                  </p>
-                </Reveal>
-              </div>
+                </>
+              )}
             </div>
 
-            {/* Feature grid */}
-            <div className="mt-16 grid gap-px overflow-hidden rounded-2xl border border-white/[0.07] bg-white/[0.07] sm:grid-cols-2 lg:mt-20 lg:grid-cols-4">
-              {features.map(({ icon: Icon, title, desc }, i) => (
-                <Reveal key={title} delay={i * 0.06}>
-                  <SpotlightCard className="h-full !rounded-none !border-0 bg-ink-950 p-7">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-mint">
-                      <Icon size={19} />
-                    </div>
-                    <h3 className="mt-5 text-[0.9375rem] font-semibold tracking-tight text-white">
-                      {title}
-                    </h3>
-                    <p className="mt-2 text-[0.875rem] leading-relaxed text-white/45">
-                      {desc}
-                    </p>
-                  </SpotlightCard>
-                </Reveal>
+            <div className="lp-grid grid-cols-2 sm:w-[22rem] sm:grid-cols-2">
+              {pillars.map(({ icon: Icon, label }) => (
+                <div
+                  key={label}
+                  className="lp-cell lp-cell--hover flex items-center gap-2.5 px-5 py-4"
+                >
+                  <Icon size={15} className="shrink-0 text-fg-subtle" />
+                  <span className="text-[0.8125rem] text-fg-muted">{label}</span>
+                </div>
               ))}
             </div>
           </div>
-        </section>
+        </Band>
+
+        {/* --- Ticker ------------------------------------------------------- */}
+        <Band>
+          <div className="lp-marquee relative overflow-hidden py-3.5">
+            <div className="lp-marquee-track">
+              {[0, 1].map((dup) => (
+                <div key={dup} className="flex shrink-0 items-center">
+                  {tickerPhrases.map((phrase, i) => (
+                    <span key={`${dup}-${i}`} className="flex items-center">
+                      <span className="lp-label whitespace-nowrap px-8">
+                        {phrase}
+                      </span>
+                      <span className="h-1 w-1 rounded-full bg-edge-loud" />
+                    </span>
+                  ))}
+                </div>
+              ))}
+            </div>
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-surface-0 to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-surface-0 to-transparent" />
+          </div>
+        </Band>
 
         {/* ================================================================== */}
-        {/*  Dashboard showcase                                                */}
+        {/*  Product                                                           */}
         {/* ================================================================== */}
-        <section
-          id="dashboard"
-          className="relative scroll-mt-28 overflow-hidden px-5 py-20 sm:px-6 lg:py-28"
-        >
-          <div
-            className="lp-aurora lp-drift-slow left-1/2 top-10 h-[420px] w-[620px] -translate-x-1/2 opacity-[0.12]"
-            style={{ background: "#7C5CFA" }}
-          />
+        <Band id="dashboard">
+          <div className="px-5 pb-14 pt-16 sm:px-8 sm:pb-16 sm:pt-20">
+            <Reveal>
+              <Label index="01">Produkt</Label>
+            </Reveal>
+            <div className="mt-7 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+              <Reveal delay={0.04}>
+                <h2 className="lp-h2 max-w-[16ch] text-fg">
+                  Das DAO Dashboard
+                </h2>
+              </Reveal>
+              <Reveal delay={0.08}>
+                <p className="lp-lead max-w-[52ch] lg:text-right">
+                  Das Dashboard bietet dir einen schnellen Überblick über alle
+                  wichtigen DAO-Funktionen und deine persönlichen Aktivitäten.
+                </p>
+              </Reveal>
+            </div>
+          </div>
 
-          <div className="relative mx-auto max-w-content">
-            <SectionHeading
-              index="02"
-              eyebrow="Produkt"
-              title="Das DAO Dashboard"
-              lead="Das Dashboard bietet dir einen schnellen Überblick über alle wichtigen DAO-Funktionen und deine persönlichen Aktivitäten."
-              align="center"
-            />
+          {/* Caption tabs */}
+          <div className="lp-grid border-t border-edge sm:grid-cols-3">
+            {shots.map((shot, i) => (
+              <button
+                key={shot.src}
+                type="button"
+                onClick={() => setActiveShot(i)}
+                aria-pressed={activeShot === i}
+                className={`lp-cell relative flex items-start gap-3 px-5 py-4 text-left transition-colors duration-200 sm:px-6 ${
+                  activeShot === i ? "!bg-surface-2" : "hover:!bg-surface-1"
+                }`}
+              >
+                {activeShot === i && (
+                  <motion.span
+                    layoutId="shot-underline"
+                    className="absolute inset-x-0 top-0 h-px bg-fg"
+                    transition={{ duration: 0.28, ease: EASE }}
+                  />
+                )}
+                <span
+                  className={`lp-mono mt-px text-[0.625rem] ${
+                    activeShot === i ? "text-fg" : "text-fg-faint"
+                  }`}
+                >
+                  0{i + 1}
+                </span>
+                <span
+                  className={`text-[0.8125rem] leading-snug ${
+                    activeShot === i ? "text-fg" : "text-fg-subtle"
+                  }`}
+                >
+                  {shot.caption}
+                </span>
+              </button>
+            ))}
+          </div>
 
-            {/* Featured frame */}
-            <Reveal delay={0.1} y={26}>
-              <div className="lp-frame mx-auto mt-14 max-w-4xl">
+          {/* Screenshot */}
+          <div className="border-t border-edge bg-surface-1 px-5 py-10 sm:px-8 sm:py-14">
+            <Reveal>
+              {/* Crosshairs live on the wrapper — .lp-frame clips its overflow. */}
+              <div className="relative mx-auto max-w-4xl">
+                <Crosses />
+                <div className="lp-frame">
                 <div className="lp-frame-bar">
                   <span className="lp-dot" />
                   <span className="lp-dot" />
                   <span className="lp-dot" />
-                  <span className="lp-mono ml-3 truncate text-[0.625rem] text-white/25">
+                  <span className="lp-mono ml-3 truncate text-[0.625rem] text-fg-faint">
                     thesis-dao.near
                   </span>
                 </div>
@@ -668,426 +537,424 @@ const LandingPage = () => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      transition={{ duration: 0.35, ease: EASE }}
+                      transition={{ duration: 0.25 }}
                       className="block w-full"
                     />
                   </AnimatePresence>
-                  <span className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-ink-950/70 text-white/70 opacity-0 backdrop-blur transition-opacity duration-300 group-hover:opacity-100">
-                    <IconExpand size={16} />
+                  <span className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-md border border-edge-strong bg-surface-0/80 text-fg-muted opacity-0 backdrop-blur transition-opacity duration-200 group-hover:opacity-100">
+                    <IconExpand size={15} />
                   </span>
                 </button>
+                </div>
               </div>
             </Reveal>
+          </div>
+        </Band>
 
-            {/* Caption selectors */}
-            <div className="mx-auto mt-8 grid max-w-4xl gap-px overflow-hidden rounded-xl border border-white/[0.07] bg-white/[0.07] sm:grid-cols-3">
-              {shots.map((shot, i) => (
-                <button
-                  key={shot.src}
-                  type="button"
-                  onClick={() => setActiveShot(i)}
-                  aria-pressed={activeShot === i}
-                  className={`flex items-start gap-3 px-4 py-4 text-left transition-colors duration-300 ${
-                    activeShot === i
-                      ? "bg-white/[0.06]"
-                      : "bg-ink-950 hover:bg-white/[0.03]"
-                  }`}
-                >
-                  <span
-                    className={`lp-mono mt-px text-[0.625rem] ${
-                      activeShot === i ? "text-mint" : "text-white/25"
-                    }`}
-                  >
-                    0{i + 1}
-                  </span>
-                  <span
-                    className={`text-[0.8125rem] leading-snug ${
-                      activeShot === i ? "text-white" : "text-white/45"
-                    }`}
-                  >
-                    {shot.caption}
-                  </span>
-                </button>
-              ))}
+        {/* ================================================================== */}
+        {/*  About                                                             */}
+        {/* ================================================================== */}
+        <Band id="about">
+          <div className="grid lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)]">
+            <div className="px-5 pb-10 pt-16 sm:px-8 sm:pt-20 lg:border-r lg:border-edge lg:pb-20">
+              <div className="lg:sticky lg:top-24">
+                <Reveal>
+                  <Label index="02">Über uns</Label>
+                </Reveal>
+                <Reveal delay={0.04}>
+                  <h2 className="lp-h2 mt-7 max-w-[12ch] text-fg">
+                    Was ist diese DAO?
+                  </h2>
+                </Reveal>
+                <Reveal delay={0.08}>
+                  <p className="mt-10 max-w-[46ch] border-l border-edge-strong pl-5 text-[0.875rem] leading-[1.7] text-fg-subtle">
+                    Diese DAO wurde als Prototyp im Rahmen einer Bachelor Thesis
+                    an der ZHAW entwickelt, um die praktische Umsetzung und
+                    Anwendbarkeit von DAOs in der modernen
+                    Organisationsgestaltung zu erforschen.
+                  </p>
+                </Reveal>
+              </div>
+            </div>
+
+            <div className="space-y-5 px-5 pb-16 pt-2 sm:px-8 sm:pb-20 lg:pt-20">
+              <Reveal>
+                <p className="lp-lead max-w-[62ch] text-fg-muted">
+                  Eine DAO (Decentralized Autonomous Organization) ist eine
+                  digitale Organisation, die von ihren Mitgliedern
+                  gemeinschaftlich gesteuert wird. Entscheidungen werden
+                  transparent und demokratisch getroffen – ohne zentrale Instanz.
+                </p>
+              </Reveal>
+              <Reveal delay={0.04}>
+                <p className="lp-lead max-w-[62ch] text-fg-muted">
+                  Mit dem Kauf von Tokens wirst du Teil der DAO und erhältst die
+                  gleichen Rechte wie ein Aktionär einer traditionellen AG – oder
+                  sogar noch mehr: Du kannst mitbestimmen, Vorschläge einbringen
+                  und direkt an der Entwicklung und Verwaltung der Organisation
+                  teilnehmen.
+                </p>
+              </Reveal>
             </div>
           </div>
-        </section>
+
+          {/* Feature cells */}
+          <div className="lp-grid border-t border-edge sm:grid-cols-2 lg:grid-cols-4">
+            {features.map(({ icon: Icon, title, desc }, i) => (
+              <div
+                key={title}
+                className="lp-cell lp-cell--hover group px-5 py-8 sm:px-6"
+              >
+                <Reveal delay={i * 0.04}>
+                  <div className="flex items-center justify-between">
+                    <Icon
+                      size={18}
+                      className="text-fg-subtle transition-colors duration-200 group-hover:text-fg"
+                    />
+                    <span className="lp-mono text-[0.625rem] text-fg-faint">
+                      0{i + 1}
+                    </span>
+                  </div>
+                  <h3 className="mt-6 text-[0.9375rem] font-medium tracking-[-0.015em] text-fg">
+                    {title}
+                  </h3>
+                  <p className="mt-2 text-[0.8125rem] leading-[1.65] text-fg-subtle">
+                    {desc}
+                  </p>
+                </Reveal>
+              </div>
+            ))}
+          </div>
+        </Band>
 
         {/* ================================================================== */}
         {/*  Tokenomics                                                        */}
         {/* ================================================================== */}
-        <section
-          id="tokenomics"
-          className="relative scroll-mt-28 px-5 py-20 sm:px-6 lg:py-28"
-        >
-          <div className="mx-auto max-w-content">
-            <SectionHeading
-              index="03"
-              eyebrow="Verteilung"
-              title="Tokenomics"
-              lead="Hier erfährst du, wie die Token im Ökosystem verteilt sind und welche Rolle sie für die Community spielen."
-            />
+        <Band id="tokenomics">
+          <div className="px-5 pb-12 pt-16 sm:px-8 sm:pt-20">
+            <Reveal>
+              <Label index="03">Verteilung</Label>
+            </Reveal>
+            <div className="mt-7 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+              <Reveal delay={0.04}>
+                <h2 className="lp-h2 text-fg">Tokenomics</h2>
+              </Reveal>
+              <Reveal delay={0.08}>
+                <p className="lp-lead max-w-[52ch] lg:text-right">
+                  Hier erfährst du, wie die Token im Ökosystem verteilt sind und
+                  welche Rolle sie für die Community spielen.
+                </p>
+              </Reveal>
+            </div>
 
-            {/* Allocation bar */}
+            {/* Segmented allocation bar */}
             <Reveal delay={0.1}>
-              <div className="mt-14 flex h-3 w-full gap-1 overflow-hidden">
+              <div className="mt-12 flex h-2 w-full gap-1 overflow-hidden">
                 {allocations.map((a) => (
                   <motion.div
                     key={a.title}
                     initial={{ width: 0 }}
                     whileInView={{ width: `${a.value}%` }}
-                    viewport={{ once: true, margin: "-80px" }}
-                    transition={{ duration: 1.1, delay: 0.15, ease: EASE }}
-                    className={`h-full rounded-full ${
-                      a.tone === "mint"
-                        ? "bg-gradient-to-r from-mint-deep to-mint"
-                        : a.tone === "iris"
-                        ? "bg-gradient-to-r from-iris-deep to-iris"
-                        : "bg-white/20"
-                    }`}
+                    viewport={{ once: true, margin: "-60px" }}
+                    transition={{ duration: 0.85, delay: 0.1, ease: EASE }}
+                    className="h-full rounded-sm"
+                    style={{ background: a.fill }}
                   />
                 ))}
               </div>
             </Reveal>
-
-            {/* Legend rows */}
-            <div className="mt-12 divide-y divide-white/[0.07] border-y border-white/[0.07]">
-              {allocations.map(({ icon: Icon, title, desc, value, tone }, i) => (
-                <Reveal key={title} delay={i * 0.07}>
-                  <div className="group flex flex-col gap-4 py-7 sm:flex-row sm:items-center sm:gap-8">
-                    <div className="flex items-center gap-4 sm:w-56">
-                      <span
-                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 ${
-                          tone === "mint"
-                            ? "bg-mint/10 text-mint"
-                            : tone === "iris"
-                            ? "bg-iris/10 text-iris"
-                            : "bg-white/[0.06] text-white/60"
-                        }`}
-                      >
-                        <Icon size={19} />
-                      </span>
-                      <span className="font-display text-xl font-medium tracking-tight text-white">
-                        {title}
-                      </span>
-                    </div>
-
-                    <p className="flex-1 text-[0.9375rem] text-white/45">
-                      {desc}
-                    </p>
-
-                    <span
-                      className={`lp-mono text-[2rem] leading-none tracking-tight sm:text-[2.5rem] ${
-                        tone === "mint"
-                          ? "text-mint"
-                          : tone === "iris"
-                          ? "text-iris"
-                          : "text-white/70"
-                      }`}
-                    >
-                      {value}%
-                    </span>
-                  </div>
-                </Reveal>
-              ))}
-            </div>
           </div>
-        </section>
+
+          {/* Allocation table */}
+          <div className="border-t border-edge">
+            {allocations.map(({ title, desc, value, fill }, i) => (
+              <div
+                key={title}
+                className={`group grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-2 px-5 py-6 transition-colors duration-200 hover:bg-surface-1 sm:grid-cols-[minmax(0,13rem)_1fr_auto] sm:px-8 ${
+                  i > 0 ? "border-t border-edge-soft" : ""
+                }`}
+              >
+                <span className="flex items-center gap-3 text-[1.0625rem] font-medium tracking-[-0.02em] text-fg">
+                  <span
+                    className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
+                    style={{ background: fill }}
+                    aria-hidden="true"
+                  />
+                  {title}
+                </span>
+                <span className="col-span-2 text-[0.8125rem] text-fg-subtle sm:col-span-1 sm:text-[0.875rem]">
+                  {desc}
+                </span>
+                <span className="lp-mono col-start-2 row-start-1 text-right text-[1.5rem] leading-none tracking-tight text-fg sm:col-start-3 sm:text-[1.75rem]">
+                  {value}%
+                </span>
+              </div>
+            ))}
+          </div>
+        </Band>
 
         {/* ================================================================== */}
         {/*  Roadmap                                                           */}
         {/* ================================================================== */}
-        <section
-          id="roadmap"
-          className="relative scroll-mt-28 overflow-hidden px-5 py-20 sm:px-6 lg:py-28"
-        >
-          <div className="relative mx-auto max-w-content">
-            <SectionHeading
-              index="04"
-              eyebrow="Meilensteine"
-              title="Roadmap"
-              lead="Unsere Roadmap zeigt dir die wichtigsten Meilensteine und die geplante Entwicklung der DAO."
-            />
-
-            {/* Desktop rail */}
-            <div className="relative mt-20 hidden lg:block">
-              <div className="absolute left-0 right-0 top-7 h-px bg-white/[0.09]" />
-              <motion.div
-                className="absolute left-0 top-7 h-px bg-gradient-to-r from-mint to-mint/0"
-                initial={{ width: 0 }}
-                whileInView={{ width: "22%" }}
-                viewport={{ once: true }}
-                transition={{ duration: 1.2, ease: EASE }}
-              />
-              <div className="relative grid grid-cols-5 gap-6">
-                {milestones.map(({ q, title, icon: Icon, done }, i) => (
-                  <Reveal key={q} delay={i * 0.08}>
-                    <div className="group flex flex-col items-start">
-                      <span
-                        className={`flex h-14 w-14 items-center justify-center rounded-2xl border transition-all duration-500 ${
-                          done
-                            ? "border-mint/40 bg-mint/10 text-mint shadow-[0_0_36px_-6px_rgba(94,234,212,0.45)]"
-                            : "border-white/10 bg-ink-900 text-white/45 group-hover:border-white/25 group-hover:text-white/75"
-                        }`}
-                      >
-                        <Icon size={21} />
-                      </span>
-                      <span
-                        className={`lp-mono mt-6 text-[0.6875rem] tracking-wider ${
-                          done ? "text-mint" : "text-white/35"
-                        }`}
-                      >
-                        {q}
-                      </span>
-                      <span className="mt-2 text-[0.9375rem] font-medium leading-snug tracking-tight text-white">
-                        {title}
-                      </span>
-                    </div>
-                  </Reveal>
-                ))}
-              </div>
-            </div>
-
-            {/* Mobile / tablet timeline */}
-            <div className="relative mt-14 lg:hidden">
-              <div className="absolute bottom-6 left-[27px] top-6 w-px bg-white/[0.09]" />
-              <div className="space-y-8">
-                {milestones.map(({ q, title, icon: Icon, done }, i) => (
-                  <Reveal key={q} delay={i * 0.06}>
-                    <div className="flex items-start gap-5">
-                      <span
-                        className={`relative z-[1] flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border ${
-                          done
-                            ? "border-mint/40 bg-mint/10 text-mint shadow-[0_0_36px_-6px_rgba(94,234,212,0.45)]"
-                            : "border-white/10 bg-ink-900 text-white/45"
-                        }`}
-                      >
-                        <Icon size={21} />
-                      </span>
-                      <div className="pt-1.5">
-                        <span
-                          className={`lp-mono text-[0.6875rem] tracking-wider ${
-                            done ? "text-mint" : "text-white/35"
-                          }`}
-                        >
-                          {q}
-                        </span>
-                        <p className="mt-1.5 text-[1.0625rem] font-medium leading-snug tracking-tight text-white">
-                          {title}
-                        </p>
-                      </div>
-                    </div>
-                  </Reveal>
-                ))}
-              </div>
+        <Band id="roadmap">
+          <div className="px-5 pb-12 pt-16 sm:px-8 sm:pt-20">
+            <Reveal>
+              <Label index="04">Meilensteine</Label>
+            </Reveal>
+            <div className="mt-7 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+              <Reveal delay={0.04}>
+                <h2 className="lp-h2 text-fg">Roadmap</h2>
+              </Reveal>
+              <Reveal delay={0.08}>
+                <p className="lp-lead max-w-[52ch] lg:text-right">
+                  Unsere Roadmap zeigt dir die wichtigsten Meilensteine und die
+                  geplante Entwicklung der DAO.
+                </p>
+              </Reveal>
             </div>
           </div>
-        </section>
+
+          <div className="border-t border-edge">
+            {milestones.map(({ q, title, icon: Icon, done }, i) => (
+              <Reveal key={q} delay={Math.min(i, 4) * 0.03}>
+                <div
+                  className={`group flex items-center gap-4 px-5 py-5 transition-colors duration-200 hover:bg-surface-1 sm:gap-6 sm:px-8 ${
+                    i > 0 ? "border-t border-edge-soft" : ""
+                  }`}
+                >
+                  <span className="lp-mono w-[4.5rem] shrink-0 text-[0.75rem] text-fg-subtle">
+                    {q}
+                  </span>
+
+                  <span
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md border transition-colors duration-200 ${
+                      done
+                        ? "border-fg bg-fg text-black"
+                        : "border-edge-strong text-fg-faint group-hover:border-edge-loud group-hover:text-fg-subtle"
+                    }`}
+                  >
+                    <Icon size={15} />
+                  </span>
+
+                  <span className="min-w-0 flex-1 text-[0.9375rem] font-medium tracking-[-0.015em] text-fg sm:text-[1.0625rem]">
+                    {title}
+                  </span>
+
+                  <span
+                    className={`lp-mono hidden shrink-0 rounded border px-2 py-0.5 text-[0.625rem] uppercase tracking-wider sm:block ${
+                      done
+                        ? "border-edge-loud text-fg"
+                        : "border-edge text-fg-faint"
+                    }`}
+                  >
+                    {done ? "Live" : "Geplant"}
+                  </span>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </Band>
 
         {/* ================================================================== */}
         {/*  FAQ                                                               */}
         {/* ================================================================== */}
-        <section
-          id="faq"
-          className="relative scroll-mt-28 px-5 py-20 sm:px-6 lg:py-28"
-        >
-          <div className="mx-auto max-w-content">
-            <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
-              <div className="lg:sticky lg:top-28 lg:self-start">
-                <SectionHeading index="05" eyebrow="FAQ" title="Häufige Fragen" />
-              </div>
-
-              <div className="border-t border-white/[0.07]">
-                {faqs.map((faq, i) => {
-                  const open = openFaq === i;
-                  return (
-                    <Reveal key={faq.q} delay={Math.min(i, 3) * 0.05}>
-                      <div className="border-b border-white/[0.07]">
-                        <button
-                          onClick={() => setOpenFaq(open ? null : i)}
-                          aria-expanded={open}
-                          className="flex w-full items-start gap-4 py-6 text-left"
-                        >
-                          <span
-                            className={`lp-mono mt-1 text-[0.6875rem] transition-colors duration-300 ${
-                              open ? "text-mint" : "text-white/25"
-                            }`}
-                          >
-                            0{i + 1}
-                          </span>
-                          <span
-                            className={`flex-1 text-[1.0625rem] font-medium leading-snug tracking-tight transition-colors duration-300 ${
-                              open ? "text-white" : "text-white/80"
-                            }`}
-                          >
-                            {faq.q}
-                          </span>
-                          <motion.span
-                            animate={{ rotate: open ? 135 : 0 }}
-                            transition={{ duration: 0.35, ease: EASE }}
-                            className={`mt-0.5 shrink-0 transition-colors duration-300 ${
-                              open ? "text-mint" : "text-white/35"
-                            }`}
-                          >
-                            <IconPlus size={18} />
-                          </motion.span>
-                        </button>
-
-                        <AnimatePresence initial={false}>
-                          {open && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: "auto", opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.38, ease: EASE }}
-                              className="overflow-hidden"
-                            >
-                              <p className="pb-7 pl-[2.375rem] pr-8 text-[0.9375rem] leading-[1.75] text-white/50">
-                                {faq.a}
-                              </p>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    </Reveal>
-                  );
-                })}
+        <Band id="faq">
+          <div className="grid lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)]">
+            <div className="px-5 pb-6 pt-16 sm:px-8 sm:pt-20 lg:border-r lg:border-edge lg:pb-20">
+              <div className="lg:sticky lg:top-24">
+                <Reveal>
+                  <Label index="05">FAQ</Label>
+                </Reveal>
+                <Reveal delay={0.04}>
+                  <h2 className="lp-h2 mt-7 max-w-[10ch] text-fg">
+                    Häufige Fragen
+                  </h2>
+                </Reveal>
               </div>
             </div>
+
+            <div className="lg:pt-6">
+              {faqs.map((faq, i) => {
+                const open = openFaq === i;
+                return (
+                  <div
+                    key={faq.q}
+                    className={i > 0 ? "border-t border-edge-soft" : ""}
+                  >
+                    <button
+                      onClick={() => setOpenFaq(open ? null : i)}
+                      aria-expanded={open}
+                      className="flex w-full items-start gap-4 px-5 py-5 text-left transition-colors duration-200 hover:bg-surface-1 sm:px-8"
+                    >
+                      <span
+                        className={`lp-mono mt-1 text-[0.625rem] ${
+                          open ? "text-fg" : "text-fg-faint"
+                        }`}
+                      >
+                        0{i + 1}
+                      </span>
+                      <span className="flex-1 text-[0.9375rem] font-medium leading-snug tracking-[-0.015em] text-fg sm:text-[1.0625rem]">
+                        {faq.q}
+                      </span>
+                      <motion.span
+                        animate={{ rotate: open ? 45 : 0 }}
+                        transition={{ duration: 0.2, ease: EASE }}
+                        className={`mt-0.5 shrink-0 ${
+                          open ? "text-fg" : "text-fg-faint"
+                        }`}
+                      >
+                        <IconPlus size={16} />
+                      </motion.span>
+                    </button>
+
+                    <AnimatePresence initial={false}>
+                      {open && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.28, ease: EASE }}
+                          className="overflow-hidden"
+                        >
+                          <p className="max-w-[68ch] pb-6 pl-[2.4rem] pr-6 text-[0.875rem] leading-[1.75] text-fg-subtle sm:pl-[3.4rem] sm:pr-10">
+                            {faq.a}
+                          </p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </section>
+        </Band>
 
         {/* ================================================================== */}
         {/*  Contact                                                           */}
         {/* ================================================================== */}
-        <section
-          id="contact"
-          className="relative scroll-mt-28 px-5 py-20 sm:px-6 lg:py-28"
-        >
-          <div className="mx-auto max-w-content">
-            <SectionHeading
-              index="06"
-              eyebrow="Kontakt"
-              title="Kontakt"
-              lead="Hast du Fragen oder möchtest mehr über unser Projekt erfahren? Wir freuen uns auf deine Nachricht!"
-              align="center"
-            />
-
-            <div className="mt-14 grid gap-4 sm:grid-cols-3">
-              <Reveal>
-                <SpotlightCard className="h-full p-7">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-mint">
-                    <IconMail size={19} />
-                  </div>
-                  <h3 className="mt-5 text-[0.9375rem] font-semibold tracking-tight text-white">
-                    Email
-                  </h3>
-                  <a
-                    href="mailto:murbalio@students.zhaw.ch"
-                    className="lp-mono mt-2 inline-block break-all text-[0.8125rem] text-white/50 transition-colors duration-300 hover:text-mint"
-                  >
-                    murbalio@students.zhaw.ch
-                  </a>
-                </SpotlightCard>
+        <Band id="contact">
+          <div className="px-5 pb-12 pt-16 sm:px-8 sm:pt-20">
+            <Reveal>
+              <Label index="06">Kontakt</Label>
+            </Reveal>
+            <div className="mt-7 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+              <Reveal delay={0.04}>
+                <h2 className="lp-h2 text-fg">Kontakt</h2>
               </Reveal>
-
-              {[
-                { icon: IconDiscord, label: "Discord" },
-                { icon: IconX, label: "Twitter" },
-              ].map(({ icon: Icon, label }, i) => (
-                <Reveal key={label} delay={0.06 * (i + 1)}>
-                  <div className="lp-card h-full p-7 opacity-60">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-white/50">
-                      <Icon size={18} />
-                    </div>
-                    <h3 className="mt-5 text-[0.9375rem] font-semibold tracking-tight text-white/80">
-                      {label}
-                    </h3>
-                    <span className="lp-mono mt-2 inline-block rounded-md border border-white/10 px-2 py-0.5 text-[0.625rem] uppercase tracking-wider text-white/35">
-                      Coming Soon
-                    </span>
-                  </div>
-                </Reveal>
-              ))}
+              <Reveal delay={0.08}>
+                <p className="lp-lead max-w-[52ch] lg:text-right">
+                  Hast du Fragen oder möchtest mehr über unser Projekt erfahren?
+                  Wir freuen uns auf deine Nachricht!
+                </p>
+              </Reveal>
             </div>
           </div>
-        </section>
+
+          <div className="lp-grid border-t border-edge sm:grid-cols-3">
+            <a
+              href="mailto:murbalio@students.zhaw.ch"
+              className="lp-cell lp-cell--hover group flex flex-col justify-between gap-8 px-5 py-8 sm:px-6"
+            >
+              <div className="flex items-center justify-between">
+                <IconMail
+                  size={18}
+                  className="text-fg-subtle transition-colors duration-200 group-hover:text-fg"
+                />
+                <IconArrowRight
+                  size={15}
+                  className="text-fg-faint transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-fg"
+                />
+              </div>
+              <div>
+                <h3 className="text-[0.9375rem] font-medium tracking-[-0.015em] text-fg">
+                  Email
+                </h3>
+                <span className="lp-mono mt-1.5 block break-all text-[0.75rem] text-fg-subtle">
+                  murbalio@students.zhaw.ch
+                </span>
+              </div>
+            </a>
+
+            {[
+              { icon: IconDiscord, label: "Discord" },
+              { icon: IconX, label: "Twitter" },
+            ].map(({ icon: Icon, label }) => (
+              <div
+                key={label}
+                className="lp-cell flex flex-col justify-between gap-8 px-5 py-8 sm:px-6"
+              >
+                <Icon size={17} className="text-fg-faint" />
+                <div>
+                  <h3 className="text-[0.9375rem] font-medium tracking-[-0.015em] text-fg-muted">
+                    {label}
+                  </h3>
+                  <span className="lp-mono mt-1.5 inline-block rounded border border-edge px-1.5 py-0.5 text-[0.625rem] uppercase tracking-wider text-fg-faint">
+                    Coming Soon
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Band>
 
         {/* ================================================================== */}
         {/*  Final CTA                                                         */}
         {/* ================================================================== */}
-        <section className="relative overflow-hidden px-5 py-20 sm:px-6 lg:py-28">
-          <div className="relative mx-auto max-w-content">
-            <div className="lp-panel relative overflow-hidden px-6 py-20 text-center sm:px-10 lg:py-28">
-              <div className="lp-grid" />
-              <div
-                className="lp-aurora lp-drift left-1/2 top-full h-[420px] w-[620px] -translate-x-1/2 -translate-y-1/2 opacity-30"
-                style={{ background: "#2DD4BF" }}
-              />
-
-              <div className="relative">
-                <Reveal>
-                  <h2 className="lp-display mx-auto max-w-2xl text-[2.5rem] sm:text-[3.5rem] lg:text-[4rem] text-white">
-                    Bereit mitzumachen?
-                  </h2>
-                </Reveal>
-                <Reveal delay={0.08}>
-                  <p className="mx-auto mt-6 max-w-xl text-[1.0625rem] leading-relaxed text-white/50 sm:text-lg">
-                    Werde Teil unserer Community. Diskutiere, vote, entwickle,
-                    verwalte.
-                  </p>
-                </Reveal>
-                <Reveal delay={0.14}>
-                  <button
-                    onClick={connectWallet}
-                    className="lp-btn lp-btn--primary mt-10"
-                  >
-                    <IconWallet size={17} />
-                    Jetzt Wallet verbinden
-                  </button>
-                </Reveal>
-              </div>
-            </div>
+        <Band className="overflow-hidden">
+          <div className="lp-rules opacity-40" />
+          <div className="relative px-5 py-20 sm:px-8 sm:py-28">
+            <Reveal>
+              <h2 className="lp-h2 max-w-[16ch] text-fg">Bereit mitzumachen?</h2>
+            </Reveal>
+            <Reveal delay={0.04}>
+              <p className="lp-lead mt-6 max-w-[46ch]">
+                Werde Teil unserer Community. Diskutiere, vote, entwickle,
+                verwalte.
+              </p>
+            </Reveal>
+            <Reveal delay={0.08}>
+              <button
+                onClick={connectWallet}
+                className="lp-btn lp-btn--primary !flex mt-9 sm:!inline-flex"
+              >
+                Jetzt Wallet verbinden
+              </button>
+            </Reveal>
           </div>
-        </section>
+        </Band>
 
         {/* ================================================================== */}
         {/*  Footer                                                            */}
         {/* ================================================================== */}
-        <footer className="border-t border-white/[0.07] px-5 py-12 sm:px-6">
-          <div className="mx-auto flex max-w-content flex-col items-center justify-between gap-6 sm:flex-row">
+        <Band>
+          <div className="flex flex-col gap-6 px-5 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-8">
             <div className="flex items-center gap-2.5">
-              <LogoMark size={22} />
-              <span className="font-display text-[0.9375rem] font-semibold text-white/80">
-                Thesis DAO
+              <LogoMark size={18} className="text-fg-subtle" />
+              <span className="text-[0.8125rem] text-fg-muted">
+                © {new Date().getFullYear()} Thesis DAO – Built on{" "}
+                <span className="text-fg">NEAR Protocol</span>
               </span>
             </div>
-
-            <p className="text-center text-[0.8125rem] text-white/35 sm:text-left">
-              © {new Date().getFullYear()} Thesis DAO – Built on{" "}
-              <span className="text-white/60">NEAR Protocol</span>
-            </p>
-
-            <p className="lp-mono text-[0.6875rem] tracking-wider text-white/25">
+            <span className="lp-mono text-[0.6875rem] text-fg-faint">
               Projekt von Lionel Murbach
-            </p>
+            </span>
           </div>
-        </footer>
-      </main>
+        </Band>
+      </div>
 
       {/* Scroll to top */}
       <AnimatePresence>
         {showTop && (
           <motion.button
-            initial={{ opacity: 0, scale: 0.85 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.85 }}
-            transition={{ duration: 0.25, ease: EASE }}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 6 }}
+            transition={{ duration: 0.18, ease: EASE }}
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             aria-label="Nach oben scrollen"
-            className="fixed bottom-6 right-5 z-[65] flex h-11 w-11 items-center justify-center rounded-full border border-white/12 bg-ink-900/85 text-white/70 backdrop-blur-xl transition-colors duration-300 hover:border-mint/40 hover:text-mint sm:bottom-8 sm:right-8"
+            className="fixed bottom-5 right-5 z-[65] flex h-10 w-10 items-center justify-center rounded-lg border border-edge-strong bg-surface-1 text-fg-muted transition-colors duration-200 hover:border-edge-loud hover:text-fg sm:bottom-8 sm:right-8"
           >
-            <IconArrowUp size={17} />
+            <IconArrowUp size={16} />
           </motion.button>
         )}
       </AnimatePresence>
@@ -1099,28 +966,28 @@ const LandingPage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-[80] flex items-center justify-center bg-ink-950/92 p-4 backdrop-blur-md sm:p-8"
+            transition={{ duration: 0.18 }}
+            className="fixed inset-0 z-[80] flex items-center justify-center bg-black/90 p-4 sm:p-10"
             onClick={() => setModalImage(null)}
             role="dialog"
             aria-modal="true"
           >
-            <motion.div
-              initial={{ scale: 0.96, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.96, opacity: 0 }}
-              transition={{ duration: 0.3, ease: EASE }}
-              className="lp-frame relative max-h-full w-full max-w-5xl overflow-auto"
+            <div
+              className="lp-frame max-h-full w-full max-w-5xl overflow-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              <img src={modalImage} alt="Screenshot in voller Grösse" className="block w-full" />
-            </motion.div>
+              <img
+                src={modalImage}
+                alt="Screenshot in voller Grösse"
+                className="block w-full"
+              />
+            </div>
             <button
               onClick={() => setModalImage(null)}
               aria-label="Schliessen"
-              className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-xl border border-white/12 bg-white/[0.05] text-white/70 backdrop-blur transition-colors hover:border-white/30 hover:text-white"
+              className="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-lg border border-edge-strong bg-surface-1 text-fg-muted transition-colors hover:border-edge-loud hover:text-fg"
             >
-              <IconClose size={18} />
+              <IconClose size={17} />
             </button>
           </motion.div>
         )}

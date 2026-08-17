@@ -11,35 +11,33 @@ module.exports = {
         cardbg: "#1E1E1E",
         accent: "#5EEAD4",
 
-        /* Landing page design tokens — dark precision surface scale */
-        ink: {
-          950: "#08090A",
-          900: "#0B0D0E",
-          850: "#101314",
-          800: "#15191B",
-          700: "#1D2224",
-          600: "#2A3033",
+        /* Landing page — monochrome surface + edge + foreground scale.
+           No brand hue: contrast and rules carry the whole design. */
+        surface: {
+          0: "#000000",
+          1: "#0A0A0A",
+          2: "#101010",
+          3: "#161616",
         },
-        mint: {
-          DEFAULT: "#5EEAD4",
-          soft: "#8FF3E3",
-          deep: "#2DD4BF",
+        edge: {
+          soft: "#141414",
+          DEFAULT: "#1F1F1F",
+          strong: "#2E2E2E",
+          loud: "#454545",
         },
-        iris: {
-          DEFAULT: "#A78BFA",
-          deep: "#7C5CFA",
+        fg: {
+          DEFAULT: "#EDEDED",
+          muted: "#A1A1A1",
+          subtle: "#6E6E6E",
+          faint: "#4A4A4A",
         },
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
-        display: ["Inter Tight", "Inter", "system-ui", "sans-serif"],
-        mono: ["JetBrains Mono", "ui-monospace", "SFMono-Regular", "monospace"],
-      },
-      letterSpacing: {
-        tightest: "-0.045em",
+        sans: ["Geist", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
+        mono: ["Geist Mono", "ui-monospace", "SFMono-Regular", "monospace"],
       },
       maxWidth: {
-        content: "1200px",
+        shell: "1180px",
       },
     },
   },
