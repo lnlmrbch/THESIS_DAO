@@ -49,7 +49,7 @@ const Header = ({ connectWallet }) => {
         <div className="mx-auto flex h-20 max-w-shell items-center justify-between px-5 sm:px-8">
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="flex items-center gap-2.5 select-none"
+            className="-my-2 flex h-11 items-center gap-2.5 py-2 select-none"
             aria-label="Zum Seitenanfang"
           >
             <LogoMark size={20} />
@@ -87,7 +87,7 @@ const Header = ({ connectWallet }) => {
             </div>
 
             <button
-              className="-mr-2 flex h-9 w-9 items-center justify-center text-fg-muted transition-colors hover:text-fg lg:hidden"
+              className="-mr-2.5 flex h-11 w-11 items-center justify-center text-fg-muted transition-colors hover:text-fg lg:hidden"
               onClick={() => setMenuOpen(true)}
               aria-label="Menü öffnen"
               aria-expanded={menuOpen}
@@ -119,7 +119,7 @@ const Header = ({ connectWallet }) => {
                   </span>
                 </div>
                 <button
-                  className="-mr-2 flex h-9 w-9 items-center justify-center text-fg-muted transition-colors hover:text-fg"
+                  className="-mr-2.5 flex h-11 w-11 items-center justify-center text-fg-muted transition-colors hover:text-fg"
                   onClick={() => setMenuOpen(false)}
                   aria-label="Menü schliessen"
                 >

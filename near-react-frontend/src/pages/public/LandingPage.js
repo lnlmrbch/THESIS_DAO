@@ -139,6 +139,59 @@ const pillars = [
   { icon: IconUsers, label: "Community" },
 ];
 
+const CONTRACT_ID = "dao.lioneluser.testnet";
+
+/* The public NEAR testnet RPC is rate-limited and has had outages. Try a
+   second provider before giving up, so one bad endpoint doesn't put the panel
+   into its "nicht verfügbar" state. */
+const RPC_ENDPOINTS = [
+  "https://rpc.testnet.near.org",
+  "https://test.rpc.fastnear.com",
+];
+
+const withTimeout = (promise, ms = 8000) =>
+  Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("RPC timeout")), ms)
+    ),
+  ]);
+
+/** Reads the sale view methods, trying each endpoint until one answers. */
+const fetchTokenSale = async () => {
+  let lastError;
+
+  for (const url of RPC_ENDPOINTS) {
+    try {
+      const provider = new providers.JsonRpcProvider(url);
+      const view = async (method, args = {}) => {
+        const res = await provider.query({
+          request_type: "call_function",
+          account_id: CONTRACT_ID,
+          method_name: method,
+          args_base64: Buffer.from(JSON.stringify(args)).toString("base64"),
+          finality: "final",
+        });
+        if (!res?.result) return null;
+        return JSON.parse(new TextDecoder().decode(new Uint8Array(res.result)));
+      };
+
+      return await withTimeout(
+        Promise.all([
+          view("ft_metadata"),
+          view("get_total_supply"),
+          view("get_token_pool"),
+        ])
+      );
+    } catch (err) {
+      lastError = err;
+      console.warn(`NEAR RPC ${url} nicht erreichbar:`, err.message);
+    }
+  }
+
+  throw lastError ?? new Error("Kein NEAR RPC erreichbar");
+};
+
 const EASE = [0.16, 1, 0.3, 1];
 const asset = (file) => `${process.env.PUBLIC_URL}/screenshots/${file}`;
 
@@ -241,39 +294,7 @@ const LandingPage = () => {
   useEffect(() => {
     (async () => {
       try {
-        const contractId = "dao.lioneluser.testnet";
-        const provider = new providers.JsonRpcProvider(
-          "https://rpc.testnet.near.org"
-        );
-        const view = async (method, args = {}) => {
-          const res = await provider.query({
-            request_type: "call_function",
-            account_id: contractId,
-            method_name: method,
-            args_base64: Buffer.from(JSON.stringify(args)).toString("base64"),
-            finality: "final",
-          });
-          if (!res?.result) return null;
-          return JSON.parse(new TextDecoder().decode(new Uint8Array(res.result)));
-        };
-
-        /* Never leave the panel stuck in its skeleton if the RPC hangs. */
-        const withTimeout = (promise, ms = 9000) =>
-          Promise.race([
-            promise,
-            new Promise((_, reject) =>
-              setTimeout(() => reject(new Error("RPC timeout")), ms)
-            ),
-          ]);
-
-        const [meta, totalSupply, tokenPool] = await withTimeout(
-          Promise.all([
-            view("ft_metadata"),
-            view("get_total_supply"),
-            view("get_token_pool"),
-          ])
-        );
-
+        const [meta, totalSupply, tokenPool] = await fetchTokenSale();
         setSale({
           sold: (parseFloat(totalSupply) - parseFloat(tokenPool)).toString(),
           symbol: meta?.symbol || "TOKEN",
