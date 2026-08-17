@@ -1,111 +1,265 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { initWalletSelector } from "../../wallet";
-import { motion, useScroll, useTransform, useInView, AnimatePresence } from "framer-motion";
-import { Link } from "react-scroll";
-import Header from "../public/Header";
-import { FaRocket, FaGem, FaExchangeAlt, FaTools, FaUsers, FaChartLine, FaCheck, FaWrench, FaBullhorn, FaRocket as FaRocket2, FaChevronDown, FaPlus, FaMinus, FaHandshake, FaVoteYea, FaArrowRight, FaEnvelope, FaDiscord, FaTwitter, FaWallet, FaEye, FaExpand, FaTimes } from "react-icons/fa";
+import {
+  AnimatePresence,
+  motion,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+} from "framer-motion";
+import { Link as ScrollLink } from "react-scroll";
 import { providers } from "near-api-js";
 
+import Header from "./Header";
+import "./landing.css";
+import {
+  IconArrowRight,
+  IconArrowUp,
+  IconChart,
+  IconClose,
+  IconDiscord,
+  IconExchange,
+  IconExpand,
+  IconEye,
+  IconHandshake,
+  IconMail,
+  IconPlus,
+  IconRocket,
+  IconToken,
+  IconTools,
+  IconUsers,
+  IconVault,
+  IconVote,
+  IconWallet,
+  IconX,
+  LogoMark,
+} from "./icons";
+
+import { initWalletSelector } from "../../wallet";
+
+/* -------------------------------------------------------------------------- */
+/*  Content                                                                    */
+/* -------------------------------------------------------------------------- */
+
 const faqs = [
-  { 
-    q: "Was ist eine DAO?", 
-    a: "Eine DAO (Decentralized Autonomous Organization) ist eine digitale Organisation, die von ihren Mitgliedern gemeinschaftlich gesteuert wird. Entscheidungen werden transparent und demokratisch getroffen – ohne zentrale Instanz. Alle Transaktionen und Abstimmungen sind auf der Blockchain nachvollziehbar."
+  {
+    q: "Was ist eine DAO?",
+    a: "Eine DAO (Decentralized Autonomous Organization) ist eine digitale Organisation, die von ihren Mitgliedern gemeinschaftlich gesteuert wird. Entscheidungen werden transparent und demokratisch getroffen – ohne zentrale Instanz. Alle Transaktionen und Abstimmungen sind auf der Blockchain nachvollziehbar.",
   },
-  { 
-    q: "Wie kann ich mitmachen?", 
-    a: "Verbinde einfach deine NEAR Wallet, erwerbe THESISDAO Tokens und schon kannst du an Abstimmungen teilnehmen, Proposals erstellen und die Zukunft der DAO mitgestalten. Je mehr Tokens du besitzt, desto mehr Stimmgewicht hast du bei Entscheidungen."
+  {
+    q: "Wie kann ich mitmachen?",
+    a: "Verbinde einfach deine NEAR Wallet, erwerbe THESISDAO Tokens und schon kannst du an Abstimmungen teilnehmen, Proposals erstellen und die Zukunft der DAO mitgestalten. Je mehr Tokens du besitzt, desto mehr Stimmgewicht hast du bei Entscheidungen.",
   },
-  { 
-    q: "Was kostet die Teilnahme?", 
-    a: "Du benötigst nur NEAR für die Transaktionen auf der Blockchain. Es gibt keine versteckten Gebühren oder Mitgliedsbeiträge. Die Kosten für Transaktionen sind minimal und transparent."
+  {
+    q: "Was kostet die Teilnahme?",
+    a: "Du benötigst nur NEAR für die Transaktionen auf der Blockchain. Es gibt keine versteckten Gebühren oder Mitgliedsbeiträge. Die Kosten für Transaktionen sind minimal und transparent.",
   },
-  { 
-    q: "Wie funktioniert das Voting?", 
-    a: "Jeder THESISDAO Token gibt dir ein Stimmrecht. Du kannst über verschiedene Proposals abstimmen, die von der Community eingereicht werden. Die Abstimmungen laufen für eine festgelegte Zeit und sind transparent auf der Blockchain einsehbar."
+  {
+    q: "Wie funktioniert das Voting?",
+    a: "Jeder THESISDAO Token gibt dir ein Stimmrecht. Du kannst über verschiedene Proposals abstimmen, die von der Community eingereicht werden. Die Abstimmungen laufen für eine festgelegte Zeit und sind transparent auf der Blockchain einsehbar.",
   },
-  { 
-    q: "Was passiert mit dem Treasury?", 
-    a: "Das Treasury wird von der Community verwaltet. Alle Mitglieder können Vorschläge einreichen, wie die Mittel verwendet werden sollen – sei es für Entwicklung, Marketing oder andere Community-Projekte. Über die Verwendung wird demokratisch abgestimmt."
+  {
+    q: "Was passiert mit dem Treasury?",
+    a: "Das Treasury wird von der Community verwaltet. Alle Mitglieder können Vorschläge einreichen, wie die Mittel verwendet werden sollen – sei es für Entwicklung, Marketing oder andere Community-Projekte. Über die Verwendung wird demokratisch abgestimmt.",
   },
-  { 
-    q: "Wie sicher ist das System?", 
-    a: "Die DAO basiert auf der NEAR Blockchain, einer der sichersten und skalierbarsten Blockchains. Alle Transaktionen und Abstimmungen sind transparent und unveränderlich. Smart Contracts regeln die Logik und Sicherheit des Systems."
-  }
+  {
+    q: "Wie sicher ist das System?",
+    a: "Die DAO basiert auf der NEAR Blockchain, einer der sichersten und skalierbarsten Blockchains. Alle Transaktionen und Abstimmungen sind transparent und unveränderlich. Smart Contracts regeln die Logik und Sicherheit des Systems.",
+  },
 ];
+
+const features = [
+  {
+    icon: IconVote,
+    title: "Mitbestimmen",
+    desc: "Stimme über Vorschläge ab und gestalte die Zukunft aktiv mit.",
+  },
+  {
+    icon: IconEye,
+    title: "Transparenz",
+    desc: "Alle Entscheidungen und Transaktionen sind on-chain und nachvollziehbar.",
+  },
+  {
+    icon: IconToken,
+    title: "Token-Belohnungen",
+    desc: "Verdiene und nutze DAO-Token für Stimmrechte und Vorteile.",
+  },
+  {
+    icon: IconVault,
+    title: "Community Treasury",
+    desc: "Gemeinsame Verwaltung und Nutzung der Mittel durch die Community.",
+  },
+];
+
+const allocations = [
+  {
+    icon: IconExchange,
+    title: "Umlauf",
+    desc: "60% Community-basiert",
+    value: 60,
+    tone: "mint",
+  },
+  {
+    icon: IconTools,
+    title: "Treasury",
+    desc: "30% für Entwicklung & Finanzierung",
+    value: 30,
+    tone: "iris",
+  },
+  {
+    icon: IconUsers,
+    title: "Team",
+    desc: "10% für Core-Contributors",
+    value: 10,
+    tone: "chalk",
+  },
+];
+
+const milestones = [
+  { q: "Q3 2025", title: "DAO & Website Launch", icon: IconRocket, done: true },
+  { q: "Q4 2025", title: "Protocol Improvements", icon: IconUsers },
+  { q: "Q1 2026", title: "Token Unlock & Distribution", icon: IconToken },
+  { q: "Q2 2026", title: "Strategic Partnerships", icon: IconHandshake },
+  { q: "Q3 2026", title: "Ecosystem Expansion", icon: IconChart },
+];
+
+const shots = [
+  {
+    src: "screenshot_dashboard.png",
+    alt: "Dashboard Übersicht",
+    caption: "Dashboard: Token, Voting Power & Proposals",
+  },
+  {
+    src: "screenshot_proposal.png",
+    alt: "Proposals im Dashboard",
+    caption: "Proposals & Abstimmungen auf einen Blick",
+  },
+  {
+    src: "screenshot_buytokens.png",
+    alt: "Token kaufen",
+    caption: "Token kaufen & Mitglied werden",
+  },
+];
+
+const tickerPhrases = [
+  "Demokratisch",
+  "Transparent",
+  "Community Driven",
+  "Built on NEAR",
+];
+
+const heroPillars = [
+  { icon: IconWallet, label: "Wallet" },
+  { icon: IconToken, label: "Token" },
+  { icon: IconChart, label: "Dashboard" },
+  { icon: IconUsers, label: "Community" },
+];
+
+const EASE = [0.22, 1, 0.36, 1];
+const asset = (file) => `${process.env.PUBLIC_URL}/screenshots/${file}`;
+
+/* -------------------------------------------------------------------------- */
+/*  Primitives                                                                 */
+/* -------------------------------------------------------------------------- */
+
+/** Scroll reveal — opacity + a short lift only, so it can never shift layout. */
+const Reveal = ({ children, delay = 0, y = 18, className = "" }) => {
+  const reduce = useReducedMotion();
+  return (
+    <motion.div
+      className={className}
+      initial={reduce ? false : { opacity: 0, y }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.7, delay, ease: EASE }}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+const SectionHeading = ({ index, eyebrow, title, lead, align = "left" }) => (
+  <div className={align === "center" ? "text-center" : ""}>
+    <Reveal>
+      <div
+        className={`flex items-center gap-3 ${
+          align === "center" ? "justify-center" : ""
+        }`}
+      >
+        <span className="lp-mono text-[0.6875rem] text-mint">{index}</span>
+        <span className="h-px w-8 bg-white/15" />
+        <span className="lp-eyebrow">{eyebrow}</span>
+      </div>
+    </Reveal>
+    <Reveal delay={0.06}>
+      <h2 className="lp-display mt-6 text-[2.25rem] sm:text-[3rem] lg:text-[3.5rem] text-white">
+        {title}
+      </h2>
+    </Reveal>
+    {lead && (
+      <Reveal delay={0.12}>
+        <p
+          className={`mt-5 max-w-2xl text-[1.0625rem] leading-relaxed text-white/55 ${
+            align === "center" ? "mx-auto" : ""
+          }`}
+        >
+          {lead}
+        </p>
+      </Reveal>
+    )}
+  </div>
+);
+
+/** Wraps a card so its border spotlight follows the pointer. */
+const SpotlightCard = ({ className = "", children, ...rest }) => {
+  const onMove = useCallback((e) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty("--mx", `${e.clientX - r.left}px`);
+    e.currentTarget.style.setProperty("--my", `${e.clientY - r.top}px`);
+  }, []);
+
+  return (
+    <div className={`lp-card ${className}`} onMouseMove={onMove} {...rest}>
+      {children}
+    </div>
+  );
+};
+
+/* -------------------------------------------------------------------------- */
+/*  Page                                                                       */
+/* -------------------------------------------------------------------------- */
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const reduce = useReducedMotion();
+
   const { scrollYProgress } = useScroll();
-  const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
-
-  // Refs for scroll animations
-  const aboutRef = useRef(null);
-  const tokenomicsRef = useRef(null);
-  const roadmapRef = useRef(null);
-  const faqRef = useRef(null);
-  const contactRef = useRef(null);
-
-  // Scroll progress for each section
-  const { scrollYProgress: aboutProgress } = useScroll({
-    target: aboutRef,
-    offset: ["start end", "end start"]
+  const progress = useSpring(scrollYProgress, {
+    stiffness: 160,
+    damping: 30,
+    restDelta: 0.001,
   });
-  const { scrollYProgress: tokenomicsProgress } = useScroll({
-    target: tokenomicsRef,
-    offset: ["start end", "end start"]
-  });
-  const { scrollYProgress: roadmapProgress } = useScroll({
-    target: roadmapRef,
-    offset: ["start end", "end start"]
-  });
-  const { scrollYProgress: faqProgress } = useScroll({
-    target: faqRef,
-    offset: ["start end", "end start"]
-  });
-  const { scrollYProgress: contactProgress } = useScroll({
-    target: contactRef,
-    offset: ["start end", "end start"]
-  });
-
-  // Transform values for parallax effects
-  const aboutY = useTransform(aboutProgress, [0, 1], [200, -200]);
-  const tokenomicsY = useTransform(tokenomicsProgress, [0, 1], [200, -200]);
-  const roadmapY = useTransform(roadmapProgress, [0, 1], [200, -200]);
-  const faqY = useTransform(faqProgress, [0, 1], [200, -200]);
-  const contactY = useTransform(contactProgress, [0, 1], [200, -200]);
-
-  // Additional transform values for enhanced animations
-  const aboutScale = useTransform(aboutProgress, [0, 0.5, 1], [0.8, 1, 0.8]);
-  const tokenomicsScale = useTransform(tokenomicsProgress, [0, 0.5, 1], [0.8, 1, 0.8]);
-  const roadmapScale = useTransform(roadmapProgress, [0, 0.5, 1], [0.8, 1, 0.8]);
-  const faqScale = useTransform(faqProgress, [0, 0.5, 1], [0.8, 1, 0.8]);
-  const contactScale = useTransform(contactProgress, [0, 0.5, 1], [0.8, 1, 0.8]);
-
-  // Opacity transforms for fade effects
-  const aboutOpacity = useTransform(aboutProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-  const tokenomicsOpacity = useTransform(tokenomicsProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-  const roadmapOpacity = useTransform(roadmapProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-  const faqOpacity = useTransform(faqProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-  const contactOpacity = useTransform(contactProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
 
   const [openFaq, setOpenFaq] = useState(null);
   const [showTop, setShowTop] = useState(false);
+  const [activeShot, setActiveShot] = useState(0);
+  const [modalImage, setModalImage] = useState(null);
+  const heroRef = useRef(null);
 
-  // 1. Parallax für Orbs
-  const [scrollYValue, setScrollYValue] = useState(0);
+  /* The landing page owns a dark canvas; the app shell is light. */
   useEffect(() => {
-    const handleScroll = () => setScrollYValue(window.scrollY);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const prev = document.body.style.backgroundColor;
+    document.body.style.backgroundColor = "#08090A";
+    return () => {
+      document.body.style.backgroundColor = prev;
+    };
   }, []);
 
   useEffect(() => {
     (async () => {
       try {
         const { selector } = await initWalletSelector();
-        const state = selector.store.getState();
-        const accounts = state.accounts;
+        const accounts = selector.store.getState().accounts;
         if (accounts.length > 0) navigate("/dashboard");
       } catch {
         console.log("🧠 Wallet nicht verbunden");
@@ -119,27 +273,51 @@ const LandingPage = () => {
   };
 
   useEffect(() => {
-    const onScroll = () => setShowTop(window.scrollY > 600);
-    window.addEventListener("scroll", onScroll);
+    const onScroll = () => setShowTop(window.scrollY > 700);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Token Sale State
-  const HARDCAP = 10_000_000; // 10 Millionen Token
+  /* Pointer spotlight in the hero. */
+  useEffect(() => {
+    if (reduce) return undefined;
+    const el = heroRef.current;
+    if (!el) return undefined;
+    const onMove = (e) => {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty("--sx", `${((e.clientX - r.left) / r.width) * 100}%`);
+      el.style.setProperty("--sy", `${((e.clientY - r.top) / r.height) * 100}%`);
+    };
+    el.addEventListener("mousemove", onMove);
+    return () => el.removeEventListener("mousemove", onMove);
+  }, [reduce]);
+
+  /* Close the lightbox on Escape. */
+  useEffect(() => {
+    if (!modalImage) return undefined;
+    const onKey = (e) => e.key === "Escape" && setModalImage(null);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [modalImage]);
+
+  /* ---- Token sale ------------------------------------------------------- */
+
+  const HARDCAP = 10_000_000;
   const [tokenSale, setTokenSale] = useState({
-    totalSupply: null,
-    tokenPool: null,
     sold: null,
     symbol: null,
     decimals: 24,
     loading: true,
+    failed: false,
   });
 
   useEffect(() => {
-    const fetchTokenSale = async () => {
+    (async () => {
       try {
-        const contractId = "dao.lioneluser.testnet"; // ggf. anpassen
-        const provider = new providers.JsonRpcProvider("https://rpc.testnet.near.org");
+        const contractId = "dao.lioneluser.testnet";
+        const provider = new providers.JsonRpcProvider(
+          "https://rpc.testnet.near.org"
+        );
         const fetchView = async (method, args = {}) => {
           const res = await provider.query({
             request_type: "call_function",
@@ -148,660 +326,805 @@ const LandingPage = () => {
             args_base64: Buffer.from(JSON.stringify(args)).toString("base64"),
             finality: "final",
           });
-          const raw = res?.result;
-          if (!raw) return null;
-          const decoded = new TextDecoder().decode(new Uint8Array(raw));
-          return JSON.parse(decoded);
+          if (!res?.result) return null;
+          return JSON.parse(new TextDecoder().decode(new Uint8Array(res.result)));
         };
-        const meta = await fetchView("ft_metadata");
-        const totalSupply = await fetchView("get_total_supply");
-        const tokenPool = await fetchView("get_token_pool");
-        const sold = (parseFloat(totalSupply) - parseFloat(tokenPool)).toString();
+
+        /* Never leave the panel stuck in its skeleton if the RPC hangs. */
+        const withTimeout = (promise, ms = 9000) =>
+          Promise.race([
+            promise,
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error("RPC timeout")), ms)
+            ),
+          ]);
+
+        const [meta, totalSupply, tokenPool] = await withTimeout(
+          Promise.all([
+            fetchView("ft_metadata"),
+            fetchView("get_total_supply"),
+            fetchView("get_token_pool"),
+          ])
+        );
+
         setTokenSale({
-          totalSupply,
-          tokenPool,
-          sold,
+          sold: (parseFloat(totalSupply) - parseFloat(tokenPool)).toString(),
           symbol: meta?.symbol || "TOKEN",
-          decimals: meta?.decimals || 24,
+          decimals: meta?.decimals ?? 24,
           loading: false,
+          failed: false,
         });
       } catch (err) {
-        setTokenSale((prev) => ({ ...prev, loading: false }));
         console.error("Fehler beim Laden des Token Sale Stands:", err);
+        setTokenSale((prev) => ({ ...prev, loading: false, failed: true }));
       }
-    };
-    fetchTokenSale();
+    })();
   }, []);
 
-  // Hilfsfunktionen für menschenlesbare Werte
-  const formatAmount = (amount) => {
-    if (!tokenSale.decimals || !amount) return "0.00";
-    return (parseFloat(amount) / Math.pow(10, tokenSale.decimals)).toLocaleString(undefined, { maximumFractionDigits: 2 });
-  };
-  const soldHuman = tokenSale.sold ? parseFloat(tokenSale.sold) / Math.pow(10, tokenSale.decimals) : 0;
+  const soldHuman = tokenSale.sold
+    ? parseFloat(tokenSale.sold) / Math.pow(10, tokenSale.decimals)
+    : 0;
   const percent = soldHuman ? Math.min(100, (soldHuman / HARDCAP) * 100) : 0;
-
-  const [modalImage, setModalImage] = useState(null);
+  const soldLabel = soldHuman.toLocaleString("de-CH", {
+    maximumFractionDigits: 0,
+  });
 
   return (
-    <div className="w-screen bg-gradient-to-br from-[#F5F7FB] via-white to-[#F5F7FB] text-black overflow-x-hidden scroll-smooth min-h-screen">
+    <div className="lp">
       <Header connectWallet={connectWallet} />
 
-      {/* Smooth Scroll Progress Bar */}
-      <motion.div 
-        style={{ scaleX }} 
-        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-blue-500 to-accent origin-left z-50"
+      {/* Scroll progress */}
+      <motion.div
+        style={{ scaleX: progress }}
+        className="fixed inset-x-0 top-0 z-[70] h-px origin-left bg-gradient-to-r from-mint via-iris to-mint"
       />
 
-      {/* Background Graphics with Parallax */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#F5F7FB] via-white to-[#F5F7FB]" />
-        <motion.div 
-          className="absolute top-10 left-20 w-72 h-72 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-30"
-          style={{ y: useTransform(scrollYProgress, [0, 1], [0, -200]) }}
-        />
-        <motion.div 
-          className="absolute bottom-20 right-20 w-64 h-64 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-30"
-          style={{ y: useTransform(scrollYProgress, [0, 1], [0, 200]) }}
-        />
-        <motion.div 
-          className="absolute bottom-left w-64 h-64 bg-pink-400 rounded-full mix-blend-multiply filter blur-xl opacity-30"
-          style={{ y: useTransform(scrollYProgress, [0, 1], [0, -150]) }}
-        />
-      </div>
+      <div className="lp-grain" />
 
-      <div className="relative z-10">
-        <div className="flex flex-col gap-1">
-        {/* Hero Section */}
-        <motion.section 
-          className="w-full min-h-[90vh] flex justify-center relative"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1.2, ease: "easeOut" }}
+      <main className="relative z-[2]">
+        {/* ================================================================== */}
+        {/*  Hero                                                              */}
+        {/* ================================================================== */}
+        <section
+          id="hero"
+          ref={heroRef}
+          className="relative overflow-hidden px-5 pb-16 pt-32 sm:px-6 sm:pt-40 lg:pb-24"
         >
-          <div className="max-w-5xl w-full mx-auto flex flex-col md:flex-row items-center md:items-stretch gap-16 px-4 sm:px-8 py-20">
-            {/* Left: Text-Content */}
-            <div className="flex-1 flex flex-col justify-center items-center md:items-start text-center md:text-left space-y-8 z-10 md:pl-8">
-              <motion.h1 
-                initial={{ backgroundPosition: '0% 50%' }}
-                animate={{ backgroundPosition: '100% 50%' }}
-                transition={{ duration: 3, repeat: Infinity, repeatType: 'reverse' }}
-                className="text-5xl md:text-6xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-primary via-blue-500 to-accent drop-shadow-lg"
-                style={{ backgroundSize: '200% 200%' }}
-              >
-                Thesis DAO
-              </motion.h1>
-              <motion.p 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-                className="text-lg md:text-xl text-gray-600 max-w-xl"
-              >
-                Demokratisch. Transparent. Community Driven. Built on NEAR.
-              </motion.p>
-              {/* Token Sale Progress */}
-              <div className="w-full max-w-xs md:max-w-sm flex flex-col items-center my-2">
-                {tokenSale.loading ? (
-                  <div className="text-gray-400 text-sm flex items-center gap-2"><FaGem className="text-accent animate-pulse" /> Token Sale wird geladen...</div>
-                ) : (
-                  <>
-                    <div className="flex items-center gap-2 mb-1">
-                      <FaGem className="text-accent text-lg" />
-                      <span className="text-sm text-gray-700 font-medium">Token Sale:</span>
-                      <span className="text-sm font-bold text-primary">{formatAmount(tokenSale.sold)} / {HARDCAP.toLocaleString()} {tokenSale.symbol}</span>
-                      <span className="text-xs text-gray-500">({percent.toFixed(2)}%)</span>
+          <div className="lp-grid" />
+          <div className="lp-spotlight" />
+          <div
+            className="lp-aurora lp-drift -left-32 -top-24 h-[440px] w-[440px] opacity-[0.22]"
+            style={{ background: "#2DD4BF" }}
+          />
+          <div
+            className="lp-aurora lp-drift-slow -right-24 top-24 h-[380px] w-[380px] opacity-[0.18]"
+            style={{ background: "#7C5CFA" }}
+          />
+
+          <div className="relative mx-auto grid max-w-content items-center gap-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
+            {/* --- Copy --- */}
+            <div>
+              <Reveal>
+                <div className="inline-flex max-w-full items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5">
+                  <span className="relative flex h-1.5 w-1.5 shrink-0">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mint opacity-60" />
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-mint" />
+                  </span>
+                  <span className="lp-mono text-[0.6875rem] leading-snug text-white/60">
+                    Ein Prototyp im Rahmen einer Bachelor Thesis an der ZHAW
+                  </span>
+                </div>
+              </Reveal>
+
+              <Reveal delay={0.08}>
+                <h1 className="lp-display mt-7 text-[3.25rem] leading-[0.92] sm:text-[4.5rem] lg:text-[5.25rem]">
+                  <span className="lp-sheen">Thesis DAO</span>
+                </h1>
+              </Reveal>
+
+              <Reveal delay={0.14}>
+                <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/55 sm:text-xl">
+                  Demokratisch. Transparent. Community Driven. Built on NEAR.
+                </p>
+              </Reveal>
+
+              <Reveal delay={0.2}>
+                <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+                  <button
+                    onClick={connectWallet}
+                    className="lp-btn lp-btn--primary"
+                  >
+                    <IconWallet size={17} />
+                    Wallet verbinden &amp; starten
+                  </button>
+                  <ScrollLink
+                    to="about"
+                    smooth
+                    duration={600}
+                    offset={-96}
+                    tabIndex={0}
+                    role="button"
+                    className="lp-btn lp-btn--ghost group"
+                  >
+                    Mehr erfahren
+                    <IconArrowRight
+                      size={16}
+                      className="transition-transform duration-300 group-hover:translate-x-1"
+                    />
+                  </ScrollLink>
+                </div>
+              </Reveal>
+
+              <Reveal delay={0.26}>
+                <p className="lp-mono mt-8 text-[0.6875rem] tracking-wider text-white/30">
+                  von Lionel Murbach
+                </p>
+              </Reveal>
+            </div>
+
+            {/* --- Token sale panel --- */}
+            <Reveal delay={0.18} y={26}>
+              <div className="relative">
+                <div
+                  className="lp-aurora absolute inset-8 opacity-25"
+                  style={{ background: "#5EEAD4" }}
+                />
+                <div className="lp-panel relative p-6 sm:p-7">
+                  <div className="flex items-center justify-between">
+                    <span className="lp-eyebrow">Token Sale</span>
+                    <span className="lp-mono rounded-md border border-mint/25 bg-mint/10 px-2 py-0.5 text-[0.625rem] text-mint">
+                      {tokenSale.symbol || "THESISDAO"}
+                    </span>
+                  </div>
+
+                  {tokenSale.loading ? (
+                    <div className="mt-6 space-y-3">
+                      <div className="h-9 w-40 animate-pulse rounded-md bg-white/[0.06]" />
+                      <div className="h-1.5 w-full animate-pulse rounded-full bg-white/[0.06]" />
                     </div>
-                    <div className="w-full h-3 bg-blue-100 rounded-full overflow-hidden">
-                      <div className="h-3 bg-gradient-to-r from-primary via-blue-500 to-accent rounded-full transition-all duration-700" style={{ width: `${percent}%` }} />
-                    </div>
-                  </>
-                )}
-              </div>
-              <motion.p 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
-                className="text-base text-gray-500 max-w-xl italic"
-              >
-                Ein Prototyp im Rahmen einer Bachelor Thesis an der ZHAW<br />
-                <span className="text-sm text-gray-400">von Lionel Murbach</span>
-              </motion.p>
-              <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center md:justify-start mt-6 mb-2">
-                <motion.button
-                  whileHover={{ scale: 1.08, boxShadow: "0 0 32px 8px #6B46C1" }}
-                  whileTap={{ scale: 0.96 }}
-                  className="modern-button bg-blue-600 text-white px-8 py-4 rounded-xl shadow-xl text-lg font-semibold hover:bg-blue-700 transition duration-300 transform"
-                  onClick={connectWallet}
-                >
-                  Wallet verbinden & starten
-                </motion.button>
-                <motion.a
-                  href="#about"
-                  whileHover={{ scale: 1.05, boxShadow: "0 0 16px 2px #6B46C1" }}
-                  whileTap={{ scale: 0.97 }}
-                  className="modern-button border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-xl shadow-md text-lg font-semibold bg-white/80 hover:bg-blue-50 transition duration-300 transform"
-                >
-                  Mehr erfahren
-                </motion.a>
-              </div>
-            </div>
-            {/* Right: Visual */}
-            <motion.div
-              initial={{ opacity: 0, x: 60 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
-              className="flex-1 flex justify-center items-center w-full md:w-auto mt-10 md:mt-0"
-            >
-              {/* Modernes Banking-Visual: Icon-Grid mit Glow/Parallax */}
-              <div className="grid grid-cols-2 gap-6 p-8 rounded-3xl bg-white/60 backdrop-blur-md shadow-2xl max-w-xs mx-auto">
-                <div className="flex flex-col items-center">
-                  <FaWallet className="text-4xl text-primary drop-shadow-lg mb-2 animate-float" />
-                  <span className="text-xs text-gray-600">Wallet</span>
-                </div>
-                <div className="flex flex-col items-center">
-                  <FaGem className="text-4xl text-accent drop-shadow-lg mb-2 animate-float-delay" />
-                  <span className="text-xs text-gray-600">Token</span>
-                </div>
-                <div className="flex flex-col items-center">
-                  <FaChartLine className="text-4xl text-blue-500 drop-shadow-lg mb-2 animate-float" />
-                  <span className="text-xs text-gray-600">Dashboard</span>
-                </div>
-                <div className="flex flex-col items-center">
-                  <FaUsers className="text-4xl text-primary drop-shadow-lg mb-2 animate-float-delay" />
-                  <span className="text-xs text-gray-600">Community</span>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </motion.section>
+                  ) : (
+                    <>
+                      <div className="mt-5 flex items-baseline gap-2">
+                        <span className="lp-mono text-[2.25rem] leading-none text-white">
+                          {tokenSale.failed ? "—" : soldLabel}
+                        </span>
+                        <span className="lp-mono text-sm text-white/35">
+                          / {HARDCAP.toLocaleString("de-CH")}
+                        </span>
+                      </div>
 
-        {/* About Section with Parallax */}
-        <motion.section 
-          id="about"
-          ref={aboutRef}
-          style={{ y: aboutY, scale: aboutScale, opacity: aboutOpacity }}
-          className="min-h-[70vh] flex flex-col justify-center px-6 text-center space-y-12 relative scroll-mt-32"
-        >
-          <motion.h2 
-            initial={{ y: 40, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
-            className="text-4xl font-bold text-primary mb-6"
-          >
-            Was ist diese DAO?
-          </motion.h2>
-          <motion.p 
-            initial={{ y: 40, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" }}
-            className="text-xl text-gray-700 leading-relaxed max-w-2xl mx-auto mb-6"
-          >
-            Eine DAO (Decentralized Autonomous Organization) ist eine digitale Organisation, die von ihren Mitgliedern gemeinschaftlich gesteuert wird. Entscheidungen werden transparent und demokratisch getroffen – ohne zentrale Instanz. <br /><br />
-            Mit dem Kauf von Tokens wirst du Teil der DAO und erhältst die gleichen Rechte wie ein Aktionär einer traditionellen AG – oder sogar noch mehr: Du kannst mitbestimmen, Vorschläge einbringen und direkt an der Entwicklung und Verwaltung der Organisation teilnehmen.
-          </motion.p>
-          <motion.p 
-            initial={{ y: 40, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.6, ease: "easeOut" }}
-            className="text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto mb-10"
-          >
-            Diese DAO wurde als Prototyp im Rahmen einer Bachelor Thesis an der ZHAW entwickelt, um die praktische Umsetzung und Anwendbarkeit von DAOs in der modernen Organisationsgestaltung zu erforschen.
-          </motion.p>
-          {/* Feature-Grid */}
-          <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 p-10 rounded-3xl bg-white/60 backdrop-blur-md shadow-2xl">
-              {/* Mitbestimmen */}
-              <div className="flex flex-col items-center text-center">
-                <FaVoteYea className="text-4xl text-primary drop-shadow-lg mb-3" />
-                <span className="text-lg font-semibold text-primary mb-1">Mitbestimmen</span>
-                <span className="text-gray-600 text-base">Stimme über Vorschläge ab und gestalte die Zukunft aktiv mit.</span>
-              </div>
-              {/* Transparenz */}
-              <div className="flex flex-col items-center text-center">
-                <FaEye className="text-4xl text-blue-500 drop-shadow-lg mb-3" />
-                <span className="text-lg font-semibold text-blue-500 mb-1">Transparenz</span>
-                <span className="text-gray-600 text-base">Alle Entscheidungen und Transaktionen sind on-chain und nachvollziehbar.</span>
-              </div>
-              {/* Token-Belohnungen */}
-              <div className="flex flex-col items-center text-center">
-                <FaGem className="text-4xl text-primary drop-shadow-lg mb-3" />
-                <span className="text-lg font-semibold text-primary mb-1">Token-Belohnungen</span>
-                <span className="text-gray-600 text-base">Verdiene und nutze DAO-Token für Stimmrechte und Vorteile.</span>
-              </div>
-              {/* Community Treasury */}
-              <div className="flex flex-col items-center text-center">
-                <FaWallet className="text-4xl text-primary drop-shadow-lg mb-3" />
-                <span className="text-lg font-semibold text-primary mb-1">Community Treasury</span>
-                <span className="text-gray-600 text-base">Gemeinsame Verwaltung und Nutzung der Mittel durch die Community.</span>
-              </div>
-            </div>
-          </div>
-        </motion.section>
+                      <div className="mt-5 h-1.5 w-full overflow-hidden rounded-full bg-white/[0.07]">
+                        <motion.div
+                          className="h-full rounded-full bg-gradient-to-r from-mint-deep to-mint"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${percent}%` }}
+                          transition={{ duration: 1.4, delay: 0.3, ease: EASE }}
+                        />
+                      </div>
 
-        {/* Dashboard Section with Parallax */}
-        <motion.section
-          id="dashboard"
-          style={{ y: tokenomicsY, scale: tokenomicsScale, opacity: tokenomicsOpacity }}
-          className="min-h-[70vh] flex flex-col justify-center px-6 text-center relative overflow-hidden scroll-mt-32"
-        >
-          <motion.h2
-            className="text-4xl font-bold text-primary mb-16 relative"
-            initial={{ scale: 0.8, opacity: 0 }}
-            whileInView={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            viewport={{ once: true }}
-          >
-            Das DAO Dashboard
-          </motion.h2>
-          <p className="text-lg text-gray-500 mb-8 max-w-2xl mx-auto">
-            Das Dashboard bietet dir einen schnellen Überblick über alle wichtigen DAO-Funktionen und deine persönlichen Aktivitäten.
-          </p>
-          <div className="mt-12 flex flex-col md:flex-row gap-8 justify-center items-center">
-            {/* Dashboard Screenshot Card */}
-            <div className="bg-white/70 rounded-xl shadow-lg border border-gray-200 p-4 max-w-md relative group">
-              <div
-                className="block relative cursor-zoom-in"
-                onClick={() => setModalImage('/THESIS_DAO/screenshots/screenshot_dashboard.png')}
-              >
-                <img
-                  src="/THESIS_DAO/screenshots/screenshot_dashboard.png"
-                  alt="Dashboard Übersicht"
-                  className="rounded-lg shadow-md hover:scale-105 transition-transform duration-200"
-                />
-                {/* Overlay Icon */}
-                <span className="absolute top-2 right-2 bg-white/80 rounded-full p-2 shadow group-hover:bg-accent group-hover:text-white transition-colors z-10">
-                  <FaExpand className="text-xl" />
-                </span>
-                {/* Overlay beim Hover */}
-                <span className="absolute inset-0 rounded-lg bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity z-0" />
-              </div>
-              <p className="text-center text-sm text-gray-600 mt-2">Dashboard: Token, Voting Power & Proposals</p>
-            </div>
-            {/* Proposal Screenshot Card */}
-            <div className="bg-white/70 rounded-xl shadow-lg border border-gray-200 p-4 max-w-md relative group">
-              <div
-                className="block relative cursor-zoom-in"
-                onClick={() => setModalImage('/THESIS_DAO/screenshots/screenshot_proposal.png')}
-              >
-                <img
-                  src="/THESIS_DAO/screenshots/screenshot_proposal.png"
-                  alt="Proposals im Dashboard"
-                  className="rounded-lg shadow-md hover:scale-105 transition-transform duration-200"
-                />
-                <span className="absolute top-2 right-2 bg-white/80 rounded-full p-2 shadow group-hover:bg-accent group-hover:text-white transition-colors z-10">
-                  <FaExpand className="text-xl" />
-                </span>
-                <span className="absolute inset-0 rounded-lg bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity z-0" />
-              </div>
-              <p className="text-center text-sm text-gray-600 mt-2">Proposals & Abstimmungen auf einen Blick</p>
-            </div>
-            {/* Buy Tokens Screenshot Card */}
-            <div className="bg-white/70 rounded-xl shadow-lg border border-gray-200 p-4 max-w-md relative group">
-              <div
-                className="block relative cursor-zoom-in"
-                onClick={() => setModalImage('/THESIS_DAO/screenshots/screenshot_buytokens.png')}
-              >
-                <img
-                  src="/THESIS_DAO/screenshots/screenshot_buytokens.png"
-                  alt="Token kaufen"
-                  className="rounded-lg shadow-md hover:scale-105 transition-transform duration-200"
-                />
-                <span className="absolute top-2 right-2 bg-white/80 rounded-full p-2 shadow group-hover:bg-accent group-hover:text-white transition-colors z-10">
-                  <FaExpand className="text-xl" />
-                </span>
-                <span className="absolute inset-0 rounded-lg bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity z-0" />
-              </div>
-              <p className="text-center text-sm text-gray-600 mt-2">Token kaufen & Mitglied werden</p>
-            </div>
-          </div>
-        </motion.section>
+                      <div className="mt-2.5 flex items-center justify-between">
+                        <span className="lp-mono text-[0.6875rem] text-white/35">
+                          {tokenSale.failed
+                            ? "Sale-Stand nicht verfügbar"
+                            : "verkauft"}
+                        </span>
+                        <span className="lp-mono text-[0.6875rem] text-mint">
+                          {tokenSale.failed ? "" : `${percent.toFixed(2)}%`}
+                        </span>
+                      </div>
+                    </>
+                  )}
 
-        {/* Tokenomics Section with Parallax */}
-        <motion.section 
-          id="tokenomics"
-          ref={tokenomicsRef}
-          style={{ y: tokenomicsY, scale: tokenomicsScale, opacity: tokenomicsOpacity }}
-          className="min-h-[70vh] flex flex-col justify-center px-6 text-center relative overflow-hidden scroll-mt-32"
-        >
-          <motion.h2 
-            initial={{ y: 40, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="text-4xl font-bold text-primary mb-16 relative z-10"
-          >
-            Tokenomics
-          </motion.h2>
-          <p className="text-lg text-gray-500 mb-8 max-w-2xl mx-auto">
-            Hier erfährst du, wie die Token im Ökosystem verteilt sind und welche Rolle sie für die Community spielen.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-12 max-w-6xl mx-auto relative z-10">
-            {[
-              { icon: <FaExchangeAlt />, title: "Umlauf", desc: "60% Community-basiert", value: "60%" },
-              { icon: <FaTools />, title: "Treasury", desc: "30% für Entwicklung & Finanzierung", value: "30%" },
-              { icon: <FaUsers />, title: "Team", desc: "10% für Core-Contributors", value: "10%" },
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 60, scale: 0.95 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.9, delay: i * 0.15 + 0.2, ease: "easeOut" }}
-                whileHover={{ 
-                  scale: 1.04,
-                  boxShadow: "0 8px 32px 0 rgba(80, 112, 255, 0.18)",
-                  filter: "brightness(1.05) blur(0.5px)",
-                  transition: { duration: 0.3, ease: "easeOut" }
-                }}
-                className="glass-effect-neobank p-10 rounded-3xl shadow-2xl border border-blue-100 flex flex-col items-center text-center backdrop-blur-md bg-white/60 hover:bg-white/80 transition-all group relative overflow-hidden"
-              >
-                {/* Glow/Gradient Icon */}
-                <div className="w-20 h-20 flex items-center justify-center rounded-full mb-6 bg-gradient-to-br from-primary via-blue-400 to-accent shadow-lg group-hover:shadow-2xl transition-all">
-                  <span className="text-4xl text-white drop-shadow-lg" style={{ filter: 'drop-shadow(0 0 12px #6B46C1)' }}>{item.icon}</span>
+                  <div className="mt-7 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-white/[0.07] bg-white/[0.07]">
+                    {heroPillars.map(({ icon: Icon, label }) => (
+                      <div
+                        key={label}
+                        className="flex items-center gap-2.5 bg-ink-900 px-3.5 py-3.5"
+                      >
+                        <Icon size={17} className="shrink-0 text-mint" />
+                        <span className="text-[0.8125rem] text-white/70">
+                          {label}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                {/* Große Zahl/Titel */}
-                <div className="text-5xl font-extrabold text-primary mb-2 tracking-tight group-hover:text-accent transition-colors">{item.value}</div>
-                <h3 className="text-2xl font-semibold text-[#2c1c5b] mb-2">{item.title}</h3>
-                <p className="text-gray-500 text-lg font-medium">{item.desc}</p>
-              </motion.div>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
+        {/* --- Ticker ------------------------------------------------------- */}
+        <div className="lp-marquee relative overflow-hidden border-y border-white/[0.07] py-4">
+          <div className="lp-marquee-track">
+            {[0, 1].map((dup) => (
+              <div key={dup} className="flex shrink-0 items-center">
+                {tickerPhrases.map((phrase, i) => (
+                  <span key={`${dup}-${i}`} className="flex items-center">
+                    <span className="lp-eyebrow whitespace-nowrap px-7 text-white/40">
+                      {phrase}
+                    </span>
+                    <LogoMark size={13} className="opacity-40" />
+                  </span>
+                ))}
+              </div>
             ))}
           </div>
-        </motion.section>
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-ink-950 to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-ink-950 to-transparent" />
+        </div>
 
-        {/* Roadmap Section with Parallax */}
-        <motion.section 
-          id="roadmap"
-          ref={roadmapRef}
-          style={{ y: roadmapY, scale: roadmapScale, opacity: roadmapOpacity }}
-          className="min-h-[70vh] flex flex-col justify-center px-6 text-center relative scroll-mt-32"
+        {/* ================================================================== */}
+        {/*  About                                                             */}
+        {/* ================================================================== */}
+        <section
+          id="about"
+          className="relative scroll-mt-28 px-5 py-20 sm:px-6 lg:py-28"
         >
-          <motion.h2 
-            initial={{ y: 40, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="text-4xl font-bold text-primary mb-20 relative z-10"
-          >
-            Roadmap
-          </motion.h2>
-          <p className="text-lg text-gray-500 mb-8 max-w-2xl mx-auto">
-            Unsere Roadmap zeigt dir die wichtigsten Meilensteine und die geplante Entwicklung der DAO.
-          </p>
-          <div className="w-full max-w-6xl mx-auto">
-            <div className="flex flex-row justify-between items-end w-full gap-2">
-              {[
-                { q: "Q3 2025", title: "DAO & Website Launch", icon: <FaRocket />, highlight: true },
-                { q: "Q4 2025", title: "Protocol Improvements", icon: <FaUsers />, highlight: false },
-                { q: "Q1 2026", title: "Token Unlock & Distribution", icon: <FaGem />, highlight: false },
-                { q: "Q2 2026", title: "Strategic Partnerships", icon: <FaHandshake />, highlight: false },
-                { q: "Q3 2026", title: "Ecosystem Expansion", icon: <FaChartLine />, highlight: false }
-              ].map((item, i) => (
-                <div key={i} className="flex flex-col items-center w-40 max-w-[20vw] min-w-0">
-                  <motion.div
-                    initial={{ scale: 0.8, boxShadow: '0 0 0px 0px #6B46C1' }}
-                    whileInView={{ scale: item.highlight ? 1.25 : 1, boxShadow: item.highlight ? '0 0 48px 12px #00e6fb, 0 0 0 8px #fff4' : '0 0 24px 6px #6B46C1' }}
-                    whileHover={{ scale: 1.1, boxShadow: '0 0 48px 12px #00e6fb, 0 0 0 8px #fff4' }}
-                    transition={{ duration: 0.4, ease: "easeOut" }}
-                    className={`flex items-center justify-center w-16 h-16 rounded-full bg-white/60 backdrop-blur-md border-4 border-white shadow-lg mb-2 ${item.highlight ? 'bg-gradient-to-br from-accent to-blue-400' : ''}`}
-                  >
-                    <span className={`text-3xl ${item.highlight ? 'text-white animate-spin-slow' : 'text-primary'}`}>{item.icon}</span>
-                  </motion.div>
-                  <span className={`text-xs sm:text-sm font-semibold mb-1 px-2 sm:px-3 py-1 rounded-full bg-white/70 backdrop-blur-md shadow text-primary ${item.highlight ? 'bg-gradient-to-r from-accent to-blue-400 text-transparent bg-clip-text font-extrabold' : ''} transition-colors`}>{item.q}</span>
-                  <span className={`block text-base sm:text-lg md:text-xl font-bold px-0 py-2 ${item.highlight ? 'bg-gradient-to-r from-accent to-blue-400 text-transparent bg-clip-text font-extrabold' : 'text-[#2c1c5b]'} transition-colors break-words text-center w-full`}>{item.title}</span>
-                </div>
+          <div className="mx-auto max-w-content">
+            <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
+              <div className="lg:sticky lg:top-28 lg:self-start">
+                <SectionHeading
+                  index="01"
+                  eyebrow="Über uns"
+                  title="Was ist diese DAO?"
+                />
+              </div>
+
+              <div className="space-y-6">
+                <Reveal>
+                  <p className="text-[1.0625rem] leading-[1.75] text-white/70 sm:text-lg">
+                    Eine DAO (Decentralized Autonomous Organization) ist eine
+                    digitale Organisation, die von ihren Mitgliedern
+                    gemeinschaftlich gesteuert wird. Entscheidungen werden
+                    transparent und demokratisch getroffen – ohne zentrale
+                    Instanz.
+                  </p>
+                </Reveal>
+                <Reveal delay={0.06}>
+                  <p className="text-[1.0625rem] leading-[1.75] text-white/70 sm:text-lg">
+                    Mit dem Kauf von Tokens wirst du Teil der DAO und erhältst
+                    die gleichen Rechte wie ein Aktionär einer traditionellen AG
+                    – oder sogar noch mehr: Du kannst mitbestimmen, Vorschläge
+                    einbringen und direkt an der Entwicklung und Verwaltung der
+                    Organisation teilnehmen.
+                  </p>
+                </Reveal>
+                <Reveal delay={0.12}>
+                  <p className="border-l border-mint/30 pl-5 text-[0.9375rem] leading-[1.75] text-white/45">
+                    Diese DAO wurde als Prototyp im Rahmen einer Bachelor Thesis
+                    an der ZHAW entwickelt, um die praktische Umsetzung und
+                    Anwendbarkeit von DAOs in der modernen
+                    Organisationsgestaltung zu erforschen.
+                  </p>
+                </Reveal>
+              </div>
+            </div>
+
+            {/* Feature grid */}
+            <div className="mt-16 grid gap-px overflow-hidden rounded-2xl border border-white/[0.07] bg-white/[0.07] sm:grid-cols-2 lg:mt-20 lg:grid-cols-4">
+              {features.map(({ icon: Icon, title, desc }, i) => (
+                <Reveal key={title} delay={i * 0.06}>
+                  <SpotlightCard className="h-full !rounded-none !border-0 bg-ink-950 p-7">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-mint">
+                      <Icon size={19} />
+                    </div>
+                    <h3 className="mt-5 text-[0.9375rem] font-semibold tracking-tight text-white">
+                      {title}
+                    </h3>
+                    <p className="mt-2 text-[0.875rem] leading-relaxed text-white/45">
+                      {desc}
+                    </p>
+                  </SpotlightCard>
+                </Reveal>
               ))}
             </div>
           </div>
-        </motion.section>
+        </section>
 
-        {/* FAQ Section with Parallax */}
-        <motion.section 
-          id="faq"
-          ref={faqRef}
-          style={{ y: faqY, scale: faqScale, opacity: faqOpacity }}
-          className="min-h-[70vh] flex flex-col justify-center px-6 text-center relative overflow-hidden scroll-mt-32"
+        {/* ================================================================== */}
+        {/*  Dashboard showcase                                                */}
+        {/* ================================================================== */}
+        <section
+          id="dashboard"
+          className="relative scroll-mt-28 overflow-hidden px-5 py-20 sm:px-6 lg:py-28"
         >
-          <motion.h2 
-            initial={{ y: 40, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="text-4xl font-bold text-primary mb-10 relative"
-          >
-            Häufige Fragen
-          </motion.h2>
-          <div className="w-full max-w-5xl mx-auto text-left space-y-4 relative">
-            {faqs.map((faq, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 60, scale: 0.95 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.9, delay: i * 0.15 + 0.2, ease: "easeOut" }}
-                whileHover={{ 
-                  scale: 1.01,
-                  boxShadow: "0 8px 32px rgba(80,112,255,0.15)",
-                  filter: "brightness(1.04) blur(0.5px)",
-                  transition: { duration: 0.2 }
-                }}
-                className={`w-full border border-blue-100 rounded-xl overflow-hidden bg-white/80 backdrop-blur-md group transition-all shadow-lg hover:shadow-xl ${openFaq === i ? '' : 'min-h-16'}`}
-              >
-                <button
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="w-full text-left px-6 py-4 font-semibold text-gray-800 flex justify-between items-center text-base hover:bg-blue-50/50 transition-colors"
-                >
-                  <span className="flex items-center">
-                    <span className="w-6 h-6 flex items-center justify-center rounded-full bg-primary/10 text-primary mr-3 text-sm font-bold">
-                      {i + 1}
-                    </span>
-                    {faq.q}
-                  </span>
-                  <motion.span
-                    animate={{ rotate: openFaq === i ? 180 : 0 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                    className="text-primary text-xl group-hover:scale-110 transition-transform"
-                  >
-                    {openFaq === i ? <FaMinus /> : <FaPlus />}
-                  </motion.span>
-                </button>
-                <AnimatePresence>
-                  {openFaq === i && (
-                    <motion.div 
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="w-full overflow-hidden bg-gradient-to-br from-blue-50/50 to-white/50"
-                    >
-                      <div className="px-6 py-4 text-gray-700 text-base leading-relaxed w-full">{faq.a}</div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            ))}
-          </div>
-        </motion.section>
+          <div
+            className="lp-aurora lp-drift-slow left-1/2 top-10 h-[420px] w-[620px] -translate-x-1/2 opacity-[0.12]"
+            style={{ background: "#7C5CFA" }}
+          />
 
-        {/* Contact Section with Parallax */}
-        <motion.section 
-          id="contact"
-          ref={contactRef}
-          style={{ y: contactY, scale: contactScale, opacity: contactOpacity }}
-          className="min-h-[70vh] flex flex-col justify-center px-6 text-center relative overflow-hidden scroll-mt-32"
-        >
-          <motion.h2 
-            initial={{ y: 40, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="text-4xl font-bold text-primary mb-6"
-          >
-            Kontakt
-          </motion.h2>
-          <motion.p 
-            initial={{ y: 40, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
-            className="text-xl text-gray-600 mb-12"
-          >
-            Hast du Fragen oder möchtest mehr über unser Projekt erfahren? Wir freuen uns auf deine Nachricht!
-          </motion.p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              whileHover={{ 
-                scale: 1.02,
-                boxShadow: "0 8px 32px rgba(80,112,255,0.15)",
-                filter: "brightness(1.04) blur(0.5px)",
-                transition: { duration: 0.2 }
-              }}
-              className="glass-effect-neobank p-8 rounded-2xl hover:shadow-2xl transition-all bg-white/70 backdrop-blur-md border border-blue-100"
-            >
-              <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary via-blue-400 to-accent flex items-center justify-center shadow-lg">
-                <FaEnvelope className="text-white text-2xl drop-shadow-lg" />
-              </div>
-              <h3 className="text-xl font-semibold text-primary mb-3">Email</h3>
-              <a 
-                href="mailto:murbalio@students.zhaw.ch" 
-                className="text-gray-600 hover:text-accent transition-colors duration-300 inline-block"
-              >
-                murbalio@students.zhaw.ch
-              </a>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              whileHover={{ 
-                scale: 1.02,
-                boxShadow: "0 8px 32px rgba(80,112,255,0.15)",
-                filter: "brightness(1.04) blur(0.5px)",
-                transition: { duration: 0.2 }
-              }}
-              className="glass-effect-neobank p-8 rounded-2xl hover:shadow-2xl transition-all bg-white/70 backdrop-blur-md border border-blue-100"
-            >
-              <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary via-blue-400 to-accent flex items-center justify-center shadow-lg">
-                <FaDiscord className="text-white text-2xl drop-shadow-lg" />
-              </div>
-              <h3 className="text-xl font-semibold text-primary mb-3">Discord</h3>
-              <p className="text-gray-600">Coming Soon</p>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
-              whileHover={{ 
-                scale: 1.02,
-                boxShadow: "0 8px 32px rgba(80,112,255,0.15)",
-                filter: "brightness(1.04) blur(0.5px)",
-                transition: { duration: 0.2 }
-              }}
-              className="glass-effect-neobank p-8 rounded-2xl hover:shadow-2xl transition-all bg-white/70 backdrop-blur-md border border-blue-100"
-            >
-              <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary via-blue-400 to-accent flex items-center justify-center shadow-lg">
-                <FaTwitter className="text-white text-2xl drop-shadow-lg" />
-              </div>
-              <h3 className="text-xl font-semibold text-primary mb-3">Twitter</h3>
-              <p className="text-gray-600">Coming Soon</p>
-            </motion.div>
-          </div>
-        </motion.section>
-
-        {/* CTA Section */}
-        <motion.section 
-          className="min-h-[70vh] flex flex-col justify-center px-6 text-center relative overflow-hidden"
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
-            className="max-w-3xl mx-auto relative"
-          >
-            <motion.h2 
-              initial={{ y: 40, opacity: 0 }}
-              whileInView={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.7, delay: 0.4, ease: "easeOut" }}
-              className="text-4xl font-bold text-primary mb-6"
-            >
-              Bereit mitzumachen?
-            </motion.h2>
-            <motion.p 
-              initial={{ y: 40, opacity: 0 }}
-              whileInView={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.7, delay: 0.5, ease: "easeOut" }}
-              className="text-xl text-gray-600 mb-8"
-            >
-              Werde Teil unserer Community. Diskutiere, vote, entwickle, verwalte.
-            </motion.p>
-            <motion.button
-              initial={{ y: 40, opacity: 0 }}
-              whileInView={{ y: 0, opacity: 1 }}
-              whileHover={{ 
-                scale: 1.05,
-                boxShadow: "0 0 20px rgba(107, 70, 193, 0.4)",
-                transition: { duration: 0.3, ease: "easeOut" }
-              }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ delay: 0.6, duration: 0.8, ease: "easeOut" }}
-              onClick={connectWallet}
-              className="modern-button bg-blue-600 text-white px-10 py-4 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105"
-            >
-              Jetzt Wallet verbinden
-            </motion.button>
-          </motion.div>
-        </motion.section>
-
-        {/* Scroll to Top */}
-        <AnimatePresence>
-          {showTop && (
-            <motion.button
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.5 }}
-              whileHover={{ 
-                scale: 1.2,
-                boxShadow: "0 0 20px rgba(107, 70, 193, 0.3)",
-                transition: { duration: 0.2 }
-              }}
-              whileTap={{ scale: 0.9 }}
-              transition={{ duration: 0.3 }}
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="fixed bottom-8 right-8 z-50 bg-primary text-white px-6 py-3 rounded-full shadow-lg hover:brightness-110 text-lg"
-            >
-              ↑ Top
-            </motion.button>
-          )}
-        </AnimatePresence>
-
-        {/* Footer */}
-        <footer className="py-12 px-6 bg-white text-center text-sm text-gray-500 border-t border-gray-200">
-          <p className="text-lg">
-            © {new Date().getFullYear()} Thesis DAO – Built on{" "}
-            <span className="text-primary font-medium">NEAR Protocol</span>
-          </p>
-          <p className="text-sm text-gray-400 mt-2">
-            Projekt von Lionel Murbach
-          </p>
-        </footer>
-        </div>
-      </div>
-
-      {modalImage && (
-        <div
-          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
-          onClick={() => setModalImage(null)}
-        >
-          <div className="relative" onClick={e => e.stopPropagation()}>
-            <img
-              src={modalImage}
-              alt="Screenshot groß"
-              className="max-h-[80vh] max-w-[90vw] rounded-xl shadow-2xl"
+          <div className="relative mx-auto max-w-content">
+            <SectionHeading
+              index="02"
+              eyebrow="Produkt"
+              title="Das DAO Dashboard"
+              lead="Das Dashboard bietet dir einen schnellen Überblick über alle wichtigen DAO-Funktionen und deine persönlichen Aktivitäten."
+              align="center"
             />
-            <button
-              className="absolute top-2 right-2 bg-white/80 rounded-full p-2 shadow hover:bg-accent hover:text-white transition-colors"
-              onClick={() => setModalImage(null)}
-            >
-              <FaTimes className="text-xl" />
-            </button>
+
+            {/* Featured frame */}
+            <Reveal delay={0.1} y={26}>
+              <div className="lp-frame mx-auto mt-14 max-w-4xl">
+                <div className="lp-frame-bar">
+                  <span className="lp-dot" />
+                  <span className="lp-dot" />
+                  <span className="lp-dot" />
+                  <span className="lp-mono ml-3 truncate text-[0.625rem] text-white/25">
+                    thesis-dao.near
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setModalImage(asset(shots[activeShot].src))}
+                  className="group relative block w-full cursor-zoom-in"
+                  aria-label={`${shots[activeShot].alt} vergrössern`}
+                >
+                  <AnimatePresence mode="wait">
+                    <motion.img
+                      key={activeShot}
+                      src={asset(shots[activeShot].src)}
+                      alt={shots[activeShot].alt}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.35, ease: EASE }}
+                      className="block w-full"
+                    />
+                  </AnimatePresence>
+                  <span className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-ink-950/70 text-white/70 opacity-0 backdrop-blur transition-opacity duration-300 group-hover:opacity-100">
+                    <IconExpand size={16} />
+                  </span>
+                </button>
+              </div>
+            </Reveal>
+
+            {/* Caption selectors */}
+            <div className="mx-auto mt-8 grid max-w-4xl gap-px overflow-hidden rounded-xl border border-white/[0.07] bg-white/[0.07] sm:grid-cols-3">
+              {shots.map((shot, i) => (
+                <button
+                  key={shot.src}
+                  type="button"
+                  onClick={() => setActiveShot(i)}
+                  aria-pressed={activeShot === i}
+                  className={`flex items-start gap-3 px-4 py-4 text-left transition-colors duration-300 ${
+                    activeShot === i
+                      ? "bg-white/[0.06]"
+                      : "bg-ink-950 hover:bg-white/[0.03]"
+                  }`}
+                >
+                  <span
+                    className={`lp-mono mt-px text-[0.625rem] ${
+                      activeShot === i ? "text-mint" : "text-white/25"
+                    }`}
+                  >
+                    0{i + 1}
+                  </span>
+                  <span
+                    className={`text-[0.8125rem] leading-snug ${
+                      activeShot === i ? "text-white" : "text-white/45"
+                    }`}
+                  >
+                    {shot.caption}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        </section>
+
+        {/* ================================================================== */}
+        {/*  Tokenomics                                                        */}
+        {/* ================================================================== */}
+        <section
+          id="tokenomics"
+          className="relative scroll-mt-28 px-5 py-20 sm:px-6 lg:py-28"
+        >
+          <div className="mx-auto max-w-content">
+            <SectionHeading
+              index="03"
+              eyebrow="Verteilung"
+              title="Tokenomics"
+              lead="Hier erfährst du, wie die Token im Ökosystem verteilt sind und welche Rolle sie für die Community spielen."
+            />
+
+            {/* Allocation bar */}
+            <Reveal delay={0.1}>
+              <div className="mt-14 flex h-3 w-full gap-1 overflow-hidden">
+                {allocations.map((a) => (
+                  <motion.div
+                    key={a.title}
+                    initial={{ width: 0 }}
+                    whileInView={{ width: `${a.value}%` }}
+                    viewport={{ once: true, margin: "-80px" }}
+                    transition={{ duration: 1.1, delay: 0.15, ease: EASE }}
+                    className={`h-full rounded-full ${
+                      a.tone === "mint"
+                        ? "bg-gradient-to-r from-mint-deep to-mint"
+                        : a.tone === "iris"
+                        ? "bg-gradient-to-r from-iris-deep to-iris"
+                        : "bg-white/20"
+                    }`}
+                  />
+                ))}
+              </div>
+            </Reveal>
+
+            {/* Legend rows */}
+            <div className="mt-12 divide-y divide-white/[0.07] border-y border-white/[0.07]">
+              {allocations.map(({ icon: Icon, title, desc, value, tone }, i) => (
+                <Reveal key={title} delay={i * 0.07}>
+                  <div className="group flex flex-col gap-4 py-7 sm:flex-row sm:items-center sm:gap-8">
+                    <div className="flex items-center gap-4 sm:w-56">
+                      <span
+                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 ${
+                          tone === "mint"
+                            ? "bg-mint/10 text-mint"
+                            : tone === "iris"
+                            ? "bg-iris/10 text-iris"
+                            : "bg-white/[0.06] text-white/60"
+                        }`}
+                      >
+                        <Icon size={19} />
+                      </span>
+                      <span className="font-display text-xl font-medium tracking-tight text-white">
+                        {title}
+                      </span>
+                    </div>
+
+                    <p className="flex-1 text-[0.9375rem] text-white/45">
+                      {desc}
+                    </p>
+
+                    <span
+                      className={`lp-mono text-[2rem] leading-none tracking-tight sm:text-[2.5rem] ${
+                        tone === "mint"
+                          ? "text-mint"
+                          : tone === "iris"
+                          ? "text-iris"
+                          : "text-white/70"
+                      }`}
+                    >
+                      {value}%
+                    </span>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ================================================================== */}
+        {/*  Roadmap                                                           */}
+        {/* ================================================================== */}
+        <section
+          id="roadmap"
+          className="relative scroll-mt-28 overflow-hidden px-5 py-20 sm:px-6 lg:py-28"
+        >
+          <div className="relative mx-auto max-w-content">
+            <SectionHeading
+              index="04"
+              eyebrow="Meilensteine"
+              title="Roadmap"
+              lead="Unsere Roadmap zeigt dir die wichtigsten Meilensteine und die geplante Entwicklung der DAO."
+            />
+
+            {/* Desktop rail */}
+            <div className="relative mt-20 hidden lg:block">
+              <div className="absolute left-0 right-0 top-7 h-px bg-white/[0.09]" />
+              <motion.div
+                className="absolute left-0 top-7 h-px bg-gradient-to-r from-mint to-mint/0"
+                initial={{ width: 0 }}
+                whileInView={{ width: "22%" }}
+                viewport={{ once: true }}
+                transition={{ duration: 1.2, ease: EASE }}
+              />
+              <div className="relative grid grid-cols-5 gap-6">
+                {milestones.map(({ q, title, icon: Icon, done }, i) => (
+                  <Reveal key={q} delay={i * 0.08}>
+                    <div className="group flex flex-col items-start">
+                      <span
+                        className={`flex h-14 w-14 items-center justify-center rounded-2xl border transition-all duration-500 ${
+                          done
+                            ? "border-mint/40 bg-mint/10 text-mint shadow-[0_0_36px_-6px_rgba(94,234,212,0.45)]"
+                            : "border-white/10 bg-ink-900 text-white/45 group-hover:border-white/25 group-hover:text-white/75"
+                        }`}
+                      >
+                        <Icon size={21} />
+                      </span>
+                      <span
+                        className={`lp-mono mt-6 text-[0.6875rem] tracking-wider ${
+                          done ? "text-mint" : "text-white/35"
+                        }`}
+                      >
+                        {q}
+                      </span>
+                      <span className="mt-2 text-[0.9375rem] font-medium leading-snug tracking-tight text-white">
+                        {title}
+                      </span>
+                    </div>
+                  </Reveal>
+                ))}
+              </div>
+            </div>
+
+            {/* Mobile / tablet timeline */}
+            <div className="relative mt-14 lg:hidden">
+              <div className="absolute bottom-6 left-[27px] top-6 w-px bg-white/[0.09]" />
+              <div className="space-y-8">
+                {milestones.map(({ q, title, icon: Icon, done }, i) => (
+                  <Reveal key={q} delay={i * 0.06}>
+                    <div className="flex items-start gap-5">
+                      <span
+                        className={`relative z-[1] flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border ${
+                          done
+                            ? "border-mint/40 bg-mint/10 text-mint shadow-[0_0_36px_-6px_rgba(94,234,212,0.45)]"
+                            : "border-white/10 bg-ink-900 text-white/45"
+                        }`}
+                      >
+                        <Icon size={21} />
+                      </span>
+                      <div className="pt-1.5">
+                        <span
+                          className={`lp-mono text-[0.6875rem] tracking-wider ${
+                            done ? "text-mint" : "text-white/35"
+                          }`}
+                        >
+                          {q}
+                        </span>
+                        <p className="mt-1.5 text-[1.0625rem] font-medium leading-snug tracking-tight text-white">
+                          {title}
+                        </p>
+                      </div>
+                    </div>
+                  </Reveal>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ================================================================== */}
+        {/*  FAQ                                                               */}
+        {/* ================================================================== */}
+        <section
+          id="faq"
+          className="relative scroll-mt-28 px-5 py-20 sm:px-6 lg:py-28"
+        >
+          <div className="mx-auto max-w-content">
+            <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
+              <div className="lg:sticky lg:top-28 lg:self-start">
+                <SectionHeading index="05" eyebrow="FAQ" title="Häufige Fragen" />
+              </div>
+
+              <div className="border-t border-white/[0.07]">
+                {faqs.map((faq, i) => {
+                  const open = openFaq === i;
+                  return (
+                    <Reveal key={faq.q} delay={Math.min(i, 3) * 0.05}>
+                      <div className="border-b border-white/[0.07]">
+                        <button
+                          onClick={() => setOpenFaq(open ? null : i)}
+                          aria-expanded={open}
+                          className="flex w-full items-start gap-4 py-6 text-left"
+                        >
+                          <span
+                            className={`lp-mono mt-1 text-[0.6875rem] transition-colors duration-300 ${
+                              open ? "text-mint" : "text-white/25"
+                            }`}
+                          >
+                            0{i + 1}
+                          </span>
+                          <span
+                            className={`flex-1 text-[1.0625rem] font-medium leading-snug tracking-tight transition-colors duration-300 ${
+                              open ? "text-white" : "text-white/80"
+                            }`}
+                          >
+                            {faq.q}
+                          </span>
+                          <motion.span
+                            animate={{ rotate: open ? 135 : 0 }}
+                            transition={{ duration: 0.35, ease: EASE }}
+                            className={`mt-0.5 shrink-0 transition-colors duration-300 ${
+                              open ? "text-mint" : "text-white/35"
+                            }`}
+                          >
+                            <IconPlus size={18} />
+                          </motion.span>
+                        </button>
+
+                        <AnimatePresence initial={false}>
+                          {open && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.38, ease: EASE }}
+                              className="overflow-hidden"
+                            >
+                              <p className="pb-7 pl-[2.375rem] pr-8 text-[0.9375rem] leading-[1.75] text-white/50">
+                                {faq.a}
+                              </p>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    </Reveal>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ================================================================== */}
+        {/*  Contact                                                           */}
+        {/* ================================================================== */}
+        <section
+          id="contact"
+          className="relative scroll-mt-28 px-5 py-20 sm:px-6 lg:py-28"
+        >
+          <div className="mx-auto max-w-content">
+            <SectionHeading
+              index="06"
+              eyebrow="Kontakt"
+              title="Kontakt"
+              lead="Hast du Fragen oder möchtest mehr über unser Projekt erfahren? Wir freuen uns auf deine Nachricht!"
+              align="center"
+            />
+
+            <div className="mt-14 grid gap-4 sm:grid-cols-3">
+              <Reveal>
+                <SpotlightCard className="h-full p-7">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-mint">
+                    <IconMail size={19} />
+                  </div>
+                  <h3 className="mt-5 text-[0.9375rem] font-semibold tracking-tight text-white">
+                    Email
+                  </h3>
+                  <a
+                    href="mailto:murbalio@students.zhaw.ch"
+                    className="lp-mono mt-2 inline-block break-all text-[0.8125rem] text-white/50 transition-colors duration-300 hover:text-mint"
+                  >
+                    murbalio@students.zhaw.ch
+                  </a>
+                </SpotlightCard>
+              </Reveal>
+
+              {[
+                { icon: IconDiscord, label: "Discord" },
+                { icon: IconX, label: "Twitter" },
+              ].map(({ icon: Icon, label }, i) => (
+                <Reveal key={label} delay={0.06 * (i + 1)}>
+                  <div className="lp-card h-full p-7 opacity-60">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-white/50">
+                      <Icon size={18} />
+                    </div>
+                    <h3 className="mt-5 text-[0.9375rem] font-semibold tracking-tight text-white/80">
+                      {label}
+                    </h3>
+                    <span className="lp-mono mt-2 inline-block rounded-md border border-white/10 px-2 py-0.5 text-[0.625rem] uppercase tracking-wider text-white/35">
+                      Coming Soon
+                    </span>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ================================================================== */}
+        {/*  Final CTA                                                         */}
+        {/* ================================================================== */}
+        <section className="relative overflow-hidden px-5 py-20 sm:px-6 lg:py-28">
+          <div className="relative mx-auto max-w-content">
+            <div className="lp-panel relative overflow-hidden px-6 py-20 text-center sm:px-10 lg:py-28">
+              <div className="lp-grid" />
+              <div
+                className="lp-aurora lp-drift left-1/2 top-full h-[420px] w-[620px] -translate-x-1/2 -translate-y-1/2 opacity-30"
+                style={{ background: "#2DD4BF" }}
+              />
+
+              <div className="relative">
+                <Reveal>
+                  <h2 className="lp-display mx-auto max-w-2xl text-[2.5rem] sm:text-[3.5rem] lg:text-[4rem] text-white">
+                    Bereit mitzumachen?
+                  </h2>
+                </Reveal>
+                <Reveal delay={0.08}>
+                  <p className="mx-auto mt-6 max-w-xl text-[1.0625rem] leading-relaxed text-white/50 sm:text-lg">
+                    Werde Teil unserer Community. Diskutiere, vote, entwickle,
+                    verwalte.
+                  </p>
+                </Reveal>
+                <Reveal delay={0.14}>
+                  <button
+                    onClick={connectWallet}
+                    className="lp-btn lp-btn--primary mt-10"
+                  >
+                    <IconWallet size={17} />
+                    Jetzt Wallet verbinden
+                  </button>
+                </Reveal>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ================================================================== */}
+        {/*  Footer                                                            */}
+        {/* ================================================================== */}
+        <footer className="border-t border-white/[0.07] px-5 py-12 sm:px-6">
+          <div className="mx-auto flex max-w-content flex-col items-center justify-between gap-6 sm:flex-row">
+            <div className="flex items-center gap-2.5">
+              <LogoMark size={22} />
+              <span className="font-display text-[0.9375rem] font-semibold text-white/80">
+                Thesis DAO
+              </span>
+            </div>
+
+            <p className="text-center text-[0.8125rem] text-white/35 sm:text-left">
+              © {new Date().getFullYear()} Thesis DAO – Built on{" "}
+              <span className="text-white/60">NEAR Protocol</span>
+            </p>
+
+            <p className="lp-mono text-[0.6875rem] tracking-wider text-white/25">
+              Projekt von Lionel Murbach
+            </p>
+          </div>
+        </footer>
+      </main>
+
+      {/* Scroll to top */}
+      <AnimatePresence>
+        {showTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.85 }}
+            transition={{ duration: 0.25, ease: EASE }}
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            aria-label="Nach oben scrollen"
+            className="fixed bottom-6 right-5 z-[65] flex h-11 w-11 items-center justify-center rounded-full border border-white/12 bg-ink-900/85 text-white/70 backdrop-blur-xl transition-colors duration-300 hover:border-mint/40 hover:text-mint sm:bottom-8 sm:right-8"
+          >
+            <IconArrowUp size={17} />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Lightbox */}
+      <AnimatePresence>
+        {modalImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-[80] flex items-center justify-center bg-ink-950/92 p-4 backdrop-blur-md sm:p-8"
+            onClick={() => setModalImage(null)}
+            role="dialog"
+            aria-modal="true"
+          >
+            <motion.div
+              initial={{ scale: 0.96, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.96, opacity: 0 }}
+              transition={{ duration: 0.3, ease: EASE }}
+              className="lp-frame relative max-h-full w-full max-w-5xl overflow-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img src={modalImage} alt="Screenshot in voller Grösse" className="block w-full" />
+            </motion.div>
+            <button
+              onClick={() => setModalImage(null)}
+              aria-label="Schliessen"
+              className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-xl border border-white/12 bg-white/[0.05] text-white/70 backdrop-blur transition-colors hover:border-white/30 hover:text-white"
+            >
+              <IconClose size={18} />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

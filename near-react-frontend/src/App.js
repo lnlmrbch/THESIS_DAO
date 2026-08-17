@@ -204,7 +204,7 @@ function App() {
   }, []);
 
   return (
-    <div className={`min-h-screen text-gray-100 font-sans w-full overflow-x-hidden ${isLanding ? "bg-white" : "bg-darkbg flex"}`}>
+    <div className={`min-h-screen text-gray-100 font-sans w-full overflow-x-hidden ${isLanding ? "bg-ink-950" : "bg-darkbg flex"}`}>
       {!isLanding && (
         <Sidebar
           accountId={accountId}

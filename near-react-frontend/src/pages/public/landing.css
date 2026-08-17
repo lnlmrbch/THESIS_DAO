@@ -1,0 +1,409 @@
+/* ==========================================================================
+   Thesis DAO — Landing Page design system
+   Scoped under .lp so nothing here can leak into the dashboard shell.
+   ========================================================================== */
+
+.lp {
+  --ink-950: #08090a;
+  --ink-900: #0b0d0e;
+  --ink-850: #101314;
+  --ink-800: #15191b;
+  --ink-700: #1d2224;
+
+  --txt-1: #f4f6f6;
+  --txt-2: #a2abaf;
+  --txt-3: #6d777b;
+
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.14);
+
+  --mint: #5eead4;
+  --mint-deep: #2dd4bf;
+  --iris: #a78bfa;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  position: relative;
+  background: var(--ink-950);
+  color: var(--txt-1);
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-feature-settings: "ss01", "cv01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+.lp ::selection {
+  background: rgba(94, 234, 212, 0.28);
+  color: #fff;
+}
+
+/* --- Typography ---------------------------------------------------------- */
+
+.lp-display {
+  font-family: "Inter Tight", "Inter", system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 0.94;
+}
+
+.lp-mono {
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Eyebrow / section index label */
+.lp-eyebrow {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--txt-3);
+}
+
+/* Gradient sheen used on the wordmark + display headings */
+.lp-sheen {
+  background: linear-gradient(
+    100deg,
+    #ffffff 0%,
+    #ffffff 38%,
+    var(--mint) 58%,
+    var(--iris) 78%,
+    #ffffff 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: lp-sheen-drift 9s var(--ease) infinite alternate;
+}
+
+@keyframes lp-sheen-drift {
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: 100% 50%;
+  }
+}
+
+/* --- Surfaces ------------------------------------------------------------ */
+
+.lp-panel {
+  position: relative;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.045) 0%,
+    rgba(255, 255, 255, 0.015) 100%
+  );
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* Top hairline highlight — the detail that sells the glass */
+.lp-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.22) 30%,
+    rgba(255, 255, 255, 0.22) 70%,
+    transparent
+  );
+  pointer-events: none;
+}
+
+/* Interactive card: pointer-tracked spotlight on the border */
+.lp-card {
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.012) 100%
+  );
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  transition: border-color 0.45s var(--ease), transform 0.45s var(--ease),
+    background-color 0.45s var(--ease);
+}
+
+.lp-card::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(
+    240px circle at var(--mx, 50%) var(--my, 0%),
+    rgba(94, 234, 212, 0.55),
+    transparent 65%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+  pointer-events: none;
+}
+
+.lp-card:hover {
+  border-color: var(--line-strong);
+  transform: translateY(-3px);
+}
+
+.lp-card:hover::after {
+  opacity: 1;
+}
+
+/* --- Buttons ------------------------------------------------------------- */
+
+.lp-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 550;
+  letter-spacing: -0.01em;
+  padding: 0.875rem 1.375rem;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform 0.3s var(--ease), background-color 0.3s var(--ease),
+    border-color 0.3s var(--ease), box-shadow 0.3s var(--ease), color 0.3s var(--ease);
+}
+
+.lp-btn:active {
+  transform: scale(0.975);
+}
+
+/* Primary — mint on ink, the single loudest element on the page */
+.lp-btn--primary {
+  background: var(--mint);
+  color: #04201c;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35) inset,
+    0 10px 30px -12px rgba(94, 234, 212, 0.65);
+}
+
+.lp-btn--primary:hover {
+  background: var(--mint-deep);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35) inset,
+    0 16px 44px -14px rgba(94, 234, 212, 0.8);
+  transform: translateY(-1px);
+}
+
+/* Secondary — hairline ghost, deliberately quieter */
+.lp-btn--ghost {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--line-strong);
+  color: var(--txt-1);
+}
+
+.lp-btn--ghost:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.26);
+  transform: translateY(-1px);
+}
+
+.lp-btn--sm {
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  border-radius: 10px;
+}
+
+/* --- Focus ring ---------------------------------------------------------- */
+
+.lp :focus-visible {
+  outline: 2px solid var(--mint);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+/* --- Ambient background -------------------------------------------------- */
+
+.lp-grain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.032;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Faint engineering grid — reads as "infrastructure", not decoration */
+.lp-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse 80% 55% at 50% 0%, #000 5%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 55% at 50% 0%, #000 5%, transparent 75%);
+  opacity: 0.55;
+}
+
+.lp-aurora {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  pointer-events: none;
+  will-change: transform;
+}
+
+@keyframes lp-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(3%, -4%, 0) scale(1.08);
+  }
+}
+
+.lp-drift {
+  animation: lp-drift 18s ease-in-out infinite;
+}
+
+.lp-drift-slow {
+  animation: lp-drift 26s ease-in-out infinite reverse;
+}
+
+/* --- Hero pointer spotlight ---------------------------------------------- */
+
+.lp-spotlight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    520px circle at var(--sx, 50%) var(--sy, 40%),
+    rgba(94, 234, 212, 0.09),
+    transparent 62%
+  );
+  transition: opacity 0.6s var(--ease);
+}
+
+/* --- Ticker -------------------------------------------------------------- */
+
+@keyframes lp-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.lp-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: lp-marquee 38s linear infinite;
+}
+
+.lp-marquee:hover .lp-marquee-track {
+  animation-play-state: paused;
+}
+
+/* --- Nav link underline -------------------------------------------------- */
+
+.lp-navlink {
+  position: relative;
+  color: var(--txt-2);
+  transition: color 0.28s var(--ease);
+}
+
+.lp-navlink::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -5px;
+  height: 1px;
+  background: var(--mint);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.34s var(--ease);
+}
+
+.lp-navlink:hover,
+.lp-navlink.is-active {
+  color: var(--txt-1);
+}
+
+.lp-navlink:hover::after,
+.lp-navlink.is-active::after {
+  transform: scaleX(1);
+}
+
+/* --- Screenshot frame ---------------------------------------------------- */
+
+.lp-frame {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  background: var(--ink-850);
+  box-shadow: 0 40px 90px -40px rgba(0, 0, 0, 0.95),
+    0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+.lp-frame-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.lp-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* --- Scrollbar (landing only) -------------------------------------------- */
+
+.lp ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.lp ::-webkit-scrollbar-track {
+  background: var(--ink-950);
+}
+
+.lp ::-webkit-scrollbar-thumb {
+  background: var(--ink-700);
+  border-radius: 9999px;
+  border: 3px solid var(--ink-950);
+}
+
+.lp ::-webkit-scrollbar-thumb:hover {
+  background: #333b3e;
+}
+
+/* --- Reduced motion ------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  .lp *,
+  .lp *::before,
+  .lp *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
